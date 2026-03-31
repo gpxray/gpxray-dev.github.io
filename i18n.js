@@ -80,6 +80,8 @@ const TRANSLATIONS = {
         'race.itraApply': 'Apply',
         'race.itraApplied': 'Applied',
         'race.itraHint': 'ITRA score gives more precise pace estimation',
+        'race.itraExplain': 'ITRA (International Trail Running Association) assigns performance scores based on your race results.',
+        'race.itraFindScore': 'Find your ITRA score',
         
         // Downhill Load tooltip
         'ddl.title': 'Descent Load (DDL/km)',
@@ -449,6 +451,8 @@ const TRANSLATIONS = {
         'race.itraApply': 'Anwenden',
         'race.itraApplied': 'Angewendet',
         'race.itraHint': 'ITRA-Score ermöglicht präzisere Tempoberechnung',
+        'race.itraExplain': 'ITRA (International Trail Running Association) vergibt Leistungswerte basierend auf deinen Rennergebnissen.',
+        'race.itraFindScore': 'Finde deinen ITRA-Score',
         
         // Downhill Load tooltip
         'ddl.title': 'Abstiegsbelastung (DDL/km)',

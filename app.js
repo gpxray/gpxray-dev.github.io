@@ -360,6 +360,22 @@ function setupItraScore() {
     const itraApplyBtn = document.getElementById('itraApplyBtn');
     const itraClearBtn = document.getElementById('itraClearBtn');
     const raceLevelButtons = document.getElementById('raceLevelButtons');
+    const itraInfoIcon = document.getElementById('itraInfoIcon');
+    const itraInfoTooltip = document.getElementById('itraInfoTooltip');
+    
+    // ITRA info tooltip toggle
+    if (itraInfoIcon && itraInfoTooltip) {
+        itraInfoIcon.addEventListener('click', (e) => {
+            e.stopPropagation();
+            itraInfoTooltip.classList.toggle('visible');
+        });
+        
+        document.addEventListener('click', (e) => {
+            if (!itraInfoTooltip.contains(e.target) && e.target !== itraInfoIcon) {
+                itraInfoTooltip.classList.remove('visible');
+            }
+        });
+    }
     
     if (!itraInput || !itraApplyBtn) return;
     

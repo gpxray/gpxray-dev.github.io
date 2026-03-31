@@ -4651,16 +4651,91 @@ h2 {
     border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.itra-label {
-    display: block;
-    font-size: 0.9rem;
-    color: rgba(255, 255, 255, 0.7);
+.itra-label-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
     margin-bottom: 10px;
+    position: relative;
 }
 
-.itra-optional {
-    color: rgba(255, 255, 255, 0.4);
-    font-size: 0.85em;
+.itra-label {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.itra-info-icon {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.15);
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.75rem;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.itra-info-icon:hover {
+    background: rgba(0, 212, 255, 0.3);
+    color: #00d4ff;
+}
+
+.itra-info-tooltip {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    margin-top: 8px;
+    padding: 12px 16px;
+    background: #1a2a40;
+    border: 1px solid rgba(0, 212, 255, 0.3);
+    border-radius: 8px;
+    width: 280px;
+    z-index: 100;
+    text-align: left;
+}
+
+.itra-info-tooltip::before {
+    content: '';
+    position: absolute;
+    top: -6px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-bottom: 6px solid rgba(0, 212, 255, 0.3);
+}
+
+.itra-info-tooltip p {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.8);
+    margin: 0 0 10px 0;
+    line-height: 1.4;
+}
+
+.itra-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.85rem;
+    color: #00d4ff;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.itra-link:hover {
+    color: #4de8ff;
+    text-decoration: underline;
+}
+
+.itra-info-tooltip.visible {
+    display: block;
 }
 
 .itra-input-row {
