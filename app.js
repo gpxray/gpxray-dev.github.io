@@ -3894,8 +3894,18 @@ function generateSplitsTable(flatPace, uphillPace, downhillPace) {
                     }
                 }
                 
-                // Surface multipliers are already applied by API to the paces
-                const surfaceMultiplier = 1.0;
+                // Apply surface factors matching the API calculation
+                let surfaceMultiplier = 1.0;
+                if (applySurface && segment.surfaceType) {
+                    const surfaceFactors = {
+                        'road': { flat: 1.0, uphill: 1.0, downhill: 1.0 },
+                        'trail': { flat: 1.05, uphill: 1.08, downhill: 1.10 },
+                        'technical': { flat: 1.12, uphill: 1.15, downhill: 1.20 },
+                        'rocky': { flat: 1.15, uphill: 1.18, downhill: 1.25 },
+                        'sand': { flat: 1.25, uphill: 1.30, downhill: 1.15 }
+                    };
+                    surfaceMultiplier = surfaceFactors[segment.surfaceType]?.[segment.terrainType] || 1.0;
+                }
                 
                 // Calculate time for this overlap
                 let basePace;
@@ -4095,8 +4105,19 @@ function renderLegSummary(flatPace, uphillPace, downhillPace, applySurface, star
                 const overlapEnd = Math.min(segment.endDistance, leg.toKm);
                 const overlapDistance = overlapEnd - overlapStart;
                 
-                // Surface multipliers are already applied by API to the paces
-                const surfaceMultiplier = 1.0;
+                // Apply surface factors matching the API calculation
+                let surfaceMultiplier = 1.0;
+                if (applySurface && segment.surfaceType) {
+                    const surfaceFactors = {
+                        'road': { flat: 1.0, uphill: 1.0, downhill: 1.0 },
+                        'trail': { flat: 1.05, uphill: 1.08, downhill: 1.10 },
+                        'technical': { flat: 1.12, uphill: 1.15, downhill: 1.20 },
+                        'rocky': { flat: 1.15, uphill: 1.18, downhill: 1.25 },
+                        'sand': { flat: 1.25, uphill: 1.30, downhill: 1.15 }
+                    };
+                    const terrain = segment.terrainType || 'flat';
+                    surfaceMultiplier = surfaceFactors[segment.surfaceType]?.[terrain] || 1.0;
+                }
                 
                 let basePace;
                 switch (segment.terrainType) {
