@@ -66,6 +66,54 @@ const RUNNER_LEVELS = {
     elite: { name: 'Elite', flatPace: 4.5, uphillRatio: 1.25, downhillRatio: 0.75 }
 };
 
+// ITRA score state
+let activeItraScore = null;
+
+// Convert ITRA score to pace preset using continuous interpolation
+function itraScoreToPaces(score) {
+    // ITRA ranges mapped to runner levels:
+    // < 300: Very beginner (slower than beginner preset)
+    // 300-450: Beginner to Intermediate
+    // 450-600: Intermediate to Advanced
+    // 600-750: Advanced to Elite
+    // > 750: Elite to Pro
+    
+    let flatPace, uphillRatio, downhillRatio;
+    
+    if (score < 300) {
+        // Very beginner - slower than preset
+        flatPace = 8.5 - (score / 300) * 1.0; // 8.5 → 7.5
+        uphillRatio = 1.6 - (score / 300) * 0.1;
+        downhillRatio = 0.95 - (score / 300) * 0.05;
+    } else if (score < 450) {
+        // Beginner to Intermediate
+        const t = (score - 300) / 150;
+        flatPace = 7.5 - t * 1.0; // 7.5 → 6.5
+        uphillRatio = 1.5 - t * 0.1;
+        downhillRatio = 0.9 - t * 0.05;
+    } else if (score < 600) {
+        // Intermediate to Advanced
+        const t = (score - 450) / 150;
+        flatPace = 6.5 - t * 1.0; // 6.5 → 5.5
+        uphillRatio = 1.4 - t * 0.1;
+        downhillRatio = 0.85 - t * 0.05;
+    } else if (score < 750) {
+        // Advanced to Elite
+        const t = (score - 600) / 150;
+        flatPace = 5.5 - t * 1.0; // 5.5 → 4.5
+        uphillRatio = 1.3 - t * 0.05;
+        downhillRatio = 0.8 - t * 0.05;
+    } else {
+        // Elite to Pro (cap at 3.5 min/km flat)
+        const t = Math.min((score - 750) / 250, 1);
+        flatPace = 4.5 - t * 1.0; // 4.5 → 3.5
+        uphillRatio = 1.25 - t * 0.05;
+        downhillRatio = 0.75 - t * 0.05;
+    }
+    
+    return { flatPace, uphillRatio, downhillRatio };
+}
+
 // Surface type display properties (calculations are server-side)
 const SURFACE_TYPES = {
     road: { name: 'Road', color: '#4CAF50' },
@@ -152,6 +200,7 @@ document.addEventListener('DOMContentLoaded', () => {
     setupEarlyAccess();
     updateEarlyAccessUI();
     setupRunnerLevel();
+    setupItraScore();
     setupPaceInfoTooltip();
     setupFeaturePillTooltips();
     
@@ -297,9 +346,89 @@ function setupRunnerLevel() {
         raceLevelButtons.addEventListener('click', (e) => {
             const btn = e.target.closest('.race-level-btn');
             if (btn) {
+                // Clear ITRA override when manually selecting level
+                clearItraOverride();
                 handleLevelChange(btn.dataset.level);
             }
         });
+    }
+}
+
+// ITRA Score Optional Input
+function setupItraScore() {
+    const itraInput = document.getElementById('itraScoreInput');
+    const itraApplyBtn = document.getElementById('itraApplyBtn');
+    const itraClearBtn = document.getElementById('itraClearBtn');
+    const raceLevelButtons = document.getElementById('raceLevelButtons');
+    
+    if (!itraInput || !itraApplyBtn) return;
+    
+    const applyItraScore = () => {
+        const score = parseInt(itraInput.value);
+        if (isNaN(score) || score < 200 || score > 1000) {
+            itraInput.classList.add('error');
+            setTimeout(() => itraInput.classList.remove('error'), 500);
+            return;
+        }
+        
+        activeItraScore = score;
+        itraApplyBtn.classList.add('active');
+        itraApplyBtn.textContent = `ITRA ${score}`;
+        
+        // Dim runner level buttons
+        if (raceLevelButtons) {
+            raceLevelButtons.classList.add('itra-override');
+        }
+        
+        // Show clear button
+        if (itraClearBtn) {
+            itraClearBtn.style.display = 'inline-block';
+        }
+        
+        // Apply and recalculate
+        if (gpxData && segments.length > 0) {
+            applyRunnerLevelPaces();
+            calculateRacePlan();
+        }
+    };
+    
+    itraApplyBtn.addEventListener('click', applyItraScore);
+    
+    // Enter key to apply
+    itraInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            applyItraScore();
+        }
+    });
+    
+    if (itraClearBtn) {
+        itraClearBtn.addEventListener('click', clearItraOverride);
+    }
+}
+
+function clearItraOverride() {
+    const itraInput = document.getElementById('itraScoreInput');
+    const itraApplyBtn = document.getElementById('itraApplyBtn');
+    const itraClearBtn = document.getElementById('itraClearBtn');
+    const raceLevelButtons = document.getElementById('raceLevelButtons');
+    
+    activeItraScore = null;
+    
+    if (itraInput) {
+        itraInput.value = '';
+    }
+    
+    if (itraApplyBtn) {
+        itraApplyBtn.classList.remove('active');
+        itraApplyBtn.textContent = typeof t === 'function' ? t('race.itraApply') : 'Apply';
+    }
+    
+    if (itraClearBtn) {
+        itraClearBtn.style.display = 'none';
+    }
+    
+    if (raceLevelButtons) {
+        raceLevelButtons.classList.remove('itra-override');
     }
 }
 
@@ -3373,13 +3502,24 @@ function getPaceInMinutes(minInput, secInput) {
 
 // Apply runner level paces to manual inputs
 function applyRunnerLevelPaces() {
-    const levelSelect = document.getElementById('runnerLevel');
-    const level = levelSelect ? levelSelect.value : 'intermediate';
-    const preset = RUNNER_LEVELS[level] || RUNNER_LEVELS.intermediate;
+    let flatPace, uphillPace, downhillPace;
     
-    const flatPace = preset.flatPace;
-    const uphillPace = flatPace * preset.uphillRatio;
-    const downhillPace = flatPace * preset.downhillRatio;
+    if (activeItraScore !== null) {
+        // Use ITRA-derived paces
+        const itraPaces = itraScoreToPaces(activeItraScore);
+        flatPace = itraPaces.flatPace;
+        uphillPace = flatPace * itraPaces.uphillRatio;
+        downhillPace = flatPace * itraPaces.downhillRatio;
+    } else {
+        // Use runner level preset
+        const levelSelect = document.getElementById('runnerLevel');
+        const level = levelSelect ? levelSelect.value : 'intermediate';
+        const preset = RUNNER_LEVELS[level] || RUNNER_LEVELS.intermediate;
+        
+        flatPace = preset.flatPace;
+        uphillPace = flatPace * preset.uphillRatio;
+        downhillPace = flatPace * preset.downhillRatio;
+    }
     
     // Update manual pace inputs
     const flatMin = document.getElementById('flatPaceMin');

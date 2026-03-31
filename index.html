@@ -185,6 +185,17 @@
                         <button type="button" class="race-level-btn" data-level="advanced" data-i18n="hero.advanced">Advanced</button>
                         <button type="button" class="race-level-btn" data-level="elite" data-i18n="hero.elite">Elite</button>
                     </div>
+                    
+                    <!-- ITRA Score Optional -->
+                    <div class="itra-score-section">
+                        <label class="itra-label" data-i18n="race.itraOptional">Know your ITRA score?</label>
+                        <div class="itra-input-row">
+                            <input type="number" id="itraScoreInput" class="itra-input" min="200" max="1000" placeholder="e.g. 550" />
+                            <button type="button" id="itraApplyBtn" class="itra-apply-btn" data-i18n="race.itraApply">Apply</button>
+                            <button type="button" id="itraClearBtn" class="itra-clear-btn">✕</button>
+                        </div>
+                        <p class="itra-hint" data-i18n="race.itraHint">ITRA score gives more precise pace estimation</p>
+                    </div>
                 </div>
                 
                 <!-- Distance Section -->

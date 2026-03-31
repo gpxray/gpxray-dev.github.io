@@ -76,6 +76,9 @@ const TRANSLATIONS = {
         'race.strategyTitle': 'Create Your Race Strategy',
         'race.selectLevel': "What's your runner level?",
         'race.selectDistance': 'Which distance are you running?',
+        'race.itraOptional': 'Know your ITRA score?',
+        'race.itraApply': 'Apply',
+        'race.itraHint': 'ITRA score gives more precise pace estimation',
         
         // Downhill Load tooltip
         'ddl.title': 'Descent Load (DDL/km)',
@@ -441,6 +444,9 @@ const TRANSLATIONS = {
         'race.strategyTitle': 'Erstelle deine Rennstrategie',
         'race.selectLevel': 'Was ist dein Läufer-Level?',
         'race.selectDistance': 'Welche Distanz läufst du?',
+        'race.itraOptional': 'Kennst du deinen ITRA-Score?',
+        'race.itraApply': 'Anwenden',
+        'race.itraHint': 'ITRA-Score ermöglicht präzisere Tempoberechnung',
         
         // Downhill Load tooltip
         'ddl.title': 'Abstiegsbelastung (DDL/km)',

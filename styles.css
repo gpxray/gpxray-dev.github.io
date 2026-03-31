@@ -4644,6 +4644,120 @@ h2 {
     color: #00d4ff;
 }
 
+/* ITRA Score Optional Input */
+.itra-score-section {
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.itra-label {
+    display: block;
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 10px;
+}
+
+.itra-optional {
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 0.85em;
+}
+
+.itra-input-row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+}
+
+.itra-input {
+    width: 100px;
+    padding: 8px 12px;
+    background: rgba(0, 0, 0, 0.4);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    color: #fff;
+    font-size: 1rem;
+    text-align: center;
+}
+
+.itra-input:focus {
+    outline: none;
+    border-color: #00d4ff;
+}
+
+.itra-input::placeholder {
+    color: rgba(255, 255, 255, 0.3);
+}
+
+.itra-apply-btn {
+    padding: 8px 16px;
+    background: rgba(0, 212, 255, 0.2);
+    border: 2px solid #00d4ff;
+    border-radius: 8px;
+    color: #00d4ff;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.itra-apply-btn:hover {
+    background: rgba(0, 212, 255, 0.3);
+}
+
+.itra-apply-btn.active {
+    background: #00d4ff;
+    color: #0a1628;
+}
+
+.itra-clear-btn {
+    display: none;
+    padding: 8px 10px;
+    background: rgba(244, 67, 54, 0.2);
+    border: 1px solid rgba(244, 67, 54, 0.4);
+    border-radius: 8px;
+    color: #f44336;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.itra-clear-btn:hover {
+    background: rgba(244, 67, 54, 0.3);
+}
+
+.itra-input.error {
+    border-color: #f44336;
+    animation: shake 0.3s ease;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+}
+
+.itra-hint {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.4);
+    margin-top: 8px;
+}
+
+.itra-active-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    background: rgba(0, 212, 255, 0.2);
+    border-radius: 10px;
+    font-size: 0.75rem;
+    color: #00d4ff;
+    margin-left: 8px;
+}
+
+.race-level-buttons.itra-override .race-level-btn {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
 .race-distances {
     display: flex;
     flex-wrap: wrap;
