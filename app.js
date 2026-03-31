@@ -5434,14 +5434,8 @@ async function exportStoryCard() {
             finishHour = parseInt(clockMatch[1]);
         }
 
-        // Try AI-generated statement first, fallback to local
-        let wittyStatement = await getAIStatement(
-            currentRouteName || 'Trail Race',
-            currentRaceLocation || 'Mountains',
-            finishHour,
-            isNextDay,
-            totalHours
-        ) || getWittyStatement(finishHour, isNextDay, totalHours);
+        // Use pre-defined witty statements
+        let wittyStatement = getWittyStatement(finishHour, isNextDay, totalHours);
 
         // Format target time (simplified)
         let targetTime = totalTimeText.split('(')[0].trim();
