@@ -700,13 +700,15 @@ def generate_ai_statement(race_name: str, location: str, finish_hour: int,
         system_prompt = """Du bist ein witziger Texter für Trail-Running-Karten. 
 Generiere einen kurzen, frechen 2-Zeilen-Spruch für die Instagram Story eines Trail-Läufers.
 Der Spruch soll lokal/kulturell zum Rennort passen (lokales Essen, Getränke, Dialekt-Anspielungen).
-Stil: casual, selbstironisch, für Freunde/Familie gedacht. 
+Stil: casual, selbstironisch, für Freunde/Familie gedacht.
+WICHTIG: Halte es familienfreundlich - keine sexuellen Anspielungen, Gewalt oder anstößigen Inhalte.
 Format: Zeile 1<br>Zeile 2 (mit einem passenden Emoji am Ende)."""
     else:
         system_prompt = """You're a witty copywriter for trail running share cards.
 Generate a short, cheeky 2-line statement for a trail runner's Instagram story.
 The statement should reference local culture/food/drinks from the race location.
 Style: casual, self-deprecating, meant for friends/family.
+IMPORTANT: Keep it family-friendly - no sexual innuendo, violence, or offensive content.
 Format: Line 1<br>Line 2 (with one fitting emoji at the end)."""
     
     user_prompt = f"""Race: {race_name}
@@ -728,6 +730,13 @@ Generate a witty 2-line statement that references local culture, food, or tradit
         )
         
         statement = response.choices[0].message.content.strip()
+        
+        # Basic content safety check (additional layer beyond Azure's filters)
+        blocked_words = ['sex', 'naked', 'nude', 'kill', 'murder', 'blood', 'porn', 'fuck', 'shit', 'ass', 'dick', 'cock']
+        statement_lower = statement.lower()
+        if any(word in statement_lower for word in blocked_words):
+            logging.warning(f"AI statement blocked for inappropriate content: {statement[:50]}...")
+            return None
         
         # Cache the result
         _ai_statement_cache[cache_key] = statement
