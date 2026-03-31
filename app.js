@@ -4192,25 +4192,49 @@ function updateHeroSection(totalTime) {
     // Update finish time
     heroTime.textContent = formatTime(totalTime);
     
-    // Update weather-adjusted time if available (inline format)
-    const weatherAdjustedContainer = document.getElementById('weatherAdjustedTime');
-    const weatherAdjustedValue = document.getElementById('weatherAdjustedValue');
-    const weatherDivider = document.getElementById('cutoffWeatherDivider');
+    // Update weather impact pill if available
+    const weatherPill = document.getElementById('weatherImpactPill');
+    const weatherTimeEl = document.getElementById('weatherAdjustedTime');
+    const weatherConditionsEl = document.getElementById('weatherConditions');
+    const weatherBreakdownEl = document.getElementById('weatherBreakdown');
     const cutoffWarning = document.getElementById('cutoffWarning');
     
-    if (weatherAdjustedContainer && weatherAdjustedValue) {
+    if (weatherPill && weatherTimeEl) {
         const adjustment = getWeatherAdjustedTime(totalTime);
         
         if (adjustment && adjustment.addedMinutes >= 1) {
-            weatherAdjustedValue.textContent = `+${adjustment.addedMinutes} min`;
-            weatherAdjustedContainer.style.display = 'flex';
-            // Show divider only if cutoff is also visible
-            if (weatherDivider && cutoffWarning && cutoffWarning.style.display !== 'none') {
-                weatherDivider.style.display = 'inline';
+            weatherTimeEl.textContent = `+${adjustment.addedMinutes} min`;
+            
+            // Build conditions text
+            const conditions = [];
+            if (raceWeatherData) {
+                conditions.push(`${raceWeatherData.tempAvg}°C`);
+                if (raceWeatherData.isRainy) conditions.push('rain forecast');
+                else if (raceWeatherData.rainChance > 50) conditions.push(`${raceWeatherData.rainChance}% rain chance`);
+                if (raceWeatherData.windSpeed > 30) conditions.push(`${raceWeatherData.windSpeed} km/h wind`);
             }
+            if (weatherConditionsEl) {
+                weatherConditionsEl.textContent = conditions.length > 0 
+                    ? `Based on ${conditions.join(' and ')}` 
+                    : 'Based on race day forecast';
+            }
+            
+            // Build breakdown text
+            if (weatherBreakdownEl && raceWeatherData && raceWeatherData.adjustment) {
+                const breakdown = raceWeatherData.adjustment.breakdown || [];
+                const breakdownText = breakdown.map(b => {
+                    if (b.factor === 'rain') return `Rain: +${b.penalty.toFixed(1)}%`;
+                    if (b.factor === 'heat') return `Heat: +${b.penalty.toFixed(1)}%`;
+                    if (b.factor === 'cold') return `Cold: +${b.penalty.toFixed(1)}%`;
+                    if (b.factor === 'wind') return `Wind: +${b.penalty.toFixed(1)}%`;
+                    return '';
+                }).filter(Boolean).join(' · ');
+                weatherBreakdownEl.textContent = breakdownText || '';
+            }
+            
+            weatherPill.style.display = 'inline-flex';
         } else {
-            weatherAdjustedContainer.style.display = 'none';
-            if (weatherDivider) weatherDivider.style.display = 'none';
+            weatherPill.style.display = 'none';
         }
     }
     

@@ -312,21 +312,21 @@
                                     <span class="cutoff-icon">✓</span>
                                     <span class="cutoff-text">Cutoff: <span id="cutoffTime">-</span></span>
                                 </div>
-                                <span class="cutoff-weather-divider" id="cutoffWeatherDivider" style="display: none;">·</span>
-                                <div class="weather-adjusted-inline" id="weatherAdjustedTime" style="display: none;">
-                                    <span class="weather-inline-text">🌡️ <span id="weatherAdjustedValue">+0 min</span> for weather</span>
-                                    <span class="info-tooltip weather-info-tooltip" tabindex="0">
-                                        ⓘ
-                                        <span class="info-tooltip-content">
-                                            <strong data-i18n="weather.title">Weather Impact</strong><br>
-                                            <span data-i18n="weather.description">Race day forecast affects your finish time.</span><br><br>
-                                            <strong data-i18n="weather.factors">Factors:</strong><br>
-                                            • Heat >15°C: +0.5%/°C<br>
-                                            • Cold <5°C: +0.3%/°C<br>
-                                            • Rain: +2-4% (wet trails)<br>
-                                            • Wind >30km/h: +1-2%
-                                        </span>
-                                    </span>
+                                <div class="weather-impact-pill" id="weatherImpactPill" style="display: none;">
+                                    <span class="weather-pill-text">🌡️ Weather Impact</span>
+                                    <span class="weather-pill-info">ⓘ</span>
+                                    <div class="weather-pill-tooltip" id="weatherPillTooltip">
+                                        <div class="weather-tooltip-header">
+                                            <span class="weather-tooltip-time" id="weatherAdjustedTime">+0 min</span>
+                                            <span class="weather-tooltip-label">weather adjustment</span>
+                                        </div>
+                                        <div class="weather-tooltip-conditions" id="weatherConditions">
+                                            <!-- Populated by JS: e.g. "Based on 13°C and rain forecast" -->
+                                        </div>
+                                        <div class="weather-tooltip-breakdown" id="weatherBreakdown">
+                                            <!-- Populated by JS: factor breakdown -->
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>

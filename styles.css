@@ -1791,27 +1791,88 @@ h2 {
     margin-top: 8px;
 }
 
-.cutoff-weather-divider {
-    color: rgba(255, 255, 255, 0.3);
-    font-size: 1.2rem;
-}
-
-/* Weather Adjusted Inline */
-.weather-adjusted-inline {
-    display: flex;
+/* Weather Impact Pill */
+.weather-impact-pill {
+    position: relative;
+    display: inline-flex;
     align-items: center;
     gap: 6px;
+    padding: 6px 12px;
+    background: rgba(255, 152, 0, 0.15);
+    border: 1px solid rgba(255, 152, 0, 0.3);
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.2s ease;
 }
 
-.weather-inline-text {
-    font-size: 0.85rem;
-    color: #ffb74d;
+.weather-impact-pill:hover {
+    background: rgba(255, 152, 0, 0.25);
+    border-color: rgba(255, 152, 0, 0.5);
 }
 
-.weather-info-tooltip {
+.weather-pill-text {
     font-size: 0.8rem;
     color: #ffb74d;
-    cursor: pointer;
+    font-weight: 500;
+}
+
+.weather-pill-info {
+    font-size: 0.75rem;
+    color: rgba(255, 183, 77, 0.7);
+}
+
+.weather-pill-tooltip {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%);
+    min-width: 220px;
+    padding: 12px 16px;
+    background: #1a2332;
+    border: 1px solid rgba(255, 152, 0, 0.3);
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.2s ease;
+    z-index: 100;
+}
+
+.weather-impact-pill:hover .weather-pill-tooltip {
+    opacity: 1;
+    visibility: visible;
+}
+
+.weather-tooltip-header {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    margin-bottom: 8px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.weather-tooltip-time {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #ffc107;
+}
+
+.weather-tooltip-label {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.weather-tooltip-conditions {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.8);
+    margin-bottom: 8px;
+}
+
+.weather-tooltip-breakdown {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.5);
+    line-height: 1.5;
 }
 
 /* Pace Info Tooltip */
