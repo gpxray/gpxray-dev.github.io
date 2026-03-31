@@ -276,7 +276,37 @@ const TRANSLATIONS = {
         'general.close': 'Close',
         'general.save': 'Save',
         'general.cancel': 'Cancel',
-        'general.delete': 'Delete'
+        'general.delete': 'Delete',
+        
+        // Story card witty statements
+        'story.nextDay.1': 'See you tomorrow.<br>Keep the coffee warm.',
+        'story.nextDay.2': "Don't wait up.<br>This one's gonna take a while.",
+        'story.nextDay.3': "I'll be back... eventually.<br>Save me some breakfast.",
+        'story.nextDay.4': 'Gone running.<br>Back in a day or so.',
+        'story.earlyMorning.1': "I'll be done before you wake up.<br>Don't worry about me.",
+        'story.earlyMorning.2': 'Back before breakfast.<br>Just a quick one.',
+        'story.earlyMorning.3': 'Early bird gets the medal.<br>See you at sunrise.',
+        'story.morning.1': "Save me some breakfast.<br>I'll be there by mid-morning.",
+        'story.morning.2': "I'll be back for brunch.<br>Make it a big one.",
+        'story.morning.3': 'Morning run, they said.<br>Should be done by 10ish.',
+        'story.midday.1': "Don't wait for lunch.<br>I'll grab something on the trail.",
+        'story.midday.2': 'Back by lunchtime.<br>With a story or two.',
+        'story.midday.3': 'Noon-ish finish planned.<br>Keep the sandwiches ready.',
+        'story.afternoon.1': "Back for happy hour.<br>First round's on me.",
+        'story.afternoon.2': 'Afternoon finish ahead.<br>Then straight to the couch.',
+        'story.afternoon.3': "Should be done by dinner prep.<br>Don't start without me.",
+        'story.evening.1': "I'll be back for dinner.<br>Maybe.",
+        'story.evening.2': 'Evening finish planned.<br>Save me a plate.',
+        'story.evening.3': "Don't wait for me at dinner.<br>But do save dessert.",
+        'story.night.1': "I'll be back at midnight.<br>Go ahead and chill the beer.",
+        'story.night.2': 'Late night finish incoming.<br>Keep the lights on.',
+        'story.night.3': "Don't wait up.<br>But maybe leave a snack out.",
+        'story.night.4': 'Back by bedtime.<br>Hopefully.',
+        'story.default': "Out for a run.<br>Back when I'm done.",
+        'story.myStrategy': 'My {race} Strategy',
+        'story.createdBy': 'Strategy created by',
+        'story.start': 'Start',
+        'story.target': 'Target'
     },
     
     de: {
@@ -553,7 +583,37 @@ const TRANSLATIONS = {
         'general.close': 'Schließen',
         'general.save': 'Speichern',
         'general.cancel': 'Abbrechen',
-        'general.delete': 'Löschen'
+        'general.delete': 'Löschen',
+        
+        // Story card witty statements
+        'story.nextDay.1': 'Bis morgen.<br>Haltet den Kaffee warm.',
+        'story.nextDay.2': 'Wartet nicht auf mich.<br>Das wird länger dauern.',
+        'story.nextDay.3': 'Bin irgendwann zurück.<br>Hebt mir Frühstück auf.',
+        'story.nextDay.4': 'Bin laufen.<br>Zurück in einem Tag oder so.',
+        'story.earlyMorning.1': 'Fertig bevor ihr aufwacht.<br>Keine Sorge.',
+        'story.earlyMorning.2': 'Zurück vor dem Frühstück.<br>Nur ne kurze Runde.',
+        'story.earlyMorning.3': 'Der frühe Vogel holt die Medaille.<br>Bis Sonnenaufgang.',
+        'story.morning.1': 'Hebt mir Frühstück auf.<br>Bin gegen Vormittag da.',
+        'story.morning.2': 'Zurück zum Brunch.<br>Macht ordentlich was.',
+        'story.morning.3': 'Morgenrunde, sagten sie.<br>Sollte gegen 10 fertig sein.',
+        'story.midday.1': 'Wartet nicht mit dem Mittagessen.<br>Ich ess unterwegs was.',
+        'story.midday.2': 'Zurück zur Mittagszeit.<br>Mit ein paar Geschichten.',
+        'story.midday.3': 'Ziel gegen Mittag.<br>Haltet die Brote bereit.',
+        'story.afternoon.1': 'Zurück zur Happy Hour.<br>Erste Runde geht auf mich.',
+        'story.afternoon.2': 'Nachmittags im Ziel.<br>Dann ab aufs Sofa.',
+        'story.afternoon.3': 'Sollte vor dem Abendessen fertig sein.<br>Fangt nicht ohne mich an.',
+        'story.evening.1': 'Bin zum Abendessen zurück.<br>Vielleicht.',
+        'story.evening.2': 'Abends im Ziel.<br>Hebt mir was auf.',
+        'story.evening.3': 'Wartet nicht mit dem Essen.<br>Aber hebt mir Nachtisch auf.',
+        'story.night.1': 'Bin um Mitternacht zurück.<br>Stellt schon mal das Bier kalt.',
+        'story.night.2': 'Spätes Finish.<br>Lasst das Licht an.',
+        'story.night.3': 'Bleibt nicht auf.<br>Aber lasst mir nen Snack da.',
+        'story.night.4': 'Zurück vor der Bettzeit.<br>Hoffentlich.',
+        'story.default': 'Bin laufen.<br>Zurück wenn ich fertig bin.',
+        'story.myStrategy': 'Meine {race} Strategie',
+        'story.createdBy': 'Strategie erstellt mit',
+        'story.start': 'Start',
+        'story.target': 'Ziel'
     }
 };
 

@@ -5461,16 +5461,16 @@ async function exportStoryCard() {
                 
                 <!-- Race Info -->
                 <div style="text-align: left; max-width: 350px;">
-                    <div style="font-size: 28px; font-weight: 700; margin-bottom: 12px;">My ${routeName} Strategy</div>
+                    <div style="font-size: 28px; font-weight: 700; margin-bottom: 12px;">${t('story.myStrategy', { race: routeName })}</div>
                     <div style="font-size: 24px; font-weight: 500; color: #ddd; margin-bottom: 8px;">${distance.toFixed(0)}${unitLabel} | ${gpxData.elevationGain.toFixed(0)}m</div>
-                    <div style="font-size: 22px; color: #aaa; margin-bottom: 6px;">Start: ${formatStartTime(startTime)}</div>
-                    <div style="font-size: 22px; color: #aaa;">Target: ${targetTime}</div>
+                    <div style="font-size: 22px; color: #aaa; margin-bottom: 6px;">${t('story.start')}: ${formatStartTime(startTime)}</div>
+                    <div style="font-size: 22px; color: #aaa;">${t('story.target')}: ${targetTime}</div>
                 </div>
             </div>
             
             <!-- GPXray Branding -->
             <div style="text-align: center;">
-                <div style="font-size: 14px; color: #666; margin-bottom: 6px;">Strategy created by</div>
+                <div style="font-size: 14px; color: #666; margin-bottom: 6px;">${t('story.createdBy')}</div>
                 <div style="font-size: 24px; font-weight: 700; color: #00E5FF; letter-spacing: 1px;">GPXray</div>
             </div>
         `;
@@ -5508,80 +5508,49 @@ async function exportStoryCard() {
 
 // Get witty statement based on finish time
 function getWittyStatement(finishHour, isNextDay, totalHours) {
+    // Helper to pick random translated statement
+    const pick = (keys) => {
+        const key = keys[Math.floor(Math.random() * keys.length)];
+        return t(key);
+    };
+    
     // Next day or very long races (24h+)
     if (isNextDay || totalHours >= 24) {
-        const statements = [
-            "See you tomorrow.<br>Keep the coffee warm.",
-            "Don't wait up.<br>This one's gonna take a while.",
-            "I'll be back... eventually.<br>Save me some breakfast.",
-            "Gone running.<br>Back in a day or so."
-        ];
-        return statements[Math.floor(Math.random() * statements.length)];
+        return pick(['story.nextDay.1', 'story.nextDay.2', 'story.nextDay.3', 'story.nextDay.4']);
     }
     
     // Very early morning finish (before 7am)
     if (finishHour < 7) {
-        const statements = [
-            "I'll be done before you wake up.<br>Don't worry about me.",
-            "Back before breakfast.<br>Just a quick one.",
-            "Early bird gets the medal.<br>See you at sunrise."
-        ];
-        return statements[Math.floor(Math.random() * statements.length)];
+        return pick(['story.earlyMorning.1', 'story.earlyMorning.2', 'story.earlyMorning.3']);
     }
     
     // Morning finish (7am - 11am)
     if (finishHour < 11) {
-        const statements = [
-            "Save me some breakfast.<br>I'll be there by mid-morning.",
-            "I'll be back for brunch.<br>Make it a big one.",
-            "Morning run, they said.<br>Should be done by 10ish."
-        ];
-        return statements[Math.floor(Math.random() * statements.length)];
+        return pick(['story.morning.1', 'story.morning.2', 'story.morning.3']);
     }
     
     // Midday finish (11am - 2pm)
     if (finishHour < 14) {
-        const statements = [
-            "Don't wait for lunch.<br>I'll grab something on the trail.",
-            "Back by lunchtime.<br>With a story or two.",
-            "Noon-ish finish planned.<br>Keep the sandwiches ready."
-        ];
-        return statements[Math.floor(Math.random() * statements.length)];
+        return pick(['story.midday.1', 'story.midday.2', 'story.midday.3']);
     }
     
     // Afternoon finish (2pm - 6pm)
     if (finishHour < 18) {
-        const statements = [
-            "Back for happy hour.<br>First round's on me.",
-            "Afternoon finish ahead.<br>Then straight to the couch.",
-            "Should be done by dinner prep.<br>Don't start without me."
-        ];
-        return statements[Math.floor(Math.random() * statements.length)];
+        return pick(['story.afternoon.1', 'story.afternoon.2', 'story.afternoon.3']);
     }
     
     // Evening finish (6pm - 9pm)
     if (finishHour < 21) {
-        const statements = [
-            "I'll be back for dinner.<br>Maybe.",
-            "Evening finish planned.<br>Save me a plate.",
-            "Don't wait for me at dinner.<br>But do save dessert."
-        ];
-        return statements[Math.floor(Math.random() * statements.length)];
+        return pick(['story.evening.1', 'story.evening.2', 'story.evening.3']);
     }
     
     // Night finish (9pm - midnight)
     if (finishHour < 24) {
-        const statements = [
-            "I'll be back at midnight.<br>Go ahead and chill the beer.",
-            "Late night finish incoming.<br>Keep the lights on.",
-            "Don't wait up.<br>But maybe leave a snack out.",
-            "Back by bedtime.<br>Hopefully."
-        ];
-        return statements[Math.floor(Math.random() * statements.length)];
+        return pick(['story.night.1', 'story.night.2', 'story.night.3', 'story.night.4']);
     }
     
     // Default
-    return "Out for a run.<br>Back when I'm done.";
+    return t('story.default');
 }
 
 // Format start time nicely
