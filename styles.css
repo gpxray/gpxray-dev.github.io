@@ -1783,10 +1783,12 @@ h2 {
 
 /* Weather Adjusted Time */
 .weather-adjusted-time {
-    display: inline-flex;
+    display: flex;
     justify-content: center;
     align-items: center;
     gap: 8px;
+    width: fit-content;
+    min-width: 420px;
     margin: 12px auto 0;
     padding: 10px 16px;
     background: rgba(255, 152, 0, 0.1);
