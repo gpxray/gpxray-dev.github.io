@@ -73,8 +73,8 @@ const TRANSLATIONS = {
         'hero.customize': 'Customize strategy ↓',
         
         // Race landing page
-        'race.selectLevel': "🏃 What's your runner level?",
-        'race.selectDistance': '🎯 Which distance are you running?',
+        'race.selectLevel': "What's your runner level?",
+        'race.selectDistance': 'Which distance are you running?',
         
         // Downhill Load tooltip
         'ddl.title': 'Descent Load (DDL/km)',
@@ -437,8 +437,8 @@ const TRANSLATIONS = {
         'hero.customize': 'Strategie anpassen ↓',
         
         // Race landing page
-        'race.selectLevel': '🏃 Was ist dein Läufer-Level?',
-        'race.selectDistance': '🎯 Welche Distanz läufst du?',
+        'race.selectLevel': 'Was ist dein Läufer-Level?',
+        'race.selectDistance': 'Welche Distanz läufst du?',
         
         // Downhill Load tooltip
         'ddl.title': 'Abstiegsbelastung (DDL/km)',
