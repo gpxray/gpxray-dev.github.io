@@ -5661,37 +5661,37 @@ function getWittyStatement(finishHour, isNextDay, totalHours) {
     
     // Next day or very long races (24h+)
     if (isNextDay || totalHours >= 24) {
-        return pick(['story.nextDay.1', 'story.nextDay.2', 'story.nextDay.3', 'story.nextDay.4', 'story.nextDay.5', 'story.nextDay.6']);
+        return pick(['story.nextDay.1', 'story.nextDay.2', 'story.nextDay.3', 'story.nextDay.4', 'story.nextDay.5', 'story.nextDay.6', 'story.nextDay.7', 'story.nextDay.8', 'story.nextDay.9', 'story.nextDay.10']);
     }
     
     // Very early morning finish (before 7am)
     if (finishHour < 7) {
-        return pick(['story.earlyMorning.1', 'story.earlyMorning.2', 'story.earlyMorning.3', 'story.earlyMorning.4', 'story.earlyMorning.5']);
+        return pick(['story.earlyMorning.1', 'story.earlyMorning.2', 'story.earlyMorning.3', 'story.earlyMorning.4', 'story.earlyMorning.5', 'story.earlyMorning.6', 'story.earlyMorning.7', 'story.earlyMorning.8', 'story.earlyMorning.9', 'story.earlyMorning.10']);
     }
     
     // Morning finish (7am - 11am)
     if (finishHour < 11) {
-        return pick(['story.morning.1', 'story.morning.2', 'story.morning.3', 'story.morning.4', 'story.morning.5']);
+        return pick(['story.morning.1', 'story.morning.2', 'story.morning.3', 'story.morning.4', 'story.morning.5', 'story.morning.6', 'story.morning.7', 'story.morning.8', 'story.morning.9', 'story.morning.10']);
     }
     
     // Midday finish (11am - 2pm)
     if (finishHour < 14) {
-        return pick(['story.midday.1', 'story.midday.2', 'story.midday.3', 'story.midday.4', 'story.midday.5']);
+        return pick(['story.midday.1', 'story.midday.2', 'story.midday.3', 'story.midday.4', 'story.midday.5', 'story.midday.6', 'story.midday.7', 'story.midday.8', 'story.midday.9', 'story.midday.10']);
     }
     
     // Afternoon finish (2pm - 6pm)
     if (finishHour < 18) {
-        return pick(['story.afternoon.1', 'story.afternoon.2', 'story.afternoon.3', 'story.afternoon.4', 'story.afternoon.5']);
+        return pick(['story.afternoon.1', 'story.afternoon.2', 'story.afternoon.3', 'story.afternoon.4', 'story.afternoon.5', 'story.afternoon.6', 'story.afternoon.7', 'story.afternoon.8', 'story.afternoon.9', 'story.afternoon.10']);
     }
     
     // Evening finish (6pm - 9pm)
     if (finishHour < 21) {
-        return pick(['story.evening.1', 'story.evening.2', 'story.evening.3', 'story.evening.4', 'story.evening.5']);
+        return pick(['story.evening.1', 'story.evening.2', 'story.evening.3', 'story.evening.4', 'story.evening.5', 'story.evening.6', 'story.evening.7', 'story.evening.8', 'story.evening.9', 'story.evening.10']);
     }
     
     // Night finish (9pm - midnight)
     if (finishHour < 24) {
-        return pick(['story.night.1', 'story.night.2', 'story.night.3', 'story.night.4', 'story.night.5', 'story.night.6']);
+        return pick(['story.night.1', 'story.night.2', 'story.night.3', 'story.night.4', 'story.night.5', 'story.night.6', 'story.night.7', 'story.night.8', 'story.night.9', 'story.night.10']);
     }
     
     // Default
