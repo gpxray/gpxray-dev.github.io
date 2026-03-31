@@ -695,28 +695,47 @@ def generate_ai_statement(race_name: str, location: str, finish_hour: int,
     
     deployment = os.environ.get('AZURE_OPENAI_DEPLOYMENT', 'gpt-4-1-mini')
     
-    # Language-specific prompts
+    # Language-specific prompts - PUNCHY style like the examples
     if lang == 'de':
-        system_prompt = """Du bist ein witziger Texter für Trail-Running-Karten. 
-Generiere einen kurzen, frechen 2-Zeilen-Spruch für die Instagram Story eines Trail-Läufers.
-Der Spruch soll lokal/kulturell zum Rennort passen (lokales Essen, Getränke, Dialekt-Anspielungen).
-Stil: casual, selbstironisch, für Freunde/Familie gedacht.
-WICHTIG: Halte es familienfreundlich - keine sexuellen Anspielungen, Gewalt oder anstößigen Inhalte.
-Format: Zeile 1<br>Zeile 2 (mit einem passenden Emoji am Ende)."""
+        system_prompt = """Generiere einen KURZEN, KNACKIGEN Trail-Running-Spruch.
+
+STIL: Extrem kurz! Maximal 6-8 Wörter pro Zeile. Locker, witzig, für Instagram.
+Kann lokale Referenz haben (Essen/Getränke der Region) - muss aber nicht.
+
+GUTE BEISPIELE:
+- "Zurück zur Happy Hour. 🍺<br>Erste Runde geht auf mich."
+- "Bin zum Weißwurst-Frühstück da. 🥨<br>Falls noch was übrig ist."
+- "Abendessen? Schaff ich. 🍽️<br>Vielleicht."
+
+SCHLECHTE BEISPIELE (zu lang!):
+- "Von Nideggen nach Zimt & Zucker, braucht der Trail-Lauf auch mal 'ne Pause"
+- "Nach so vielen Kilometern durch die wunderschöne Eifel..."
+
+Format: Zeile1<br>Zeile2 (EIN Emoji, am Zeilenende)
+WICHTIG: Familienfreundlich. MAX 15 Wörter total!"""
     else:
-        system_prompt = """You're a witty copywriter for trail running share cards.
-Generate a short, cheeky 2-line statement for a trail runner's Instagram story.
-The statement should reference local culture/food/drinks from the race location.
-Style: casual, self-deprecating, meant for friends/family.
-IMPORTANT: Keep it family-friendly - no sexual innuendo, violence, or offensive content.
-Format: Line 1<br>Line 2 (with one fitting emoji at the end)."""
+        system_prompt = """Generate a SHORT, PUNCHY trail running statement.
+
+STYLE: Extremely brief! Max 6-8 words per line. Casual, witty, Instagram-ready.
+Can reference local food/drinks from the region - but doesn't have to.
+
+GOOD EXAMPLES:
+- "Back for happy hour. 🍺<br>First round's on me."
+- "Save me some breakfast. 🥞<br>I'll be there by mid-morning."
+- "Dinner time? Maybe. 🍽️<br>Keep a plate warm."
+
+BAD EXAMPLES (too long!):
+- "From the mountains to the valley, through scenic trails and beautiful vistas..."
+- "After running through the amazing Alps all day..."
+
+Format: Line1<br>Line2 (ONE emoji, at line end)
+IMPORTANT: Family-friendly. MAX 15 words total!"""
     
     user_prompt = f"""Race: {race_name}
 Location: {location}
-Finish time context: {time_desc}
-Language: {'German' if lang == 'de' else 'English'}
+Finish: {time_desc}
 
-Generate a witty 2-line statement that references local culture, food, or traditions from the race location."""
+Generate ONE short punchy statement (max 15 words, 2 lines)."""
 
     try:
         response = client.chat.completions.create(
@@ -725,8 +744,8 @@ Generate a witty 2-line statement that references local culture, food, or tradit
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_prompt}
             ],
-            max_tokens=100,
-            temperature=0.8
+            max_tokens=60,
+            temperature=0.7
         )
         
         statement = response.choices[0].message.content.strip()
