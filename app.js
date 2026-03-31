@@ -5451,7 +5451,7 @@ async function exportStoryCard() {
             <div style="text-align: center;">
                 <!-- App Icon Logo -->
                 <div style="margin-bottom: 30px;">
-                    <img id="storyCardLogo" crossorigin="anonymous" src="img/gpxray-app-icon-300.png" style="height: 140px; width: 140px; border-radius: 24px; opacity: 0.95;">
+                    <img id="storyCardLogo" crossorigin="anonymous" src="img/gpxray-app-icon-300.png" style="height: 160px; width: 160px; border-radius: 28px; opacity: 0.95;">
                 </div>
                 
                 <!-- Witty Statement -->
