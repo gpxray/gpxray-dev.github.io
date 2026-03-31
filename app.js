@@ -5446,32 +5446,29 @@ async function exportStoryCard() {
         `;
 
         card.innerHTML = `
-            <div style="flex: 0;"></div>
-            
-            <div style="text-align: center;">
-                <!-- App Icon Logo -->
-                <div style="margin-bottom: 30px;">
-                    <img id="storyCardLogo" crossorigin="anonymous" src="img/gpxray-app-icon-300.png" style="height: 160px; width: 160px; border-radius: 28px; opacity: 0.95;">
-                </div>
-                
-                <!-- Witty Statement -->
-                <div style="font-size: 32px; font-weight: 600; font-style: italic; color: #00E5FF; line-height: 1.4; max-width: 420px; margin-bottom: 60px;">
+            <!-- Witty Statement (Hero) -->
+            <div style="text-align: center; padding-top: 40px;">
+                <div style="font-size: 36px; font-weight: 600; font-style: italic; color: #00E5FF; line-height: 1.4; max-width: 440px;">
                     ${wittyStatement}
-                </div>
-                
-                <!-- Race Info -->
-                <div style="text-align: left; max-width: 350px;">
-                    <div style="font-size: 28px; font-weight: 700; margin-bottom: 12px;">${t('story.myStrategy', { race: routeName })}</div>
-                    <div style="font-size: 24px; font-weight: 500; color: #ddd; margin-bottom: 8px;">${distance.toFixed(0)}${unitLabel} | ${gpxData.elevationGain.toFixed(0)}m</div>
-                    <div style="font-size: 22px; color: #aaa; margin-bottom: 6px;">${t('story.start')}: ${formatStartTime(startTime)}</div>
-                    <div style="font-size: 22px; color: #aaa;">${t('story.target')}: ${targetTime}</div>
                 </div>
             </div>
             
-            <!-- GPXray Branding -->
+            <!-- Race Strategy Block -->
             <div style="text-align: center;">
-                <div style="font-size: 14px; color: #666; margin-bottom: 6px;">${t('story.createdBy')}</div>
-                <div style="font-size: 24px; font-weight: 700; color: #00E5FF; letter-spacing: 1px;">GPXray</div>
+                <div style="font-size: 18px; color: #888; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 16px;">${t('story.myStrategy')}</div>
+                <div style="font-size: 30px; font-weight: 700; margin-bottom: 16px; max-width: 400px;">${routeName}</div>
+                <div style="font-size: 26px; font-weight: 500; color: #ddd; margin-bottom: 20px;">${distance.toFixed(0)}${unitLabel} | ${gpxData.elevationGain.toFixed(0)}m</div>
+                <div style="font-size: 20px; color: #aaa; margin-bottom: 8px;">${t('story.start')}: ${formatStartTime(startTime)}</div>
+                <div style="font-size: 20px; color: #aaa;">${t('story.target')}: ${targetTime}</div>
+            </div>
+            
+            <!-- GPXray Branding with Logo -->
+            <div style="text-align: center; padding-bottom: 20px;">
+                <div style="font-size: 14px; color: #666; margin-bottom: 10px;">${t('story.createdBy')}</div>
+                <div style="display: flex; align-items: center; justify-content: center; gap: 12px;">
+                    <img id="storyCardLogo" crossorigin="anonymous" src="img/gpxray-app-icon-300.png" style="height: 48px; width: 48px; border-radius: 10px;">
+                    <div style="font-size: 28px; font-weight: 700; color: #00E5FF; letter-spacing: 1px;">GPXray</div>
+                </div>
             </div>
         `;
 

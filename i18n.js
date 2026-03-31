@@ -303,7 +303,7 @@ const TRANSLATIONS = {
         'story.night.3': "Don't wait up. 😴<br>But maybe leave a snack out.",
         'story.night.4': 'Back by bedtime.<br>Hopefully. 🤞',
         'story.default': "Out for a run. 🏃<br>Back when I'm done.",
-        'story.myStrategy': 'My {race} Strategy',
+        'story.myStrategy': 'My Race Strategy',
         'story.createdBy': 'Strategy created by',
         'story.start': 'Start',
         'story.target': 'Target'
@@ -610,7 +610,7 @@ const TRANSLATIONS = {
         'story.night.3': 'Bleibt nicht auf. 😴<br>Aber lasst mir nen Snack da.',
         'story.night.4': 'Zurück vor der Bettzeit.<br>Hoffentlich. 🤞',
         'story.default': 'Bin laufen. 🏃<br>Zurück wenn ich fertig bin.',
-        'story.myStrategy': 'Meine {race} Strategie',
+        'story.myStrategy': 'Meine Rennstrategie',
         'story.createdBy': 'Strategie erstellt mit',
         'story.start': 'Start',
         'story.target': 'Ziel'
