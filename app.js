@@ -309,10 +309,10 @@ function updatePaceInfoContent() {
     const uphillPace = flatPace * preset.uphillRatio;
     const downhillPace = flatPace * preset.downhillRatio;
     
-    // Get fatigue multiplier if we have distance
+    // Get fatigue multiplier from API cache
     let fatigueInfo = '';
     if (gpxData && gpxData.totalDistance) {
-        const fatigue = getFatigueMultiplier(gpxData.totalDistance);
+        const fatigue = lastCachedFatigue || 1.0;
         if (fatigue > 1.0) {
             const pct = Math.round((fatigue - 1) * 100);
             fatigueInfo = `
@@ -3806,8 +3806,8 @@ function generateSplitsTable(flatPace, uphillPace, downhillPace) {
     const unitLabel = useMetric ? 'km' : 'mi';
     const totalUnits = useMetric ? Math.ceil(totalDistanceKm) : Math.ceil(totalDistanceKm * KM_TO_MILES);
     
-    // Get fatigue multiplier for ultra-distance adjustment
-    const fatigueMultiplier = getFatigueMultiplier(totalDistanceKm);
+    // Use cached fatigue multiplier from API (includes ultra-distance adjustment)
+    const fatigueMultiplier = lastCachedFatigue || 1.0;
     
     // Pace conversion: input paces are in min/km, convert to min/mi if needed
     const paceMultiplier = useMetric ? 1 : MILES_TO_KM;
@@ -4553,9 +4553,8 @@ function calculateCheckpointTimes() {
     const surfaceToggle = document.getElementById('surfaceEnabled');
     const applySurface = surfaceToggle ? surfaceToggle.checked : false;
     
-    // Get fatigue multiplier (same as splits table)
-    const totalDistanceKm = gpxData.totalDistance;
-    const fatigueMultiplier = getFatigueMultiplier(totalDistanceKm);
+    // Get fatigue multiplier (same as splits table, from API)
+    const fatigueMultiplier = lastCachedFatigue || 1.0;
     
     let checkpointsHtml = '';
     
