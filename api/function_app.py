@@ -16,6 +16,8 @@ import logging
 import math
 import hashlib
 import time
+import os
+from openai import AzureOpenAI
 
 app = func.FunctionApp(http_auth_level=func.AuthLevel.ANONYMOUS)
 
@@ -632,6 +634,201 @@ def validate_access_code(code: str) -> dict:
         return {'valid': True, 'code': normalized}
     
     return {'valid': False, 'reason': 'invalid_code'}
+
+
+# ============================================================================
+# AI STATEMENT GENERATION
+# ============================================================================
+
+# Cache for AI-generated statements (race_id + time_category + lang -> statement)
+_ai_statement_cache = {}
+
+def get_ai_client():
+    """Get Azure OpenAI client"""
+    endpoint = os.environ.get('AZURE_OPENAI_ENDPOINT')
+    key = os.environ.get('AZURE_OPENAI_KEY')
+    
+    if not endpoint or not key:
+        return None
+    
+    return AzureOpenAI(
+        azure_endpoint=endpoint,
+        api_key=key,
+        api_version="2024-10-21"
+    )
+
+def generate_ai_statement(race_name: str, location: str, finish_hour: int, 
+                          is_next_day: bool, total_hours: float, lang: str = 'en') -> str:
+    """Generate a witty statement using Azure OpenAI"""
+    
+    # Determine time category
+    if is_next_day or total_hours >= 24:
+        time_cat = "next_day"
+        time_desc = "finishing the next day after a 24+ hour race"
+    elif finish_hour < 7:
+        time_cat = "early_morning"
+        time_desc = "finishing very early morning (before 7am)"
+    elif finish_hour < 11:
+        time_cat = "morning"
+        time_desc = "finishing mid-morning (7-11am)"
+    elif finish_hour < 14:
+        time_cat = "midday"
+        time_desc = "finishing around lunchtime (11am-2pm)"
+    elif finish_hour < 18:
+        time_cat = "afternoon"
+        time_desc = "finishing in the afternoon (2-6pm)"
+    elif finish_hour < 21:
+        time_cat = "evening"
+        time_desc = "finishing in the evening (6-9pm)"
+    else:
+        time_cat = "night"
+        time_desc = "finishing late at night (9pm-midnight)"
+    
+    # Check cache
+    cache_key = f"{race_name}_{time_cat}_{lang}"
+    if cache_key in _ai_statement_cache:
+        return _ai_statement_cache[cache_key]
+    
+    client = get_ai_client()
+    if not client:
+        return None
+    
+    deployment = os.environ.get('AZURE_OPENAI_DEPLOYMENT', 'gpt-4-1-mini')
+    
+    # Language-specific prompts - PUNCHY and FUNNY like backup statements
+    if lang == 'de':
+        system_prompt = """Generiere einen WITZIGEN Trail-Running-Spruch für Instagram.
+
+REGELN:
+1. NUR DEUTSCH! Keine englischen Wörter!
+2. MAX 12 Wörter gesamt (2 kurze Zeilen)
+3. Muss LUSTIG sein - über Essen, Bier, Couch, Schlaf
+4. Locker wie mit Freunden reden
+5. Kann OPTIONAL lokales Essen/Bier erwähnen (Weißwurst, Kölsch, etc.)
+
+PERFEKTE BEISPIELE:
+- "Zurück zur Happy Hour. 🍺<br>Erste Runde geht auf mich."
+- "Ab aufs Sofa. 🛋️<br>Hab's mir verdient."
+- "Abendessen? Vielleicht. 🤷<br>Wartet nicht auf mich."
+- "Bier kalt stellen. 🍻<br>Bin gegen Mitternacht da."
+- "Erst laufen, dann Kuchen. 🍰<br>Prioritäten."
+
+VERBOTEN:
+- Englische Wörter (KEIN "Finish", "Trail", "Run", etc.)
+- Poetisch oder inspirierend
+- Länger als 12 Wörter
+
+Format: Zeile1<br>Zeile2 + EIN Emoji
+Familienfreundlich!"""
+    else:
+        system_prompt = """Generate a FUNNY trail running statement for Instagram.
+
+RULES:
+1. ENGLISH ONLY! No other languages!
+2. MAX 12 words total (2 short lines)
+3. Must be FUNNY - about food, beer, couch, sleep
+4. Casual like talking to friends
+5. Can OPTIONALLY mention local food/drinks (pretzels, fondue, etc.)
+
+PERFECT EXAMPLES:
+- "Back for happy hour. 🍺<br>First round's on me."
+- "Straight to the couch. 🛋️<br>Earned it."
+- "Dinner? Maybe. 🤷<br>Don't wait up."
+- "Chill the beer. 🍻<br>Be there by midnight."
+- "First run, then cake. 🍰<br>Priorities."
+
+FORBIDDEN:
+- Poetic or inspirational
+- Longer than 12 words
+- Trying too hard to be clever
+
+Format: Line1<br>Line2 + ONE emoji
+Family-friendly!"""
+    
+    user_prompt = f"""Race: {race_name}
+Location: {location}
+Finish: {time_desc}
+
+Generate ONE short punchy statement (max 15 words, 2 lines)."""
+
+    try:
+        response = client.chat.completions.create(
+            model=deployment,
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_prompt}
+            ],
+            max_tokens=60,
+            temperature=0.7
+        )
+        
+        statement = response.choices[0].message.content.strip()
+        
+        # Basic content safety check (additional layer beyond Azure's filters)
+        blocked_words = ['sex', 'naked', 'nude', 'kill', 'murder', 'blood', 'porn', 'fuck', 'shit', 'ass', 'dick', 'cock']
+        statement_lower = statement.lower()
+        if any(word in statement_lower for word in blocked_words):
+            logging.warning(f"AI statement blocked for inappropriate content: {statement[:50]}...")
+            return None
+        
+        # Cache the result
+        _ai_statement_cache[cache_key] = statement
+        
+        return statement
+    except Exception as e:
+        logging.error(f"AI generation error: {e}")
+        return None
+
+
+@app.route(route="ai/statement", methods=["POST"])
+def generate_statement(req: func.HttpRequest) -> func.HttpResponse:
+    """Generate AI-powered witty statement for story card"""
+    
+    # CORS headers
+    headers = {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'POST, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type',
+        'Content-Type': 'application/json'
+    }
+    
+    if req.method == 'OPTIONS':
+        return func.HttpResponse('', status_code=204, headers=headers)
+    
+    try:
+        data = req.get_json()
+        
+        race_name = data.get('raceName', 'Trail Race')
+        location = data.get('location', 'Mountains')
+        finish_hour = data.get('finishHour', 12)
+        is_next_day = data.get('isNextDay', False)
+        total_hours = data.get('totalHours', 6)
+        lang = data.get('lang', 'en')
+        
+        statement = generate_ai_statement(
+            race_name, location, finish_hour, is_next_day, total_hours, lang
+        )
+        
+        if statement:
+            return func.HttpResponse(
+                json.dumps({'statement': statement, 'source': 'ai'}),
+                status_code=200,
+                headers=headers
+            )
+        else:
+            return func.HttpResponse(
+                json.dumps({'error': 'AI generation failed', 'source': 'fallback'}),
+                status_code=200,
+                headers=headers
+            )
+            
+    except Exception as e:
+        logging.error(f"Statement generation error: {e}")
+        return func.HttpResponse(
+            json.dumps({'error': str(e)}),
+            status_code=500,
+            headers=headers
+        )
 
 
 @app.route(route="validate-code", methods=["POST", "OPTIONS"])

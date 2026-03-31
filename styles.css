@@ -3575,6 +3575,31 @@ h2 {
     color: #00d4ff;
 }
 
+/* Share Your Strategy button in hero */
+.share-strategy-btn {
+    display: block;
+    margin: 20px auto 12px;
+    padding: 12px 28px;
+    font-size: 1rem;
+    font-weight: 600;
+    color: white;
+    background: linear-gradient(135deg, #E1306C 0%, #C13584 50%, #833AB4 100%);
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(225, 48, 108, 0.3);
+}
+
+.share-strategy-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 25px rgba(225, 48, 108, 0.5);
+}
+
+.share-strategy-btn:active {
+    transform: translateY(0);
+}
+
 /* Section Header */
 .section-header {
     display: flex;
@@ -3618,6 +3643,14 @@ h2 {
 
 .share-btn:hover {
     box-shadow: 0 5px 20px rgba(155, 89, 182, 0.4);
+}
+
+.story-btn {
+    background: linear-gradient(135deg, #E1306C 0%, #C13584 50%, #833AB4 100%);
+}
+
+.story-btn:hover {
+    box-shadow: 0 5px 20px rgba(225, 48, 108, 0.4);
 }
 
 .crew-btn {

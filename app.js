@@ -11,6 +11,7 @@ let useMetric = true; // true = km, false = miles
 let surfaceData = []; // Stores surface data from OSM
 let surfaceEnabled = true; // Whether to use surface multipliers
 let currentRouteName = ''; // Name of current loaded route
+let currentRaceLocation = ''; // Location of current race for AI statements
 let sunTimes = null; // Sunrise/sunset times for race day
 let isDemoMode = false; // Whether demo is currently loaded
 let isSurfaceLoading = false; // Whether surface data is being fetched
@@ -31,6 +32,9 @@ const API_CONFIG = {
     calculateEndpoint: IS_DEV 
         ? 'https://gpxray-dev.azurewebsites.net/api/calculate'
         : 'https://api.gpxray.run/api/calculate',
+    aiStatementEndpoint: IS_DEV
+        ? 'https://gpxray-dev.azurewebsites.net/api/ai/statement'
+        : 'https://api.gpxray.run/api/ai/statement',
     useBackend: true,
     timeout: 15000
 };
@@ -702,6 +706,7 @@ async function loadDemoGpx() {
         const gpxContent = await response.text();
         console.log('Demo GPX content length:', gpxContent.length);
         currentRouteName = 'ZUT Garmisch-Partenkirchen Trail';
+        currentRaceLocation = 'Garmisch-Partenkirchen, Bavaria, Germany';
         isDemoMode = true; // Mark as demo mode
         
         // Pre-stored surface profile for demo (75% trail, 22% road, 2% technical)
@@ -895,6 +900,7 @@ async function loadRace(raceId) {
         
         const gpxContent = await response.text();
         currentRouteName = race.name;
+        currentRaceLocation = race.location || '';
         isDemoMode = false; // Race browser load, not demo
         preStoredSurfaceData = null; // Clear pre-stored data, will fetch from OSM
         parseGPX(gpxContent);
@@ -985,6 +991,7 @@ function setupFileInput() {
 function processFile(file) {
     // Store filename (without extension) as default route name
     currentRouteName = file.name.replace(/\.gpx$/i, '');
+    currentRaceLocation = ''; // No location info for uploaded files
     isDemoMode = false; // Regular file upload, not demo
     preStoredSurfaceData = null; // Clear pre-stored data, will fetch from OSM
     
@@ -1747,6 +1754,26 @@ function showSections() {
     document.getElementById('mapSection').style.display = 'block';
     document.getElementById('elevationSection').style.display = 'block';
     document.getElementById('paceSection').style.display = 'block';
+    
+    // Show Story button only for RET races (or all races on dev)
+    updateStoryButtonVisibility();
+}
+
+// Check if Story card button should be visible
+function updateStoryButtonVisibility() {
+    const storyBtn = document.getElementById('exportStoryCard');
+    if (!storyBtn) return;
+    
+    // Always show on dev, only RET races on production
+    const isRETRace = currentRouteName && 
+        (currentRouteName.toLowerCase().includes('ret') || 
+         currentRouteName.toLowerCase().includes('rureifel'));
+    
+    if (IS_DEV || isRETRace) {
+        storyBtn.style.display = 'inline-flex';
+    } else {
+        storyBtn.style.display = 'none';
+    }
 }
 
 // Setup chart selector for elevation/gradient toggle
@@ -4608,6 +4635,7 @@ function setupExport() {
     document.getElementById('exportCsv').addEventListener('click', exportToCsv);
     document.getElementById('exportPdf').addEventListener('click', exportToPdf);
     document.getElementById('exportShareCard').addEventListener('click', exportShareCard);
+    document.getElementById('exportStoryCard')?.addEventListener('click', exportStoryCard);
     document.getElementById('exportCrewCard')?.addEventListener('click', exportCrewCard);
     document.getElementById('exportCrewPdf')?.addEventListener('click', exportCrewPdf);
 }
@@ -5377,6 +5405,305 @@ async function exportShareCard() {
         btn.textContent = originalText;
         btn.disabled = false;
     }
+}
+
+// Instagram Story Card Export - Fun shareable story with witty time-based statements
+async function exportStoryCard() {
+    if (!gpxData || segments.length === 0) {
+        alert('Please load a GPX file and calculate your race strategy first.');
+        return;
+    }
+
+    const btn = document.getElementById('exportStoryCard');
+    const originalText = btn.textContent;
+    btn.textContent = t('btn.creating');
+    btn.disabled = true;
+
+    try {
+        // Get race info
+        const unitLabel = useMetric ? 'km' : 'mi';
+        const distance = useMetric ? gpxData.totalDistance : gpxData.totalDistance * KM_TO_MILES;
+        const totalTimeText = document.getElementById('totalTime')?.textContent || '-';
+        const timeInput = document.getElementById('raceStartTime');
+        const startTime = timeInput?.value || '06:00';
+
+        // Get finish clock time
+        let finishClockTime = '';
+        const splitsTable = document.getElementById('splitsTable');
+        if (splitsTable) {
+            const allRows = splitsTable.querySelectorAll('tbody tr');
+            if (allRows.length > 0) {
+                const lastRow = allRows[allRows.length - 1];
+                const cells = lastRow.querySelectorAll('td');
+                finishClockTime = cells[9]?.textContent || '';
+            }
+        }
+
+        // Parse total time to get hours for statement selection
+        let totalHours = 0;
+        const timeMatch = totalTimeText.match(/(\d+):(\d+)/);
+        if (timeMatch) {
+            totalHours = parseInt(timeMatch[1]) + parseInt(timeMatch[2]) / 60;
+        }
+
+        // Parse finish clock time for statement
+        let finishHour = 12;
+        let isNextDay = finishClockTime.includes('+1') || finishClockTime.includes('+2');
+        const clockMatch = finishClockTime.match(/(\d+):(\d+)/);
+        if (clockMatch) {
+            finishHour = parseInt(clockMatch[1]);
+        }
+
+        // Use pre-defined witty statements
+        let wittyStatement = getWittyStatement(finishHour, isNextDay, totalHours);
+
+        // Format target time (simplified)
+        let targetTime = totalTimeText.split('(')[0].trim();
+        if (targetTime.includes(':')) {
+            const parts = targetTime.split(':');
+            if (parts.length >= 2) {
+                const h = parseInt(parts[0]);
+                targetTime = `Sub ${h + 1}h`;
+            }
+        }
+
+        let routeName = currentRouteName || 'My Race';
+        if (routeName.length > 30) {
+            routeName = routeName.substring(0, 27) + '...';
+        }
+
+        // Get race date and format with weekday
+        const dateInput = document.getElementById('raceStartDate');
+        let raceDateFormatted = '';
+        if (dateInput?.value) {
+            const raceDate = new Date(dateInput.value);
+            const weekdays = currentLang === 'de' 
+                ? ['Sonntag', 'Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag']
+                : ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+            const months = currentLang === 'de'
+                ? ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember']
+                : ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+            const weekday = weekdays[raceDate.getDay()];
+            const day = raceDate.getDate();
+            const month = months[raceDate.getMonth()];
+            const year = raceDate.getFullYear();
+            raceDateFormatted = currentLang === 'de' 
+                ? `${weekday}, ${day}. ${month} ${year}`
+                : `${weekday}, ${month} ${day}, ${year}`;
+        }
+
+        // Create Instagram Story sized card (1080x1920)
+        const card = document.createElement('div');
+        card.id = 'storyCardContainer';
+        card.style.cssText = `
+            position: fixed;
+            left: -9999px;
+            top: 0;
+            width: 540px;
+            height: 960px;
+            background: linear-gradient(180deg, #0a1628 0%, #0d1f3c 50%, #0a1628 100%);
+            font-family: 'Sora', -apple-system, BlinkMacSystemFont, sans-serif;
+            color: white;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            padding: 60px 40px;
+        `;
+
+        card.innerHTML = `
+            <!-- Logo at Top -->
+            <div style="text-align: center; padding-top: 20px;">
+                <img id="storyCardLogo" crossorigin="anonymous" src="img/gpxray-app-icon-300.png" style="height: 160px; width: 160px; border-radius: 28px;">
+            </div>
+            
+            <!-- Witty Statement -->
+            <div style="text-align: center;">
+                <div style="font-size: 36px; font-weight: 600; font-style: italic; color: #00E5FF; line-height: 1.4; max-width: 440px;">
+                    ${wittyStatement}
+                </div>
+            </div>
+            
+            <!-- Race Strategy Block -->
+            <div style="text-align: center;">
+                <div style="font-size: 18px; color: #888; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 16px;">🏃 ${t('story.myStrategy')}</div>
+                <div style="font-size: 30px; font-weight: 700; margin-bottom: 12px; max-width: 400px;">${routeName}</div>
+                ${raceDateFormatted ? `<div style="font-size: 18px; color: #00E5FF; margin-bottom: 16px;">📅 ${raceDateFormatted}</div>` : ''}
+                <div style="font-size: 26px; font-weight: 500; color: #ddd; margin-bottom: 20px;">${distance.toFixed(0)}${unitLabel} | ${gpxData.elevationGain.toFixed(0)}m</div>
+                <div style="font-size: 20px; color: #aaa; margin-bottom: 8px;">${t('story.start')}: ${formatStartTime(startTime)}</div>
+                <div style="font-size: 20px; color: #aaa;">${t('story.target')}: ${targetTime}</div>
+            </div>
+            
+            <!-- Footer Wordmark Only -->
+            <div style="text-align: center; padding-bottom: 20px;">
+                <div style="font-size: 14px; color: #666; margin-bottom: 8px;">${t('story.createdBy')}</div>
+                <div style="font-size: 28px; font-weight: 700; color: #00E5FF; letter-spacing: 1px;">GPXray</div>
+            </div>
+        `;
+
+        document.body.appendChild(card);
+
+        // Wait for logo image to load
+        const logoImg = card.querySelector('#storyCardLogo');
+        if (logoImg && !logoImg.complete) {
+            await new Promise((resolve) => {
+                logoImg.onload = resolve;
+                logoImg.onerror = resolve;
+            });
+        }
+
+        // Use html2canvas to capture (scale 2x for retina)
+        const canvas = await html2canvas(card, {
+            width: 540,
+            height: 960,
+            scale: 2,
+            backgroundColor: null,
+            logging: false,
+            useCORS: true,
+            allowTaint: false
+        });
+
+        document.body.removeChild(card);
+
+        // Create blob and file for sharing
+        const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+        const fileName = (currentRouteName || 'race_story').replace(/[^a-z0-9]/gi, '_').toLowerCase();
+        const file = new File([blob], `${fileName}_story.png`, { type: 'image/png' });
+
+        // Check if Web Share API is available and can share files (mobile)
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+            // Mobile - use native share (Instagram, WhatsApp, etc.)
+            try {
+                await navigator.share({
+                    title: `${routeName} - Race Strategy`,
+                    text: `${wittyStatement.replace(/<br>/g, ' ')}\n\n🏃 ${routeName}\n📅 ${raceDateFormatted}\n\nCreated with https://gpxray.run`,
+                    files: [file]
+                });
+                trackEvent('share_story_card', { race_name: currentRouteName || 'unknown', method: 'native' });
+            } catch (shareError) {
+                if (shareError.name !== 'AbortError') {
+                    // User cancelled, that's fine. Otherwise fall back to download
+                    downloadStoryCard(canvas, fileName);
+                    trackEvent('export_story_card', { race_name: currentRouteName || 'unknown', method: 'download_fallback' });
+                }
+            }
+        } else {
+            // Desktop - download
+            downloadStoryCard(canvas, fileName);
+            trackEvent('export_story_card', { race_name: currentRouteName || 'unknown', method: 'download' });
+        }
+
+    } catch (error) {
+        console.error('Story card generation error:', error);
+        alert('Failed to generate story card. Please try again.');
+    } finally {
+        btn.textContent = originalText;
+        btn.disabled = false;
+    }
+}
+
+// Helper function to download story card as PNG
+function downloadStoryCard(canvas, fileName) {
+    const link = document.createElement('a');
+    link.download = `${fileName}_story.png`;
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+}
+
+// Try to get AI-generated statement (location-aware)
+async function getAIStatement(raceName, location, finishHour, isNextDay, totalHours) {
+    // Only try AI if we have location info
+    if (!location || !API_CONFIG.aiStatementEndpoint) {
+        return null;
+    }
+    
+    try {
+        const response = await fetch(API_CONFIG.aiStatementEndpoint, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                raceName: raceName,
+                location: location,
+                finishHour: finishHour,
+                isNextDay: isNextDay,
+                totalHours: totalHours,
+                lang: currentLang || 'en'
+            }),
+            signal: AbortSignal.timeout(5000) // 5 second timeout
+        });
+        
+        if (!response.ok) {
+            return null;
+        }
+        
+        const data = await response.json();
+        if (data.statement && data.source === 'ai') {
+            console.log('AI statement generated:', data.statement);
+            trackEvent('ai_statement_generated', { race: raceName, location: location });
+            return data.statement;
+        }
+        
+        return null;
+    } catch (error) {
+        console.log('AI statement fallback to local:', error.message);
+        return null;
+    }
+}
+
+// Get witty statement based on finish time (local fallback)
+function getWittyStatement(finishHour, isNextDay, totalHours) {
+    // Helper to pick random translated statement
+    const pick = (keys) => {
+        const key = keys[Math.floor(Math.random() * keys.length)];
+        return t(key);
+    };
+    
+    // Next day or very long races (24h+)
+    if (isNextDay || totalHours >= 24) {
+        return pick(['story.nextDay.1', 'story.nextDay.2', 'story.nextDay.3', 'story.nextDay.4', 'story.nextDay.5', 'story.nextDay.6']);
+    }
+    
+    // Very early morning finish (before 7am)
+    if (finishHour < 7) {
+        return pick(['story.earlyMorning.1', 'story.earlyMorning.2', 'story.earlyMorning.3', 'story.earlyMorning.4', 'story.earlyMorning.5']);
+    }
+    
+    // Morning finish (7am - 11am)
+    if (finishHour < 11) {
+        return pick(['story.morning.1', 'story.morning.2', 'story.morning.3', 'story.morning.4', 'story.morning.5']);
+    }
+    
+    // Midday finish (11am - 2pm)
+    if (finishHour < 14) {
+        return pick(['story.midday.1', 'story.midday.2', 'story.midday.3', 'story.midday.4', 'story.midday.5']);
+    }
+    
+    // Afternoon finish (2pm - 6pm)
+    if (finishHour < 18) {
+        return pick(['story.afternoon.1', 'story.afternoon.2', 'story.afternoon.3', 'story.afternoon.4', 'story.afternoon.5']);
+    }
+    
+    // Evening finish (6pm - 9pm)
+    if (finishHour < 21) {
+        return pick(['story.evening.1', 'story.evening.2', 'story.evening.3', 'story.evening.4', 'story.evening.5']);
+    }
+    
+    // Night finish (9pm - midnight)
+    if (finishHour < 24) {
+        return pick(['story.night.1', 'story.night.2', 'story.night.3', 'story.night.4', 'story.night.5', 'story.night.6']);
+    }
+    
+    // Default
+    return t('story.default');
+}
+
+// Format start time nicely
+function formatStartTime(time) {
+    const [h, m] = time.split(':').map(Number);
+    const ampm = h >= 12 ? 'PM' : 'AM';
+    const hour12 = h % 12 || 12;
+    return `${hour12}:${m.toString().padStart(2, '0')} ${ampm}`;
 }
 
 // Crew Card Export - Simple card for sharing AID station schedule with supporters
@@ -6235,6 +6562,7 @@ function validateRaceCode(raceId, raceConfig) {
         
         // Continue with race mode initialization
         currentRaceConfig = raceConfig;
+        currentRaceLocation = raceConfig.location || '';
         initRaceModeContent(raceConfig);
     } else {
         // Show error
@@ -6308,6 +6636,7 @@ function initRaceMode() {
     }
     
     currentRaceConfig = raceConfig;
+    currentRaceLocation = raceConfig.location || '';
     
     // Initialize race mode content
     initRaceModeContent(raceConfig);
