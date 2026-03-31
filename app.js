@@ -5546,14 +5546,33 @@ async function exportStoryCard() {
 
         document.body.removeChild(card);
 
-        // Download as PNG
-        const link = document.createElement('a');
+        // Create blob and file for sharing
+        const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
         const fileName = (currentRouteName || 'race_story').replace(/[^a-z0-9]/gi, '_').toLowerCase();
-        link.download = `${fileName}_story.png`;
-        link.href = canvas.toDataURL('image/png');
-        link.click();
+        const file = new File([blob], `${fileName}_story.png`, { type: 'image/png' });
 
-        trackEvent('export_story_card', { race_name: currentRouteName || 'unknown' });
+        // Check if Web Share API is available and can share files (mobile)
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+            // Mobile - use native share (Instagram, WhatsApp, etc.)
+            try {
+                await navigator.share({
+                    title: `${routeName} - Race Strategy`,
+                    text: `${wittyStatement.replace(/<br>/g, ' ')}\n\n🏃 ${routeName}\n📅 ${raceDateFormatted}\n\nCreated with https://gpxray.run`,
+                    files: [file]
+                });
+                trackEvent('share_story_card', { race_name: currentRouteName || 'unknown', method: 'native' });
+            } catch (shareError) {
+                if (shareError.name !== 'AbortError') {
+                    // User cancelled, that's fine. Otherwise fall back to download
+                    downloadStoryCard(canvas, fileName);
+                    trackEvent('export_story_card', { race_name: currentRouteName || 'unknown', method: 'download_fallback' });
+                }
+            }
+        } else {
+            // Desktop - download
+            downloadStoryCard(canvas, fileName);
+            trackEvent('export_story_card', { race_name: currentRouteName || 'unknown', method: 'download' });
+        }
 
     } catch (error) {
         console.error('Story card generation error:', error);
@@ -5562,6 +5581,14 @@ async function exportStoryCard() {
         btn.textContent = originalText;
         btn.disabled = false;
     }
+}
+
+// Helper function to download story card as PNG
+function downloadStoryCard(canvas, fileName) {
+    const link = document.createElement('a');
+    link.download = `${fileName}_story.png`;
+    link.href = canvas.toDataURL('image/png');
+    link.click();
 }
 
 // Try to get AI-generated statement (location-aware)
