@@ -360,6 +360,16 @@ function setupItraScore() {
     const itraApplyBtn = document.getElementById('itraApplyBtn');
     const itraClearBtn = document.getElementById('itraClearBtn');
     const raceLevelButtons = document.getElementById('raceLevelButtons');
+    const itraInfoToggle = document.getElementById('itraInfoToggle');
+    const itraInfoBox = document.getElementById('itraInfoBox');
+    
+    // Toggle info box visibility
+    if (itraInfoToggle && itraInfoBox) {
+        itraInfoToggle.addEventListener('click', () => {
+            itraInfoBox.classList.toggle('visible');
+            itraInfoToggle.classList.toggle('active');
+        });
+    }
     
     if (!itraInput || !itraApplyBtn) return;
     

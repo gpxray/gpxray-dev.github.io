@@ -4651,11 +4651,39 @@ h2 {
     border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
+.itra-label-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
 .itra-label {
-    display: block;
     font-size: 0.9rem;
     color: rgba(255, 255, 255, 0.7);
-    margin-bottom: 10px;
+}
+
+.itra-info-icon {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.15);
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.7rem;
+    font-style: italic;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.itra-info-icon:hover,
+.itra-info-icon.active {
+    background: rgba(0, 212, 255, 0.3);
+    color: #00d4ff;
 }
 
 .itra-input-row {
@@ -4666,12 +4694,17 @@ h2 {
 }
 
 .itra-info-box {
+    display: none;
     margin-top: 12px;
     padding: 10px 14px;
     background: rgba(0, 212, 255, 0.08);
     border: 1px solid rgba(0, 212, 255, 0.2);
     border-radius: 8px;
     text-align: center;
+}
+
+.itra-info-box.visible {
+    display: block;
 }
 
 .itra-info-box p {
@@ -4694,13 +4727,6 @@ h2 {
 .itra-link:hover {
     color: #4de8ff;
     text-decoration: underline;
-}
-
-.itra-input-row {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 10px;
 }
 
 .itra-input {

@@ -188,13 +188,16 @@
                     
                     <!-- ITRA Score Optional -->
                     <div class="itra-score-section">
-                        <label class="itra-label" data-i18n="race.itraOptional">Know your ITRA score?</label>
+                        <div class="itra-label-row">
+                            <label class="itra-label" data-i18n="race.itraOptional">Know your ITRA score?</label>
+                            <span class="itra-info-icon" id="itraInfoToggle">i</span>
+                        </div>
                         <div class="itra-input-row">
                             <input type="number" id="itraScoreInput" class="itra-input" min="200" max="1000" placeholder="e.g. 550" />
                             <button type="button" id="itraApplyBtn" class="itra-apply-btn" data-i18n="race.itraApply">Apply</button>
                             <button type="button" id="itraClearBtn" class="itra-clear-btn">✕</button>
                         </div>
-                        <div class="itra-info-box">
+                        <div class="itra-info-box" id="itraInfoBox">
                             <p data-i18n="race.itraExplain">ITRA (International Trail Running Association) assigns performance scores based on your race results.</p>
                             <a href="https://itra.run/Runners/FindARunner" target="_blank" rel="noopener" class="itra-link">🔍 <span data-i18n="race.itraFindScore">Find your ITRA score</span></a>
                         </div>
