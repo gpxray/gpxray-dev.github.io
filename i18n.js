@@ -73,6 +73,7 @@ const TRANSLATIONS = {
         'hero.customize': 'Customize strategy ↓',
         
         // Race landing page
+        'race.strategyTitle': 'Create Your Race Strategy',
         'race.selectLevel': "What's your runner level?",
         'race.selectDistance': 'Which distance are you running?',
         
@@ -437,6 +438,7 @@ const TRANSLATIONS = {
         'hero.customize': 'Strategie anpassen ↓',
         
         // Race landing page
+        'race.strategyTitle': 'Erstelle deine Rennstrategie',
         'race.selectLevel': 'Was ist dein Läufer-Level?',
         'race.selectDistance': 'Welche Distanz läufst du?',
         

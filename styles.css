@@ -4579,10 +4579,32 @@ h2 {
     content: '📍';
 }
 
+/* Race Strategy Box - Visual container for user inputs */
+.race-strategy-box {
+    background: rgba(0, 212, 255, 0.03);
+    border: 1px solid rgba(0, 212, 255, 0.15);
+    border-radius: 16px;
+    padding: 30px 25px;
+    margin-top: 30px;
+}
+
+.race-strategy-title {
+    text-align: center;
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #00d4ff;
+    margin: 0 0 25px 0;
+    letter-spacing: 0.5px;
+}
+
 /* Race Setup Sections - Stacked layout */
 .race-setup-section {
     text-align: center;
     margin-bottom: 25px;
+}
+
+.race-setup-section:last-child {
+    margin-bottom: 0;
 }
 
 .race-setup-label {
