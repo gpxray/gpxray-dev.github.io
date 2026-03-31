@@ -20,6 +20,7 @@ let lastCachedDDL = null; // Store DDL from API - formulas protected on server
 let lastCachedCheckpoints = null; // Store checkpoints from API
 let lastCachedFatigue = 1.0; // Store fatigue multiplier from API
 let preStoredSurfaceData = null; // Pre-computed surface data from race config
+let raceWeatherData = null; // Weather data for race day (for weather adjustment)
 
 // Environment detection
 const IS_DEV = window.location.hostname === 'localhost' || 
@@ -4191,6 +4192,23 @@ function updateHeroSection(totalTime) {
     // Update finish time
     heroTime.textContent = formatTime(totalTime);
     
+    // Update weather-adjusted time if available
+    const weatherAdjustedContainer = document.getElementById('weatherAdjustedTime');
+    const weatherAdjustedValue = document.getElementById('weatherAdjustedValue');
+    const weatherAdjustedInfo = document.getElementById('weatherAdjustedInfo');
+    
+    if (weatherAdjustedContainer && weatherAdjustedValue) {
+        const adjustment = getWeatherAdjustedTime(totalTime);
+        
+        if (adjustment && adjustment.addedMinutes >= 1) {
+            weatherAdjustedValue.textContent = formatTime(adjustment.adjustedMinutes);
+            weatherAdjustedInfo.textContent = `+${adjustment.addedMinutes} min (${adjustment.tempAvg}°C${adjustment.isRainy ? ', rain' : ''})`;
+            weatherAdjustedContainer.style.display = 'block';
+        } else {
+            weatherAdjustedContainer.style.display = 'none';
+        }
+    }
+    
     // Update distance
     if (heroDistance && gpxData) {
         const dist = useMetric ? gpxData.totalDistance : gpxData.totalDistance * KM_TO_MILES;
@@ -6761,6 +6779,19 @@ async function fetchRaceWeather(config) {
         const windSpeed = Math.round(data.daily.windspeed_10m_max[dayIndex]);
         const weatherCode = data.daily.weathercode[dayIndex];
         
+        // Store weather data globally for time adjustment
+        raceWeatherData = {
+            tempMax,
+            tempMin,
+            tempAvg: Math.round((tempMax + tempMin) / 2),
+            rainChance,
+            windSpeed,
+            weatherCode,
+            isRainy: weatherCode >= 51 && weatherCode <= 82,
+            adjustment: calculateWeatherAdjustment(tempMax, tempMin, rainChance, windSpeed, weatherCode)
+        };
+        console.log('Weather adjustment calculated:', raceWeatherData);
+        
         const weatherIcon = getWeatherIcon(weatherCode);
         const weatherDesc = getWeatherDescription(weatherCode);
         
@@ -6810,6 +6841,95 @@ function getWeatherDescription(code) {
     if (code <= 86) return 'Snow showers';
     if (code >= 95) return 'Thunderstorm';
     return 'Variable';
+}
+
+// Weather adjustment algorithm based on research
+// Optimal running temp: 10-15°C, penalty increases outside this range
+function calculateWeatherAdjustment(tempMax, tempMin, rainChance, windSpeed, weatherCode) {
+    let totalPenalty = 0;
+    const breakdown = [];
+    const tempAvg = (tempMax + tempMin) / 2;
+    
+    // Heat penalty: +0.5% per °C above 15°C, accelerates above 25°C
+    if (tempAvg > 15) {
+        const heatDegrees = tempAvg - 15;
+        let heatPenalty;
+        if (tempAvg > 25) {
+            // Accelerated penalty above 25°C: +1% per degree
+            heatPenalty = (10 * 0.5) + ((tempAvg - 25) * 1.0);
+        } else {
+            heatPenalty = heatDegrees * 0.5;
+        }
+        totalPenalty += heatPenalty;
+        breakdown.push({ factor: 'heat', degrees: Math.round(heatDegrees), penalty: heatPenalty });
+    }
+    
+    // Cold penalty: +0.3% per °C below 5°C
+    if (tempAvg < 5) {
+        const coldDegrees = 5 - tempAvg;
+        const coldPenalty = coldDegrees * 0.3;
+        totalPenalty += coldPenalty;
+        breakdown.push({ factor: 'cold', degrees: Math.round(coldDegrees), penalty: coldPenalty });
+    }
+    
+    // Rain penalty on trails: +2-4% depending on intensity
+    const isRainy = weatherCode >= 51 && weatherCode <= 82;
+    if (isRainy || rainChance > 50) {
+        let rainPenalty;
+        if (weatherCode >= 61 && weatherCode <= 67) {
+            rainPenalty = 3.5; // Moderate rain
+        } else if (weatherCode >= 80 && weatherCode <= 82) {
+            rainPenalty = 4.0; // Heavy showers
+        } else if (rainChance > 70) {
+            rainPenalty = 3.0;
+        } else {
+            rainPenalty = 2.0; // Light rain / drizzle
+        }
+        totalPenalty += rainPenalty;
+        breakdown.push({ factor: 'rain', penalty: rainPenalty });
+    }
+    
+    // Wind penalty: +1-2% for strong wind (>30 km/h)
+    if (windSpeed > 30) {
+        const windPenalty = windSpeed > 40 ? 2.0 : 1.0;
+        totalPenalty += windPenalty;
+        breakdown.push({ factor: 'wind', speed: windSpeed, penalty: windPenalty });
+    }
+    
+    return {
+        totalPenaltyPercent: Math.round(totalPenalty * 10) / 10,
+        breakdown,
+        tempAvg: Math.round(tempAvg),
+        description: getWeatherAdjustmentDescription(totalPenalty, tempAvg, isRainy)
+    };
+}
+
+function getWeatherAdjustmentDescription(penalty, tempAvg, isRainy) {
+    if (penalty < 1) return 'Ideal conditions';
+    if (penalty < 2) return 'Good conditions';
+    if (penalty < 4) return isRainy ? 'Wet trails expected' : (tempAvg > 20 ? 'Warm day' : 'Slight slowdown expected');
+    if (penalty < 6) return tempAvg > 25 ? 'Hot conditions - hydrate well' : 'Challenging weather';
+    return 'Difficult conditions - adjust expectations';
+}
+
+// Calculate weather-adjusted finish time
+function getWeatherAdjustedTime(baseTimeMinutes) {
+    if (!raceWeatherData || !raceWeatherData.adjustment) return null;
+    
+    const adjustment = raceWeatherData.adjustment;
+    if (adjustment.totalPenaltyPercent < 0.5) return null; // No significant adjustment
+    
+    const addedMinutes = baseTimeMinutes * (adjustment.totalPenaltyPercent / 100);
+    const adjustedTime = baseTimeMinutes + addedMinutes;
+    
+    return {
+        adjustedMinutes: adjustedTime,
+        addedMinutes: Math.round(addedMinutes),
+        penaltyPercent: adjustment.totalPenaltyPercent,
+        description: adjustment.description,
+        tempAvg: raceWeatherData.tempAvg,
+        isRainy: raceWeatherData.isRainy
+    };
 }
 
 async function selectRaceDistance(distanceConfig, buttonEl) {

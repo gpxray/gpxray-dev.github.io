@@ -1772,6 +1772,38 @@ h2 {
     letter-spacing: 0.5px;
 }
 
+/* Weather Adjusted Time */
+.weather-adjusted-time {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    margin-top: 12px;
+    padding: 12px 20px;
+    background: linear-gradient(135deg, rgba(255, 152, 0, 0.15), rgba(255, 193, 7, 0.1));
+    border: 1px solid rgba(255, 152, 0, 0.3);
+    border-radius: 12px;
+}
+
+.weather-adjusted-label {
+    font-size: 0.85rem;
+    color: #ffb74d;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+}
+
+.weather-adjusted-value {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #ffc107;
+    letter-spacing: 1px;
+}
+
+.weather-adjusted-info {
+    font-size: 0.8rem;
+    color: rgba(255, 183, 77, 0.8);
+}
+
 /* Pace Info Tooltip */
 .info-icon {
     cursor: pointer;
