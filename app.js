@@ -45,11 +45,12 @@ const KM_TO_MILES = 0.621371;
 const MILES_TO_KM = 1.60934;
 
 // Runner level presets - display names only (calculations are server-side)
+// Runner level presets - display defaults for UI (core calculations are server-side)
 const RUNNER_LEVELS = {
-    beginner: { name: 'Beginner' },
-    intermediate: { name: 'Intermediate' },
-    advanced: { name: 'Advanced' },
-    elite: { name: 'Elite' }
+    beginner: { name: 'Beginner', flatPace: 7.5, uphillRatio: 1.5, downhillRatio: 0.9 },
+    intermediate: { name: 'Intermediate', flatPace: 6.5, uphillRatio: 1.4, downhillRatio: 0.85 },
+    advanced: { name: 'Advanced', flatPace: 5.5, uphillRatio: 1.3, downhillRatio: 0.8 },
+    elite: { name: 'Elite', flatPace: 4.5, uphillRatio: 1.25, downhillRatio: 0.75 }
 };
 
 // Surface type display properties (calculations are server-side)
