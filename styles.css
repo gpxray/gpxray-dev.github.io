@@ -4579,48 +4579,43 @@ h2 {
     content: '📍';
 }
 
-/* Race Setup Row - Level + Distance selectors */
-.race-setup-row {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 20px;
-    flex-wrap: wrap;
-    margin-bottom: 15px;
+/* Race Setup Sections - Stacked layout */
+.race-setup-section {
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+.race-setup-label {
+    display: block;
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
 }
 
 .race-runner-level {
-    display: flex;
+    display: inline-flex;
     align-items: center;
-    gap: 10px;
-    padding: 10px 15px;
-    background: rgba(0, 0, 0, 0.3);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    border-radius: 10px;
-}
-
-.race-runner-level label {
-    font-size: 0.85rem;
-    color: rgba(255, 255, 255, 0.7);
+    justify-content: center;
 }
 
 .race-runner-level select {
-    background: rgba(0, 212, 255, 0.15);
-    border: 1px solid rgba(0, 212, 255, 0.4);
-    border-radius: 6px;
+    background: rgba(0, 0, 0, 0.4);
+    border: 2px solid rgba(0, 212, 255, 0.4);
+    border-radius: 10px;
     color: #00d4ff;
-    padding: 6px 10px;
-    font-size: 0.9rem;
+    padding: 12px 20px;
+    font-size: 1rem;
     cursor: pointer;
+    min-width: 180px;
+    transition: all 0.2s ease;
 }
 
-.race-runner-level select:hover {
+.race-runner-level select:hover,
+.race-runner-level select:focus {
     border-color: #00d4ff;
-}
-
-.race-setup-arrow {
-    color: rgba(255, 255, 255, 0.3);
-    font-size: 1.2rem;
+    background: rgba(0, 212, 255, 0.1);
 }
 
 .race-distances {

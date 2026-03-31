@@ -72,6 +72,10 @@ const TRANSLATIONS = {
         'hero.hint': 'Based on default paces',
         'hero.customize': 'Customize strategy ↓',
         
+        // Race landing page
+        'race.selectLevel': 'Select your Runner Level:',
+        'race.selectDistance': 'Select your Race Distance:',
+        
         // Downhill Load tooltip
         'ddl.title': 'Descent Load (DDL/km)',
         'ddl.description': 'Measures downhill stress (steepness + time + surface).',
@@ -431,6 +435,10 @@ const TRANSLATIONS = {
         'hero.elevationGain': 'Höhenmeter',
         'hero.hint': 'Basierend auf Standard-Paces',
         'hero.customize': 'Strategie anpassen ↓',
+        
+        // Race landing page
+        'race.selectLevel': 'Wähle dein Läufer-Level:',
+        'race.selectDistance': 'Wähle deine Renndistanz:',
         
         // Downhill Load tooltip
         'ddl.title': 'Abstiegsbelastung (DDL/km)',

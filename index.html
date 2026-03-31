@@ -171,9 +171,11 @@
                     <div class="weather-loading">Loading forecast...</div>
                 </div>
             </div>
-            <div class="race-setup-row">
+            
+            <!-- Runner Level Section -->
+            <div class="race-setup-section">
+                <label class="race-setup-label" data-i18n="race.selectLevel">Select your Runner Level:</label>
                 <div class="race-runner-level">
-                    <label for="raceRunnerLevel" data-i18n="hero.runnerLevel">Runner Level:</label>
                     <select id="raceRunnerLevel">
                         <option value="beginner" data-i18n="hero.beginner">Beginner</option>
                         <option value="intermediate" selected data-i18n="hero.intermediate">Intermediate</option>
@@ -181,12 +183,15 @@
                         <option value="elite" data-i18n="hero.elite">Elite</option>
                     </select>
                 </div>
-                <span class="race-setup-arrow">→</span>
+            </div>
+            
+            <!-- Distance Section -->
+            <div class="race-setup-section">
+                <label class="race-setup-label" data-i18n="race.selectDistance">Select your Race Distance:</label>
                 <div class="race-distances" id="raceDistances">
                     <!-- Distance buttons will be populated here -->
                 </div>
             </div>
-            <p class="race-instruction">Select your level and distance to create your race strategy</p>
         </section>
 
         <!-- Feedback Panel -->
