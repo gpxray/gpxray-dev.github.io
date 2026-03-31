@@ -138,7 +138,7 @@ const RACE_CONFIGS = {
         date: '2026-04-18',
         location: 'Nideggen, Germany',
         website: 'https://www.rureifel-trail.com',
-        logo: null,
+        logo: 'https://gpxrayraces.blob.core.windows.net/logos/ret-logo.png',
         tagline: 'Go Nature, Go Rureifel Trail',
         accessCode: 'RUREIFEL26', // Access code for race page
         
