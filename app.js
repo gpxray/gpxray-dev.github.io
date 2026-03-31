@@ -6708,9 +6708,108 @@ function populateRaceLanding(config) {
         });
         
         console.log('Race landing populated successfully');
+        
+        // Fetch weather forecast if coordinates available
+        if (config.coordinates && config.date) {
+            fetchRaceWeather(config);
+        }
     } catch (error) {
         console.error('Error in populateRaceLanding:', error);
     }
+}
+
+// Weather forecast for race landing page
+async function fetchRaceWeather(config) {
+    const widget = document.getElementById('raceWeatherWidget');
+    const content = document.getElementById('weatherContent');
+    if (!widget || !content) return;
+    
+    const raceDate = new Date(config.date);
+    const today = new Date();
+    const daysUntilRace = Math.ceil((raceDate - today) / (1000 * 60 * 60 * 24));
+    
+    // Only show forecast if race is within 16 days (Open-Meteo limit)
+    if (daysUntilRace < 0 || daysUntilRace > 16) {
+        content.innerHTML = `<p class="weather-note">Weather forecast available ${daysUntilRace > 16 ? '2 weeks before race' : 'for upcoming races'}</p>`;
+        widget.style.display = 'block';
+        return;
+    }
+    
+    widget.style.display = 'block';
+    
+    try {
+        const { lat, lon } = config.coordinates;
+        const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max,weathercode,windspeed_10m_max&timezone=Europe/Berlin`;
+        
+        const response = await fetch(url);
+        if (!response.ok) throw new Error('Weather API error');
+        
+        const data = await response.json();
+        
+        // Find race day in forecast
+        const raceDateStr = config.date;
+        const dayIndex = data.daily.time.indexOf(raceDateStr);
+        
+        if (dayIndex === -1) {
+            content.innerHTML = `<p class="weather-note">Forecast not yet available for ${raceDate.toLocaleDateString()}</p>`;
+            return;
+        }
+        
+        const tempMax = Math.round(data.daily.temperature_2m_max[dayIndex]);
+        const tempMin = Math.round(data.daily.temperature_2m_min[dayIndex]);
+        const rainChance = data.daily.precipitation_probability_max[dayIndex];
+        const windSpeed = Math.round(data.daily.windspeed_10m_max[dayIndex]);
+        const weatherCode = data.daily.weathercode[dayIndex];
+        
+        const weatherIcon = getWeatherIcon(weatherCode);
+        const weatherDesc = getWeatherDescription(weatherCode);
+        
+        content.innerHTML = `
+            <div class="weather-forecast">
+                <div class="weather-main">
+                    <span class="weather-icon">${weatherIcon}</span>
+                    <span class="weather-temp">${tempMin}° - ${tempMax}°C</span>
+                </div>
+                <div class="weather-details">
+                    <span class="weather-desc">${weatherDesc}</span>
+                    <span class="weather-rain">💧 ${rainChance}% rain</span>
+                    <span class="weather-wind">💨 ${windSpeed} km/h</span>
+                </div>
+                <p class="weather-update">Updated: ${new Date().toLocaleDateString()}</p>
+            </div>
+        `;
+        
+    } catch (error) {
+        console.error('Weather fetch error:', error);
+        content.innerHTML = `<p class="weather-note">Weather forecast temporarily unavailable</p>`;
+    }
+}
+
+function getWeatherIcon(code) {
+    // WMO Weather interpretation codes
+    if (code === 0) return '☀️';
+    if (code <= 3) return '⛅';
+    if (code <= 48) return '🌫️';
+    if (code <= 57) return '🌧️';
+    if (code <= 67) return '🌧️';
+    if (code <= 77) return '❄️';
+    if (code <= 82) return '🌧️';
+    if (code <= 86) return '🌨️';
+    if (code >= 95) return '⛈️';
+    return '🌤️';
+}
+
+function getWeatherDescription(code) {
+    if (code === 0) return 'Clear sky';
+    if (code <= 3) return 'Partly cloudy';
+    if (code <= 48) return 'Foggy';
+    if (code <= 57) return 'Drizzle';
+    if (code <= 67) return 'Rain';
+    if (code <= 77) return 'Snow';
+    if (code <= 82) return 'Rain showers';
+    if (code <= 86) return 'Snow showers';
+    if (code >= 95) return 'Thunderstorm';
+    return 'Variable';
 }
 
 async function selectRaceDistance(distanceConfig, buttonEl) {

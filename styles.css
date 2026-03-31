@@ -4397,6 +4397,77 @@ h2 {
     transform: translateY(-1px);
 }
 
+/* Weather Widget */
+.race-weather-widget {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 16px 24px;
+    margin: 20px auto;
+    max-width: 400px;
+    text-align: center;
+}
+
+.race-weather-widget h3 {
+    font-size: 1rem;
+    color: #00d4ff;
+    margin: 0 0 12px 0;
+    font-weight: 500;
+}
+
+.weather-forecast {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.weather-main {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    font-size: 1.5rem;
+}
+
+.weather-icon {
+    font-size: 2rem;
+}
+
+.weather-temp {
+    font-weight: 600;
+    color: #fff;
+}
+
+.weather-details {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    flex-wrap: wrap;
+    color: #aaa;
+    font-size: 0.9rem;
+}
+
+.weather-desc {
+    color: #ccc;
+}
+
+.weather-update {
+    font-size: 0.75rem;
+    color: #666;
+    margin: 8px 0 0 0;
+}
+
+.weather-note {
+    color: #888;
+    font-size: 0.9rem;
+    margin: 0;
+}
+
+.weather-loading {
+    color: #666;
+    font-size: 0.9rem;
+}
+
 .race-date::before {
     content: '📅';
 }
