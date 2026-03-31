@@ -4587,9 +4587,10 @@ h2 {
 
 .race-setup-label {
     display: block;
-    font-size: 1rem;
-    color: rgba(255, 255, 255, 0.8);
-    margin-bottom: 12px;
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: #fff;
+    margin-bottom: 14px;
 }
 
 .race-level-buttons {
