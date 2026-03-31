@@ -4326,7 +4326,7 @@ function updateHeroSection(totalTime) {
     }
     
     // Check and display cutoff warning for race pages
-    const cutoffWarning = document.getElementById('cutoffWarning');
+    // cutoffWarning already declared above for weather divider logic
     const cutoffTimeEl = document.getElementById('cutoffTime');
     
     if (cutoffWarning && cutoffTimeEl && currentDistanceConfig && currentDistanceConfig.finishCutoff) {
