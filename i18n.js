@@ -25,7 +25,7 @@ const TRANSLATIONS = {
         'pill.aidStations.info': 'Never bonk between stations. See how far and how hard each leg is — fuel and pace accordingly.',
         'pill.sunTimes.info': 'Race the light, not just the clock. Know when you\'ll need your headlamp so you pack smart and run confident.',
         'pill.shareCard.info': 'Show your race plan to the world. Create a visual strategy card to share with friends and on social media.',
-        'pill.lockscreenCard.info': 'Your race plan at a glance. Save your splits to your phone lockscreen — check pace mid-race without unlocking.',
+        'pill.lockscreenCard.info': 'Stay focused when it hurts. See distance to the next aid and where the big climbs hit — one glance, no thinking.','
         'pill.nutritionPlanner.info': 'Fuel without guessing. Plan calories and hydration for every leg so you stay strong to the finish.',
         'pill.downhillLoad.info': 'Protect your quads for race day. See where cumulative descent stress will peak — so you know when to hold back.',
         'pill.crewCard.info': 'Keep your crew in sync. Give them exact times and locations so they\'re ready when you roll in.',
@@ -380,7 +380,7 @@ const TRANSLATIONS = {
         'pill.aidStations.info': 'Nie wieder Hungerast zwischen den Stationen. Sieh wie weit und wie hart jede Etappe ist — und verpflege dich richtig.',
         'pill.sunTimes.info': 'Lauf dem Licht voraus. Wisse wann du die Stirnlampe brauchst — pack smart und lauf sicher.',
         'pill.shareCard.info': 'Zeig deinen Rennplan der Welt. Erstelle eine Strategie-Karte zum Teilen mit Freunden und auf Social Media.',
-        'pill.lockscreenCard.info': 'Dein Rennplan auf einen Blick. Speichere deine Splits auf dem Sperrbildschirm — checke dein Tempo unterwegs ohne zu entsperren.',
+        'pill.lockscreenCard.info': 'Bleib fokussiert wenn es wehtut. Sieh die Distanz zur nächsten Verpflegung und wo die harten Anstiege kommen — ein Blick, kein Nachdenken.',
         'pill.nutritionPlanner.info': 'Verpflegung ohne Rätselraten. Plane Kalorien und Flüssigkeit für jede Etappe — stark bis ins Ziel.',
         'pill.downhillLoad.info': 'Schone deine Oberschenkel fürs Rennen. Sieh wo die Abstiegsbelastung ihren Höhepunkt erreicht — und halte dich zurück.',
         'pill.crewCard.info': 'Halte dein Crew-Team synchron. Gib ihnen genaue Zeiten und Standorte — sie sind bereit wenn du ankommst.',
