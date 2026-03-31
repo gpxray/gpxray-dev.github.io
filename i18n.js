@@ -25,7 +25,7 @@ const TRANSLATIONS = {
         'pill.aidStations.info': 'Never bonk between stations. See how far and how hard each leg is — fuel and pace accordingly.',
         'pill.sunTimes.info': 'Race the light, not just the clock. Know when you\'ll need your headlamp so you pack smart and run confident.',
         'pill.shareCard.info': 'Show your race plan to the world. Create a visual strategy card to share with friends and on social media.',
-        'pill.lockscreenCard.info': 'Stay focused when it hurts. See distance to the next aid and where the big climbs hit — one glance, no thinking.','
+        'pill.lockscreenCard.info': 'Stay focused when it hurts. See distance to the next aid and where the big climbs hit — one glance, no thinking.',
         'pill.nutritionPlanner.info': 'Fuel without guessing. Plan calories and hydration for every leg so you stay strong to the finish.',
         'pill.downhillLoad.info': 'Protect your quads for race day. See where cumulative descent stress will peak — so you know when to hold back.',
         'pill.crewCard.info': 'Keep your crew in sync. Give them exact times and locations so they\'re ready when you roll in.',
