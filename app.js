@@ -5446,8 +5446,13 @@ async function exportStoryCard() {
         `;
 
         card.innerHTML = `
-            <!-- Witty Statement (Hero) -->
-            <div style="text-align: center; padding-top: 40px;">
+            <!-- Logo at Top -->
+            <div style="text-align: center; padding-top: 20px;">
+                <img id="storyCardLogo" crossorigin="anonymous" src="img/gpxray-app-icon-300.png" style="height: 160px; width: 160px; border-radius: 28px;">
+            </div>
+            
+            <!-- Witty Statement -->
+            <div style="text-align: center;">
                 <div style="font-size: 36px; font-weight: 600; font-style: italic; color: #00E5FF; line-height: 1.4; max-width: 440px;">
                     ${wittyStatement}
                 </div>
@@ -5462,13 +5467,10 @@ async function exportStoryCard() {
                 <div style="font-size: 20px; color: #aaa;">${t('story.target')}: ${targetTime}</div>
             </div>
             
-            <!-- GPXray Branding with Logo -->
+            <!-- Footer Wordmark Only -->
             <div style="text-align: center; padding-bottom: 20px;">
-                <div style="font-size: 14px; color: #666; margin-bottom: 10px;">${t('story.createdBy')}</div>
-                <div style="display: flex; align-items: center; justify-content: center; gap: 12px;">
-                    <img id="storyCardLogo" crossorigin="anonymous" src="img/gpxray-app-icon-300.png" style="height: 48px; width: 48px; border-radius: 10px;">
-                    <div style="font-size: 28px; font-weight: 700; color: #00E5FF; letter-spacing: 1px;">GPXray</div>
-                </div>
+                <div style="font-size: 14px; color: #666; margin-bottom: 8px;">${t('story.createdBy')}</div>
+                <div style="font-size: 28px; font-weight: 700; color: #00E5FF; letter-spacing: 1px;">GPXray</div>
             </div>
         `;
 
