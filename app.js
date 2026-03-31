@@ -5435,7 +5435,7 @@ async function exportStoryCard() {
             width: 540px;
             height: 960px;
             background: linear-gradient(180deg, #0a1628 0%, #0d1f3c 50%, #0a1628 100%);
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-family: 'Sora', -apple-system, BlinkMacSystemFont, sans-serif;
             color: white;
             box-sizing: border-box;
             display: flex;
