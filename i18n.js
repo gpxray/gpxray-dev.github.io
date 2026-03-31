@@ -248,6 +248,7 @@ const TRANSLATIONS = {
         'btn.creating': '⏳ Creating...',
         'btn.joining': 'Joining...',
         'btn.joinWaitlist': 'Join Waitlist',
+        'btn.shareStrategy': 'Share Your Strategy',
         
         // Race browser
         'races.noResults': 'No races found matching your criteria.',
@@ -569,6 +570,7 @@ const TRANSLATIONS = {
         'btn.creating': '⏳ Erstelle...',
         'btn.joining': 'Beitritt...',
         'btn.joinWaitlist': 'Warteliste beitreten',
+        'btn.shareStrategy': 'Strategie teilen',
         
         // Race browser
         'races.noResults': 'Keine Rennen gefunden, die deinen Kriterien entsprechen.',
