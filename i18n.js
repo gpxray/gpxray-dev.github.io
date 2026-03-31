@@ -248,7 +248,7 @@ const TRANSLATIONS = {
         'btn.creating': '⏳ Creating...',
         'btn.joining': 'Joining...',
         'btn.joinWaitlist': 'Join Waitlist',
-        'btn.shareStrategy': 'Share Your Strategy',
+        'btn.shareStrategy': 'Share Your Plan',
         
         // Race browser
         'races.noResults': 'No races found matching your criteria.',
@@ -318,7 +318,7 @@ const TRANSLATIONS = {
         'story.night.5': 'Headlamp heroes. 🔦<br>Night shift running.',
         'story.night.6': 'Chasing stars tonight. ⭐<br>Be home before dawn.',
         'story.default': "Out for a run. 🏃<br>Back when I'm done.",
-        'story.myStrategy': 'My Race Strategy',
+        'story.myStrategy': 'My Race Plan',
         'story.createdBy': 'Strategy created by',
         'story.start': 'Start',
         'story.target': 'Target'
@@ -570,7 +570,7 @@ const TRANSLATIONS = {
         'btn.creating': '⏳ Erstelle...',
         'btn.joining': 'Beitritt...',
         'btn.joinWaitlist': 'Warteliste beitreten',
-        'btn.shareStrategy': 'Strategie teilen',
+        'btn.shareStrategy': 'Plan teilen',
         
         // Race browser
         'races.noResults': 'Keine Rennen gefunden, die deinen Kriterien entsprechen.',
@@ -641,7 +641,7 @@ const TRANSLATIONS = {
         'story.night.6': 'Sterne jagen heute Nacht. ⭐<br>Vor Sonnenaufgang daheim.',
         'story.night.4': 'Zurück vor der Bettzeit.<br>Hoffentlich. 🤞',
         'story.default': 'Bin laufen. 🏃<br>Zurück wenn ich fertig bin.',
-        'story.myStrategy': 'Meine Rennstrategie',
+        'story.myStrategy': 'Mein Rennplan',
         'story.createdBy': 'Strategie erstellt mit',
         'story.start': 'Start',
         'story.target': 'Ziel'
