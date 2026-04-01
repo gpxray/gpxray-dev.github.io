@@ -267,7 +267,7 @@ const TRANSLATIONS = {
         'btn.shareStrategy': 'Share Your Plan',
         
         // Share card preview
-        'share.previewLabel': 'Your card statement:',
+        'share.previewLabel': 'Your Plan Card will say:',
         
         // Race browser
         'races.noResults': 'No races found matching your criteria.',
@@ -641,7 +641,7 @@ const TRANSLATIONS = {
         'btn.shareStrategy': 'Plan teilen',
         
         // Share card preview
-        'share.previewLabel': 'Dein Kartenspruch:',
+        'share.previewLabel': 'Auf deiner Karte steht:',
         
         // Race browser
         'races.noResults': 'Keine Rennen gefunden, die deinen Kriterien entsprechen.',
