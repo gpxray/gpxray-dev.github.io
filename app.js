@@ -939,7 +939,8 @@ function getWeatherTip(weather, weatherCode) {
     // Check for snow (codes 71-77, 85-86: snow)
     const isSnowy = (code >= 71 && code <= 77) || (code >= 85 && code <= 86);
     
-    if (isRainy || weather.rainChance >= 50) {
+    // Rain tip: only if significant rain chance (≥40%) or heavy rain with ≥30% chance
+    if (weather.rainChance >= 40 || (isRainy && weather.rainChance >= 30)) {
         return {
             icon: '🧥',
             text: lang === 'de' ? 'Regenjacke nicht vergessen!' : "Don't forget your rain jacket!"
