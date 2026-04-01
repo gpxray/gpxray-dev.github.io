@@ -757,8 +757,8 @@ async function fetchGpxWeather() {
             return;
         }
         
-        const tempMax = Math.round(data.daily.temperature_2m_max[dayIndex]);
-        const tempMin = Math.round(data.daily.temperature_2m_min[dayIndex]);
+        const tempMax = 32; // DEBUG: Fake hot weather to test adjustment
+        const tempMin = 25; // DEBUG: Fake hot weather
         const rainChance = data.daily.precipitation_probability_max[dayIndex];
         const weatherCode = data.daily.weathercode[dayIndex];
         const windSpeed = Math.round(data.daily.windspeed_10m_max[dayIndex]);
@@ -772,7 +772,8 @@ async function fetchGpxWeather() {
             weatherCode,
             windSpeed,
             isHot: tempMax >= 25,
-            isRainy: rainChance > 50
+            isRainy: rainChance > 50,
+            adjustment: calculateWeatherAdjustment(tempMax, tempMin, rainChance, windSpeed, weatherCode)
         };
         
         // Show weather widget in results area
