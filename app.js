@@ -977,10 +977,15 @@ function updateHeroWeatherWidget(weather, weatherCode, adjustment) {
     if (detailsEl) detailsEl.style.display = 'flex'; // Re-show if was hidden
     
     // Show weather tip based on conditions
+    // DEBUG: Show tip status in description temporarily
+    const debugDiv = document.createElement('div');
+    debugDiv.style.cssText = 'background: #ff0; color: #000; padding: 4px; font-size: 11px; margin-top: 4px;';
+    
     if (tipContainer && tipIconEl && tipTextEl) {
         console.log('Getting weather tip for:', weather, 'code:', weatherCode);
         const tip = getWeatherTip(weather, weatherCode);
         console.log('Weather tip result:', tip);
+        debugDiv.textContent = `DEBUG: tempMin=${weather.tempMin}, tempMax=${weather.tempMax}, rain=${weather.rainChance}%, tip=${tip ? tip.text : 'null'}`;
         if (tip) {
             tipIconEl.textContent = tip.icon;
             tipTextEl.textContent = tip.text;
@@ -989,8 +994,13 @@ function updateHeroWeatherWidget(weather, weatherCode, adjustment) {
             tipContainer.style.display = 'none';
         }
     } else {
+        debugDiv.textContent = `DEBUG: Tip elements NOT found! tipContainer=${!!tipContainer}, tipIconEl=${!!tipIconEl}, tipTextEl=${!!tipTextEl}`;
         console.log('Tip elements not found:', { tipContainer, tipIconEl, tipTextEl });
     }
+    
+    // Append debug div to hero widget
+    const heroWidget = document.getElementById('heroWeatherWidget');
+    if (heroWidget) heroWidget.appendChild(debugDiv);
     
     // Show adjustment if applicable
     if (adjContainer && adjTextEl && adjustment && adjustment.addedMinutes > 0) {
