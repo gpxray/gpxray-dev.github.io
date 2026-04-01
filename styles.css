@@ -3678,6 +3678,65 @@ h2 {
     color: #00d4ff;
 }
 
+/* Statement Preview Section for Share Card */
+.statement-preview-section {
+    width: 100%;
+    margin: 16px 0;
+    padding: 12px 16px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.statement-preview-label {
+    margin: 0 0 8px 0;
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.6);
+    text-align: center;
+}
+
+.statement-preview-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+}
+
+.statement-preview {
+    margin: 0;
+    font-size: 1rem;
+    font-style: italic;
+    color: #00d4ff;
+    text-align: center;
+    flex: 1;
+    max-width: 400px;
+}
+
+.reroll-btn {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.reroll-btn:hover {
+    background: rgba(0, 212, 255, 0.2);
+    border-color: #00d4ff;
+    transform: rotate(180deg);
+}
+
+.reroll-btn:active {
+    transform: rotate(360deg) scale(0.95);
+}
+
 /* Share Your Strategy button in hero */
 .share-strategy-btn {
     display: inline-block;

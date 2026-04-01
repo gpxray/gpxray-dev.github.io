@@ -21,6 +21,8 @@ let lastCachedCheckpoints = null; // Store checkpoints from API
 let lastCachedFatigue = 1.0; // Store fatigue multiplier from API
 let preStoredSurfaceData = null; // Pre-computed surface data from race config
 let raceWeatherData = null; // Weather data for race day (for weather adjustment)
+let currentStatementIndex = 0; // Current index for statement reroll
+let currentStatementCategory = null; // Current statement time category
 
 // Environment detection
 const IS_DEV = window.location.hostname === 'localhost' || 
@@ -2003,6 +2005,7 @@ function showSections() {
 // Check if Story card button should be visible
 function updateStoryButtonVisibility() {
     const storyBtn = document.getElementById('exportStoryCard');
+    const previewSection = document.getElementById('statementPreviewSection');
     if (!storyBtn) return;
     
     // Always show on dev, only RET races on production
@@ -2012,8 +2015,15 @@ function updateStoryButtonVisibility() {
     
     if (IS_DEV || isRETRace) {
         storyBtn.style.display = 'inline-flex';
+        if (previewSection) {
+            previewSection.style.display = 'block';
+            initStatementPreview();
+        }
     } else {
         storyBtn.style.display = 'none';
+        if (previewSection) {
+            previewSection.style.display = 'none';
+        }
     }
 }
 
@@ -4021,6 +4031,9 @@ function displayApiResults(result) {
     // Update Hero section
     updateHeroSection(totalTimeMinutes);
     
+    // Update statement preview if visible
+    updateStatementPreview();
+    
     console.log('Race plan calculated via API', { fatigueMultiplier, checkpoints, ddl });
 }
 
@@ -5752,8 +5765,8 @@ async function exportStoryCard() {
             finishHour = parseInt(clockMatch[1]);
         }
 
-        // Use pre-defined witty statements
-        let wittyStatement = getWittyStatement(finishHour, isNextDay, totalHours);
+        // Use the statement from preview (already selected by user via reroll)
+        let wittyStatement = getWittyStatement(finishHour, isNextDay, totalHours, currentStatementIndex);
 
         // Format target time (simplified)
         let targetTime = totalTimeText.split('(')[0].trim();
@@ -5949,51 +5962,102 @@ async function getAIStatement(raceName, location, finishHour, isNextDay, totalHo
     }
 }
 
+// Get statement category based on finish time
+function getStatementCategory(finishHour, isNextDay, totalHours) {
+    if (isNextDay || totalHours >= 24) return 'nextDay';
+    if (finishHour < 7) return 'earlyMorning';
+    if (finishHour < 11) return 'morning';
+    if (finishHour < 14) return 'midday';
+    if (finishHour < 18) return 'afternoon';
+    if (finishHour < 21) return 'evening';
+    if (finishHour < 24) return 'night';
+    return 'default';
+}
+
+// Get statement keys for a category
+function getStatementKeys(category) {
+    if (category === 'default') return ['story.default'];
+    return [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(i => `story.${category}.${i}`);
+}
+
 // Get witty statement based on finish time (local fallback)
-function getWittyStatement(finishHour, isNextDay, totalHours) {
-    // Helper to pick random translated statement
-    const pick = (keys) => {
-        const key = keys[Math.floor(Math.random() * keys.length)];
-        return t(key);
-    };
+function getWittyStatement(finishHour, isNextDay, totalHours, forceIndex = null) {
+    const category = getStatementCategory(finishHour, isNextDay, totalHours);
+    const keys = getStatementKeys(category);
     
-    // Next day or very long races (24h+)
-    if (isNextDay || totalHours >= 24) {
-        return pick(['story.nextDay.1', 'story.nextDay.2', 'story.nextDay.3', 'story.nextDay.4', 'story.nextDay.5', 'story.nextDay.6', 'story.nextDay.7', 'story.nextDay.8', 'story.nextDay.9', 'story.nextDay.10']);
+    // Update current category for reroll
+    currentStatementCategory = category;
+    
+    // Use forced index or current index
+    const index = forceIndex !== null ? forceIndex : currentStatementIndex;
+    const safeIndex = index % keys.length;
+    
+    return t(keys[safeIndex]);
+}
+
+// Reroll to next statement in current category
+function rerollStatement() {
+    if (!currentStatementCategory) return;
+    
+    const keys = getStatementKeys(currentStatementCategory);
+    currentStatementIndex = (currentStatementIndex + 1) % keys.length;
+    
+    // Update preview display
+    updateStatementPreview();
+}
+
+// Update statement preview display
+function updateStatementPreview() {
+    const previewEl = document.getElementById('statementPreview');
+    if (!previewEl) return;
+    
+    // Get current finish time info
+    const finishInfo = getFinishTimeInfo();
+    if (!finishInfo) return;
+    
+    const statement = getWittyStatement(finishInfo.finishHour, finishInfo.isNextDay, finishInfo.totalHours, currentStatementIndex);
+    previewEl.textContent = `"${statement}"`;
+}
+
+// Get finish time info for statement generation
+function getFinishTimeInfo() {
+    const totalTimeText = document.getElementById('totalTime')?.textContent || '-';
+    const splitsTable = document.getElementById('splitsTable');
+    
+    let finishClockTime = '';
+    if (splitsTable) {
+        const allRows = splitsTable.querySelectorAll('tbody tr');
+        if (allRows.length > 0) {
+            const lastRow = allRows[allRows.length - 1];
+            const cells = lastRow.querySelectorAll('td');
+            finishClockTime = cells[9]?.textContent || '';
+        }
     }
     
-    // Very early morning finish (before 7am)
-    if (finishHour < 7) {
-        return pick(['story.earlyMorning.1', 'story.earlyMorning.2', 'story.earlyMorning.3', 'story.earlyMorning.4', 'story.earlyMorning.5', 'story.earlyMorning.6', 'story.earlyMorning.7', 'story.earlyMorning.8', 'story.earlyMorning.9', 'story.earlyMorning.10']);
+    let totalHours = 0;
+    const timeMatch = totalTimeText.match(/(\d+):(\d+)/);
+    if (timeMatch) {
+        totalHours = parseInt(timeMatch[1]) + parseInt(timeMatch[2]) / 60;
     }
     
-    // Morning finish (7am - 11am)
-    if (finishHour < 11) {
-        return pick(['story.morning.1', 'story.morning.2', 'story.morning.3', 'story.morning.4', 'story.morning.5', 'story.morning.6', 'story.morning.7', 'story.morning.8', 'story.morning.9', 'story.morning.10']);
+    let finishHour = 12;
+    let isNextDay = finishClockTime.includes('+1') || finishClockTime.includes('+2');
+    const clockMatch = finishClockTime.match(/(\d+):(\d+)/);
+    if (clockMatch) {
+        finishHour = parseInt(clockMatch[1]);
     }
     
-    // Midday finish (11am - 2pm)
-    if (finishHour < 14) {
-        return pick(['story.midday.1', 'story.midday.2', 'story.midday.3', 'story.midday.4', 'story.midday.5', 'story.midday.6', 'story.midday.7', 'story.midday.8', 'story.midday.9', 'story.midday.10']);
-    }
+    return { finishHour, isNextDay, totalHours };
+}
+
+// Initialize statement preview when share section becomes visible
+function initStatementPreview() {
+    const previewEl = document.getElementById('statementPreview');
+    if (!previewEl) return;
     
-    // Afternoon finish (2pm - 6pm)
-    if (finishHour < 18) {
-        return pick(['story.afternoon.1', 'story.afternoon.2', 'story.afternoon.3', 'story.afternoon.4', 'story.afternoon.5', 'story.afternoon.6', 'story.afternoon.7', 'story.afternoon.8', 'story.afternoon.9', 'story.afternoon.10']);
-    }
-    
-    // Evening finish (6pm - 9pm)
-    if (finishHour < 21) {
-        return pick(['story.evening.1', 'story.evening.2', 'story.evening.3', 'story.evening.4', 'story.evening.5', 'story.evening.6', 'story.evening.7', 'story.evening.8', 'story.evening.9', 'story.evening.10']);
-    }
-    
-    // Night finish (9pm - midnight)
-    if (finishHour < 24) {
-        return pick(['story.night.1', 'story.night.2', 'story.night.3', 'story.night.4', 'story.night.5', 'story.night.6', 'story.night.7', 'story.night.8', 'story.night.9', 'story.night.10']);
-    }
-    
-    // Default
-    return t('story.default');
+    // Reset index for new calculation
+    currentStatementIndex = Math.floor(Math.random() * 10);
+    updateStatementPreview();
 }
 
 // Format start time nicely

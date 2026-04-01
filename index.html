@@ -502,6 +502,14 @@
                     <!-- AID station times will appear here -->
                 </div>
                 
+                <div class="statement-preview-section" id="statementPreviewSection" style="display: none;">
+                    <p class="statement-preview-label"><span data-i18n="share.previewLabel">Your card statement:</span></p>
+                    <div class="statement-preview-row">
+                        <p class="statement-preview" id="statementPreview">"Loading..."</p>
+                        <button class="reroll-btn" onclick="rerollStatement()" title="Get different statement">🔄</button>
+                    </div>
+                </div>
+                
                 <div style="text-align: center; width: 100%;">
                     <button id="exportStoryCard" class="share-strategy-btn" style="display: none;">📸 <span data-i18n="btn.shareStrategy">Share Your Strategy</span></button>
                 </div>

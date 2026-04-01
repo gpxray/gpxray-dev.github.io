@@ -266,6 +266,9 @@ const TRANSLATIONS = {
         'btn.joinWaitlist': 'Join Waitlist',
         'btn.shareStrategy': 'Share Your Plan',
         
+        // Share card preview
+        'share.previewLabel': 'Your card statement:',
+        
         // Race browser
         'races.noResults': 'No races found matching your criteria.',
         
@@ -636,6 +639,9 @@ const TRANSLATIONS = {
         'btn.joining': 'Beitritt...',
         'btn.joinWaitlist': 'Warteliste beitreten',
         'btn.shareStrategy': 'Plan teilen',
+        
+        // Share card preview
+        'share.previewLabel': 'Dein Kartenspruch:',
         
         // Race browser
         'races.noResults': 'Keine Rennen gefunden, die deinen Kriterien entsprechen.',
