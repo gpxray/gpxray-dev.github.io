@@ -591,7 +591,10 @@ function setupDatePresets() {
                     if (targetHoursInput) targetHoursInput.value = hours;
                     if (targetMinutesInput) targetMinutesInput.value = minutes;
                     
-                    // Activate target time mode
+                    // IMPORTANT: Set the actual mode to 'target'
+                    currentMode = 'target';
+                    
+                    // Activate target time mode UI
                     const targetBtn = document.getElementById('targetModeBtn');
                     const manualBtn = document.getElementById('manualModeBtn');
                     const targetMode = document.getElementById('targetMode');
@@ -600,6 +603,8 @@ function setupDatePresets() {
                     if (manualBtn) manualBtn.classList.remove('active');
                     if (targetMode) targetMode.style.display = 'block';
                     if (manualMode) manualMode.style.display = 'none';
+                    
+                    console.log('Target time mode activated:', hours, ':', minutes);
                 }
             }
             
