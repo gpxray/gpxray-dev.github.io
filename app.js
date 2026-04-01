@@ -605,27 +605,44 @@ function setupDatePresets() {
             
             // Trigger calculation
             if (gpxData && segments.length > 0) {
-                // Show all sections that were hidden until Calculate
-                showAllSections();
-                
-                calculateRacePlan();
-                
-                // Fetch weather for GPX upload (if date is within 16 days)
-                fetchGpxWeather();
-                
-                // Recalculate sun times with synced date, then update hero display
-                updateSunTimesDisplay();
-                updateHeroSunTimes();
-                
-                // Hide strategy box and show edit button
+                // Show loading state
                 const strategyBox = document.getElementById('heroRunnerLevel');
-                const editBtn = document.getElementById('editStrategyBtn');
-                if (strategyBox) strategyBox.style.display = 'none';
-                if (editBtn) editBtn.style.display = 'inline-flex';
+                calculateBtn.disabled = true;
+                calculateBtn.innerHTML = '⏳ <span data-i18n="race.calculating">Calculating...</span>';
+                calculateBtn.classList.add('loading');
+                if (strategyBox) strategyBox.classList.add('loading');
                 
-                // Hide the paceSection (redundant now)
-                const paceSection = document.getElementById('paceSection');
-                if (paceSection) paceSection.style.display = 'none';
+                // Use setTimeout to allow UI to update before heavy calculation
+                setTimeout(async () => {
+                    // Show all sections that were hidden until Calculate
+                    showAllSections();
+                    
+                    calculateRacePlan();
+                    
+                    // Fetch weather for GPX upload (if date is within 16 days)
+                    await fetchGpxWeather();
+                    
+                    // Recalculate sun times with synced date, then update hero display
+                    updateSunTimesDisplay();
+                    updateHeroSunTimes();
+                    
+                    // Hide strategy box and show edit button
+                    if (strategyBox) {
+                        strategyBox.style.display = 'none';
+                        strategyBox.classList.remove('loading');
+                    }
+                    const editBtn = document.getElementById('editStrategyBtn');
+                    if (editBtn) editBtn.style.display = 'inline-flex';
+                    
+                    // Reset button state
+                    calculateBtn.disabled = false;
+                    calculateBtn.innerHTML = '🚀 <span data-i18n="race.calculate">Calculate Strategy</span>';
+                    calculateBtn.classList.remove('loading');
+                    
+                    // Hide the paceSection (redundant now)
+                    const paceSection = document.getElementById('paceSection');
+                    if (paceSection) paceSection.style.display = 'none';
+                }, 50);
             }
         });
     }
@@ -725,30 +742,23 @@ async function fetchGpxWeather() {
         
         const data = await response.json();
         
-        // Find race day in forecast - ensure YYYY-MM-DD format
-        const raceDateStr = dateInput.value; // Should already be YYYY-MM-DD from input type="date"
-        const dayIndex = data.daily.time.indexOf(raceDateStr);
+        // Find race day in forecast - dateInput.value is already YYYY-MM-DD format from input type="date"
+        const raceDateStr = dateInput.value;
+        let dayIndex = data.daily.time.indexOf(raceDateStr);
         
-        console.log('Looking for date:', raceDateStr, 'in', data.daily.time, 'found at index:', dayIndex);
+        console.log('Weather: Looking for date:', raceDateStr, 'in', data.daily.time.slice(0, 5), '... found at index:', dayIndex);
         
         if (dayIndex === -1) {
-            console.log('Race date not found in forecast, trying alternative match');
-            // Fallback: try to find by matching the date object
-            const targetDate = raceDate.toISOString().split('T')[0];
-            const altIndex = data.daily.time.indexOf(targetDate);
-            if (altIndex === -1) {
-                showWeatherUnavailable(daysUntilRace);
-                return;
-            }
+            console.log('Weather: Race date not found in forecast');
+            showWeatherUnavailable(daysUntilRace);
+            return;
         }
         
-        const finalIndex = dayIndex !== -1 ? dayIndex : data.daily.time.indexOf(raceDate.toISOString().split('T')[0]);
-        
-        const tempMax = Math.round(data.daily.temperature_2m_max[finalIndex]);
-        const tempMin = Math.round(data.daily.temperature_2m_min[finalIndex]);
-        const rainChance = data.daily.precipitation_probability_max[finalIndex];
-        const weatherCode = data.daily.weathercode[finalIndex];
-        const windSpeed = Math.round(data.daily.windspeed_10m_max[finalIndex]);
+        const tempMax = Math.round(data.daily.temperature_2m_max[dayIndex]);
+        const tempMin = Math.round(data.daily.temperature_2m_min[dayIndex]);
+        const rainChance = data.daily.precipitation_probability_max[dayIndex];
+        const weatherCode = data.daily.weathercode[dayIndex];
+        const windSpeed = Math.round(data.daily.windspeed_10m_max[dayIndex]);
         
         // Store weather data for pace adjustment
         raceWeatherData = {
