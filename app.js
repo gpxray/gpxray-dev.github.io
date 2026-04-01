@@ -628,6 +628,21 @@ function setupDatePresets() {
                     
                     console.log('Target time mode activated:', hours, ':', minutes);
                 }
+            } else {
+                // No target time - use runner level / manual mode
+                currentMode = 'manual';
+                
+                // Switch UI back to manual mode
+                const targetBtn = document.getElementById('targetModeBtn');
+                const manualBtn = document.getElementById('manualModeBtn');
+                const targetMode = document.getElementById('targetMode');
+                const manualMode = document.getElementById('manualMode');
+                if (targetBtn) targetBtn.classList.remove('active');
+                if (manualBtn) manualBtn.classList.add('active');
+                if (targetMode) targetMode.style.display = 'none';
+                if (manualMode) manualMode.style.display = 'block';
+                
+                console.log('Manual mode (runner level) activated');
             }
             
             // Trigger calculation
