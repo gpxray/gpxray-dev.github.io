@@ -617,10 +617,15 @@ function setupDatePresets() {
                     // Show all sections that were hidden until Calculate
                     showAllSections();
                     
-                    calculateRacePlan();
-                    
-                    // Fetch weather for GPX upload (if date is within 16 days)
-                    await fetchGpxWeather();
+                    try {
+                        // Wait for calculation to complete before fetching weather
+                        await calculateRacePlan();
+                        
+                        // Fetch weather for GPX upload (if date is within 16 days)
+                        await fetchGpxWeather();
+                    } catch (error) {
+                        console.log('Calculation or weather fetch failed:', error);
+                    }
                     
                     // Recalculate sun times with synced date, then update hero display
                     updateSunTimesDisplay();
@@ -712,33 +717,20 @@ function setDateFromPreset(preset, dateInput, timeInput) {
 
 // Fetch weather for custom GPX uploads
 async function fetchGpxWeather() {
-    console.log('fetchGpxWeather called');
-    console.log('gpxData exists:', !!gpxData, 'points:', gpxData?.points?.length);
-    
-    if (!gpxData || !gpxData.points || gpxData.points.length === 0) {
-        console.log('Weather: No GPX data available');
-        return;
-    }
+    if (!gpxData || !gpxData.points || gpxData.points.length === 0) return;
     
     const dateInput = document.getElementById('heroRaceDate') || document.getElementById('raceStartDate');
-    console.log('Date input found:', !!dateInput, 'value:', dateInput?.value);
-    
-    if (!dateInput || !dateInput.value) {
-        console.log('Weather: No date input found');
-        return;
-    }
+    if (!dateInput || !dateInput.value) return;
     
     // Get coordinates from first GPX point
     const firstPoint = gpxData.points[0];
     const lat = firstPoint.lat;
     const lon = firstPoint.lon;
-    console.log('Weather: Coords:', lat, lon);
     
     const raceDate = new Date(dateInput.value);
     const today = new Date();
     today.setHours(0, 0, 0, 0); // Normalize to start of day
     const daysUntilRace = Math.ceil((raceDate - today) / (1000 * 60 * 60 * 24));
-    console.log('Weather: Days until race:', daysUntilRace);
     
     // Only fetch if within 16 days (Open-Meteo limit)
     if (daysUntilRace < 0 || daysUntilRace > 16) {
@@ -758,8 +750,6 @@ async function fetchGpxWeather() {
         // Find race day in forecast - dateInput.value is already YYYY-MM-DD format from input type="date"
         const raceDateStr = dateInput.value;
         let dayIndex = data.daily.time.indexOf(raceDateStr);
-        
-        console.log('Weather: Looking for date:', raceDateStr, 'in', data.daily.time.slice(0, 5), '... found at index:', dayIndex);
         
         if (dayIndex === -1) {
             console.log('Weather: Race date not found in forecast');
@@ -796,8 +786,6 @@ async function fetchGpxWeather() {
 }
 
 function showGpxWeatherWidget(weather, weatherCode, dateStr) {
-    console.log('showGpxWeatherWidget called with:', weather, weatherCode);
-    
     const weatherIcon = getWeatherIcon(weatherCode);
     const weatherDesc = getWeatherDescription(weatherCode);
     
@@ -806,8 +794,6 @@ function showGpxWeatherWidget(weather, weatherCode, dateStr) {
     
     // Update hero weather widget (main page)
     const heroWidget = document.getElementById('heroWeatherWidget');
-    console.log('heroWeatherWidget element:', heroWidget);
-    
     if (heroWidget) {
         updateHeroWeatherWidget(weather, weatherCode, adjustment);
         return; // Hero widget is enough on main page
@@ -892,14 +878,11 @@ function showWeatherUnavailable(daysUntilRace) {
 
 // Update hero weather widget (in results section)
 function updateHeroWeatherWidget(weather, weatherCode, adjustment) {
-    console.log('updateHeroWeatherWidget called');
     const heroWidget = document.getElementById('heroWeatherWidget');
-    console.log('heroWidget element found:', !!heroWidget);
     if (!heroWidget) return;
     
     const weatherIcon = getWeatherIcon(weatherCode);
     const weatherDesc = getWeatherDescription(weatherCode);
-    console.log('Weather display:', weatherIcon, weatherDesc, weather.tempMin + '-' + weather.tempMax + '°C');
     
     // Update elements
     const iconEl = document.getElementById('heroWeatherIcon');
@@ -4826,7 +4809,7 @@ function displayApiResults(result) {
 function calculateRacePlan() {
     if (!gpxData || segments.length === 0) {
         alert('Please load a GPX file first.');
-        return;
+        return Promise.reject('No GPX data');
     }
     
     // Show loading state
@@ -4836,12 +4819,13 @@ function calculateRacePlan() {
     }
     
     // API-only calculation (no local fallback - formulas are protected)
-    calculateRacePlanFromAPI()
+    return calculateRacePlanFromAPI()
         .then(result => {
             displayApiResults(result);
             if (resultsSection) {
                 resultsSection.classList.remove('loading');
             }
+            return result;
         })
         .catch(error => {
             console.error('API calculation failed:', error.message);
@@ -4849,6 +4833,7 @@ function calculateRacePlan() {
                 resultsSection.classList.remove('loading');
             }
             showNotification('Warming up the servers... Please try again in a moment! ☕', 'error');
+            throw error;
         });
 }
 
