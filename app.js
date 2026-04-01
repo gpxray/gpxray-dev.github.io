@@ -203,6 +203,7 @@ document.addEventListener('DOMContentLoaded', () => {
     updateEarlyAccessUI();
     setupRunnerLevel();
     setupItraScore();
+    setupDatePresets();
     setupPaceInfoTooltip();
     setupFeaturePillTooltips();
     
@@ -514,6 +515,236 @@ function clearItraOverride() {
     [raceLevelButtons, mainLevelButtons].forEach(container => {
         if (container) container.classList.remove('itra-override');
     });
+}
+
+// Date Presets for Race Strategy Box
+function setupDatePresets() {
+    const presetBtns = document.querySelectorAll('.race-date-preset');
+    const dateInput = document.getElementById('heroRaceDate');
+    const timeInput = document.getElementById('heroRaceTime');
+    const calculateBtn = document.getElementById('heroCalculateBtn');
+    
+    if (!presetBtns.length || !dateInput) return;
+    
+    // Set today as default date
+    const today = new Date();
+    dateInput.value = formatDateForInput(today);
+    dateInput.min = formatDateForInput(today);
+    
+    // Preset button handlers
+    presetBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const preset = btn.dataset.preset;
+            setDateFromPreset(preset, dateInput, timeInput);
+            
+            // Update selected state
+            presetBtns.forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+        });
+    });
+    
+    // Manual date/time change clears preset selection
+    dateInput.addEventListener('change', () => {
+        presetBtns.forEach(b => b.classList.remove('selected'));
+        // Select "Custom" if manually changed
+        const customBtn = document.querySelector('.race-date-preset[data-preset="custom"]');
+        if (customBtn) customBtn.classList.add('selected');
+    });
+    
+    timeInput.addEventListener('change', () => {
+        presetBtns.forEach(b => b.classList.remove('selected'));
+        const customBtn = document.querySelector('.race-date-preset[data-preset="custom"]');
+        if (customBtn) customBtn.classList.add('selected');
+    });
+    
+    // Calculate button handler
+    if (calculateBtn) {
+        calculateBtn.addEventListener('click', () => {
+            // Sync hero date/time to the hidden paceSection inputs
+            const mainDateInput = document.getElementById('raceStartDate');
+            const mainTimeInput = document.getElementById('raceStartTime');
+            if (mainDateInput) mainDateInput.value = dateInput.value;
+            if (mainTimeInput) mainTimeInput.value = timeInput.value;
+            
+            // Trigger calculation
+            if (gpxData && segments.length > 0) {
+                calculateRacePlan();
+                
+                // Fetch weather for GPX upload (if date is within 16 days)
+                fetchGpxWeather();
+            }
+        });
+    }
+}
+
+function formatDateForInput(date) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+}
+
+function setDateFromPreset(preset, dateInput, timeInput) {
+    const now = new Date();
+    let targetDate = new Date(now);
+    let targetTime = '06:00';
+    
+    switch (preset) {
+        case '2h':
+            // 2 hours from now
+            targetDate.setHours(targetDate.getHours() + 2);
+            targetTime = `${String(targetDate.getHours()).padStart(2, '0')}:${String(targetDate.getMinutes()).padStart(2, '0')}`;
+            break;
+        case 'tomorrow':
+            // Tomorrow morning
+            targetDate.setDate(targetDate.getDate() + 1);
+            targetTime = '06:00';
+            break;
+        case 'weekend':
+            // Next Saturday or Sunday (whichever is closer)
+            const dayOfWeek = targetDate.getDay();
+            if (dayOfWeek === 0) {
+                // It's Sunday, use today
+                targetTime = '07:00';
+            } else if (dayOfWeek === 6) {
+                // It's Saturday, use today
+                targetTime = '07:00';
+            } else {
+                // Find next Saturday
+                const daysUntilSaturday = 6 - dayOfWeek;
+                targetDate.setDate(targetDate.getDate() + daysUntilSaturday);
+                targetTime = '07:00';
+            }
+            break;
+        case 'custom':
+            // Keep current values, just ensure date picker is focused
+            dateInput.focus();
+            return;
+    }
+    
+    dateInput.value = formatDateForInput(targetDate);
+    timeInput.value = targetTime;
+}
+
+// Fetch weather for custom GPX uploads
+async function fetchGpxWeather() {
+    if (!gpxData || !gpxData.points || gpxData.points.length === 0) return;
+    
+    const dateInput = document.getElementById('heroRaceDate') || document.getElementById('raceStartDate');
+    if (!dateInput || !dateInput.value) return;
+    
+    // Get coordinates from first GPX point
+    const firstPoint = gpxData.points[0];
+    const lat = firstPoint.lat;
+    const lon = firstPoint.lon;
+    
+    const raceDate = new Date(dateInput.value);
+    const today = new Date();
+    const daysUntilRace = Math.ceil((raceDate - today) / (1000 * 60 * 60 * 24));
+    
+    // Only fetch if within 16 days (Open-Meteo limit)
+    if (daysUntilRace < 0 || daysUntilRace > 16) {
+        console.log('Weather forecast not available for this date range');
+        return;
+    }
+    
+    try {
+        const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max,weathercode,windspeed_10m_max&timezone=auto`;
+        
+        const response = await fetch(url);
+        if (!response.ok) throw new Error('Weather API error');
+        
+        const data = await response.json();
+        
+        // Find race day in forecast
+        const raceDateStr = dateInput.value;
+        const dayIndex = data.daily.time.indexOf(raceDateStr);
+        
+        if (dayIndex === -1) {
+            console.log('Race date not found in forecast');
+            return;
+        }
+        
+        const tempMax = Math.round(data.daily.temperature_2m_max[dayIndex]);
+        const tempMin = Math.round(data.daily.temperature_2m_min[dayIndex]);
+        const rainChance = data.daily.precipitation_probability_max[dayIndex];
+        const weatherCode = data.daily.weathercode[dayIndex];
+        const windSpeed = Math.round(data.daily.windspeed_10m_max[dayIndex]);
+        
+        // Store weather data for pace adjustment
+        raceWeatherData = {
+            tempMax,
+            tempMin,
+            tempAvg: Math.round((tempMax + tempMin) / 2),
+            rainChance,
+            weatherCode,
+            windSpeed,
+            isHot: tempMax >= 25,
+            isRainy: rainChance > 50
+        };
+        
+        // Show weather widget in results area
+        showGpxWeatherWidget(raceWeatherData, weatherCode, dateInput.value);
+        
+        console.log('GPX Weather fetched:', raceWeatherData);
+        
+    } catch (error) {
+        console.error('Error fetching GPX weather:', error);
+    }
+}
+
+function showGpxWeatherWidget(weather, weatherCode, dateStr) {
+    // Find or create weather widget
+    let widget = document.getElementById('gpxWeatherWidget');
+    
+    if (!widget) {
+        // Create widget and insert after hero-stats
+        widget = document.createElement('div');
+        widget.id = 'gpxWeatherWidget';
+        widget.className = 'race-weather-widget gpx-weather';
+        
+        const heroStats = document.querySelector('.hero-stats');
+        if (heroStats) {
+            heroStats.after(widget);
+        }
+    }
+    
+    const weatherIcon = getWeatherIcon(weatherCode);
+    const weatherDesc = getWeatherDescription(weatherCode);
+    const raceDate = new Date(dateStr);
+    const formattedDate = raceDate.toLocaleDateString(currentLang === 'de' ? 'de-DE' : 'en-US', { 
+        weekday: 'long', 
+        month: 'long', 
+        day: 'numeric' 
+    });
+    
+    // Calculate adjustment info
+    const adjustment = getWeatherAdjustedTime(100); // Get percentage
+    let adjustmentText = '';
+    if (adjustment && adjustment.penalty > 0) {
+        adjustmentText = `<div class="weather-adjustment">⚠️ ${adjustment.description}</div>`;
+    }
+    
+    widget.innerHTML = `
+        <h3>🌤️ ${typeof t === 'function' ? t('weather.forecast') : 'Weather Forecast'}</h3>
+        <div class="weather-content">
+            <div class="weather-forecast">
+                <div class="weather-date">${formattedDate}</div>
+                <div class="weather-main">
+                    <span class="weather-icon">${weatherIcon}</span>
+                    <span class="weather-temp">${weather.tempMin}° - ${weather.tempMax}°C</span>
+                </div>
+                <div class="weather-details">
+                    <span class="weather-desc">${weatherDesc}</span>
+                    <span class="weather-rain">💧 ${weather.rainChance}%</span>
+                    <span class="weather-wind">💨 ${weather.windSpeed} km/h</span>
+                </div>
+                ${adjustmentText}
+            </div>
+        </div>
+    `;
+    
+    widget.style.display = 'block';
 }
 
 // Pace Info Tooltip

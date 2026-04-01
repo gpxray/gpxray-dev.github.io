@@ -402,6 +402,24 @@
                                     <a href="https://itra.run/Runners/FindARunner" target="_blank" rel="noopener" class="itra-link">🔍 <span data-i18n="race.itraFindScore">Find your ITRA score</span></a>
                                 </div>
                             </div>
+                            
+                            <!-- Race Date/Time Section -->
+                            <div class="race-date-section" id="raceDateSection">
+                                <label class="race-setup-label" data-i18n="race.whenRace">When is your race?</label>
+                                <div class="race-date-presets">
+                                    <button type="button" class="race-date-preset" data-preset="2h" data-i18n="race.preset2h">In 2 hours</button>
+                                    <button type="button" class="race-date-preset" data-preset="tomorrow" data-i18n="race.presetTomorrow">Tomorrow</button>
+                                    <button type="button" class="race-date-preset" data-preset="weekend" data-i18n="race.presetWeekend">This Weekend</button>
+                                    <button type="button" class="race-date-preset" data-preset="custom" data-i18n="race.presetCustom">Custom</button>
+                                </div>
+                                <div class="race-date-inputs" id="raceDateInputs">
+                                    <input type="date" id="heroRaceDate" class="race-date-input" />
+                                    <input type="time" id="heroRaceTime" class="race-time-input" value="06:00" />
+                                </div>
+                            </div>
+                            
+                            <!-- Calculate Button -->
+                            <button type="button" id="heroCalculateBtn" class="hero-calculate-btn" data-i18n="race.calculate">🚀 Calculate Strategy</button>
                         </div>
                         
                         <!-- Hidden select for compatibility -->

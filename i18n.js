@@ -83,6 +83,17 @@ const TRANSLATIONS = {
         'race.itraExplain': 'ITRA (International Trail Running Association) assigns performance scores based on your race results.',
         'race.itraFindScore': 'Find your ITRA score',
         
+        // Race date/time presets
+        'race.whenRace': 'When is your race?',
+        'race.preset2h': 'In 2 hours',
+        'race.presetTomorrow': 'Tomorrow',
+        'race.presetWeekend': 'This Weekend',
+        'race.presetCustom': 'Custom',
+        'race.calculate': '🚀 Calculate Strategy',
+        
+        // Weather
+        'weather.forecast': 'Weather Forecast',
+        
         // Downhill Load tooltip
         'ddl.title': 'Descent Load (DDL/km)',
         'ddl.description': 'Measures downhill stress (steepness + time + surface).',
@@ -456,6 +467,17 @@ const TRANSLATIONS = {
         'race.itraHint': 'ITRA-Score ermöglicht präzisere Tempoberechnung',
         'race.itraExplain': 'ITRA (International Trail Running Association) vergibt Leistungswerte basierend auf deinen Rennergebnissen.',
         'race.itraFindScore': 'Finde deinen ITRA-Score',
+        
+        // Race date/time presets
+        'race.whenRace': 'Wann ist dein Rennen?',
+        'race.preset2h': 'In 2 Stunden',
+        'race.presetTomorrow': 'Morgen',
+        'race.presetWeekend': 'Am Wochenende',
+        'race.presetCustom': 'Individuell',
+        'race.calculate': '🚀 Strategie berechnen',
+        
+        // Weather
+        'weather.forecast': 'Wettervorhersage',
         
         // Downhill Load tooltip
         'ddl.title': 'Abstiegsbelastung (DDL/km)',

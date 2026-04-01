@@ -4630,6 +4630,27 @@ h2 {
     font-size: 0.9rem;
 }
 
+.weather-adjustment {
+    margin-top: 12px;
+    padding: 8px 12px;
+    background: rgba(255, 193, 7, 0.1);
+    border: 1px solid rgba(255, 193, 7, 0.3);
+    border-radius: 8px;
+    color: #ffc107;
+    font-size: 0.85rem;
+}
+
+.weather-date {
+    font-size: 0.85rem;
+    color: #aaa;
+    margin-bottom: 4px;
+}
+
+/* GPX Weather Widget positioning */
+.gpx-weather {
+    margin: 16px auto;
+}
+
 .race-date::before {
     content: '📅';
 }
@@ -4890,6 +4911,109 @@ h2 {
 .race-level-buttons.itra-override .race-level-btn {
     opacity: 0.5;
     pointer-events: none;
+}
+
+/* Race Date Section */
+.race-date-section {
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.race-date-presets {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    margin: 12px 0;
+}
+
+.race-date-preset {
+    padding: 8px 14px;
+    background: rgba(0, 0, 0, 0.4);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-radius: 20px;
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.race-date-preset:hover {
+    border-color: #00d4ff;
+    color: #fff;
+}
+
+.race-date-preset.selected {
+    background: rgba(0, 212, 255, 0.2);
+    border-color: #00d4ff;
+    color: #00d4ff;
+}
+
+.race-date-inputs {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    margin-top: 12px;
+}
+
+.race-date-input,
+.race-time-input {
+    padding: 10px 14px;
+    background: rgba(0, 0, 0, 0.4);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    color: #fff;
+    font-size: 0.95rem;
+    cursor: pointer;
+}
+
+.race-date-input {
+    min-width: 150px;
+}
+
+.race-time-input {
+    min-width: 90px;
+}
+
+.race-date-input:focus,
+.race-time-input:focus {
+    outline: none;
+    border-color: #00d4ff;
+}
+
+/* Calculate Button */
+.hero-calculate-btn {
+    display: block;
+    width: 100%;
+    max-width: 300px;
+    margin: 24px auto 0;
+    padding: 14px 28px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #0a1628;
+    background: linear-gradient(135deg, #00d4ff 0%, #00b4d8 100%);
+    border: none;
+    border-radius: 30px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 212, 255, 0.3);
+}
+
+.hero-calculate-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 25px rgba(0, 212, 255, 0.5);
+}
+
+.hero-calculate-btn:active {
+    transform: translateY(0);
+}
+
+.hero-calculate-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
 }
 
 .race-distances {
