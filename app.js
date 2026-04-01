@@ -759,7 +759,7 @@ async function fetchGpxWeather() {
         
         const tempMax = Math.round(data.daily.temperature_2m_max[dayIndex]);
         const tempMin = Math.round(data.daily.temperature_2m_min[dayIndex]);
-        const rainChance = 55; // DEBUG: Fake rain chance to test tip
+        const rainChance = data.daily.precipitation_probability_max[dayIndex];
         const weatherCode = data.daily.weathercode[dayIndex];
         const windSpeed = Math.round(data.daily.windspeed_10m_max[dayIndex]);
         
@@ -908,17 +908,15 @@ function updateHeroWeatherWidget(weather, weatherCode, adjustment) {
     if (detailsEl) detailsEl.style.display = 'flex'; // Re-show if was hidden
     
     // Show weather tip based on conditions
-    console.log('Tip elements:', { tipContainer: !!tipContainer, tipIconEl: !!tipIconEl, tipTextEl: !!tipTextEl });
-    
     if (tipContainer && tipIconEl && tipTextEl) {
-        // FORCE TIP FOR DEBUG
-        tipIconEl.textContent = '🧥';
-        tipTextEl.textContent = "DEBUG: Rain jacket test!";
-        tipContainer.style.display = 'flex';
-        tipContainer.style.border = '2px solid red';
-        console.log('FORCED tip to display!');
-    } else {
-        console.log('Tip elements not found!');
+        const tip = getWeatherTip(weather, weatherCode);
+        if (tip) {
+            tipIconEl.textContent = tip.icon;
+            tipTextEl.textContent = tip.text;
+            tipContainer.style.display = 'flex';
+        } else {
+            tipContainer.style.display = 'none';
+        }
     }
     
     // Show adjustment if applicable
@@ -7912,7 +7910,7 @@ async function fetchRaceWeather(config) {
         
         const tempMax = Math.round(data.daily.temperature_2m_max[dayIndex]);
         const tempMin = Math.round(data.daily.temperature_2m_min[dayIndex]);
-        const rainChance = 55; // DEBUG: Fake rain chance to test tip
+        const rainChance = data.daily.precipitation_probability_max[dayIndex];
         const windSpeed = Math.round(data.daily.windspeed_10m_max[dayIndex]);
         const weatherCode = data.daily.weathercode[dayIndex];
         
@@ -7927,7 +7925,6 @@ async function fetchRaceWeather(config) {
             isRainy: weatherCode >= 51 && weatherCode <= 82,
             adjustment: calculateWeatherAdjustment(tempMax, tempMin, rainChance, windSpeed, weatherCode)
         };
-        console.log('Race Weather with fake 55%:', raceWeatherData);
         
         const weatherIcon = getWeatherIcon(weatherCode);
         const weatherDesc = getWeatherDescription(weatherCode);

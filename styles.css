@@ -5201,18 +5201,18 @@ h2 {
 }
 
 .race-unit-btn {
-    padding: 6px 12px !important;
+    padding: 6px 12px;
     background: rgba(0, 0, 0, 0.4);
     border: 2px solid rgba(255, 255, 255, 0.2);
     border-radius: 6px;
     color: rgba(255, 255, 255, 0.7);
-    font-size: 0.8rem !important;
+    font-size: 0.8rem;
     font-weight: 500;
     cursor: pointer;
     transition: all 0.2s ease;
-    line-height: 1 !important;
+    line-height: 1;
     box-sizing: border-box;
-    height: 32px !important;
+    height: 32px;
     vertical-align: middle;
 }
 
@@ -5235,18 +5235,18 @@ h2 {
 }
 
 .target-time-input {
-    width: 70px !important;
-    padding: 6px 12px !important;
+    width: 70px;
+    padding: 6px 12px;
     background: rgba(0, 0, 0, 0.4);
     border: 2px solid rgba(255, 255, 255, 0.2);
     border-radius: 6px;
     color: #fff;
-    font-size: 0.8rem !important;
+    font-size: 0.8rem;
     font-weight: 500;
     text-align: center;
     box-sizing: border-box;
-    line-height: 1 !important;
-    height: 32px !important;
+    line-height: 1;
+    height: 32px;
     vertical-align: middle;
 }
 
