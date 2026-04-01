@@ -608,7 +608,7 @@ function setupDatePresets() {
                 // Show loading state
                 const strategyBox = document.getElementById('heroRunnerLevel');
                 calculateBtn.disabled = true;
-                calculateBtn.innerHTML = '⏳ <span data-i18n="race.calculating">Calculating...</span>';
+                calculateBtn.innerHTML = '⏳ <span data-i18n="race.calculating">Creating...</span>';
                 calculateBtn.classList.add('loading');
                 if (strategyBox) strategyBox.classList.add('loading');
                 
@@ -636,7 +636,7 @@ function setupDatePresets() {
                     
                     // Reset button state
                     calculateBtn.disabled = false;
-                    calculateBtn.innerHTML = '🚀 <span data-i18n="race.calculate">Calculate Strategy</span>';
+                    calculateBtn.innerHTML = '🚀 <span data-i18n="race.calculate">Create Strategy</span>';
                     calculateBtn.classList.remove('loading');
                     
                     // Hide the paceSection (redundant now)
