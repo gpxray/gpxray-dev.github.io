@@ -1459,6 +1459,9 @@ function setupChangeRouteButton() {
     if (!changeBtn) return;
     
     changeBtn.addEventListener('click', () => {
+        // Reset all state for new route
+        resetStrategyState();
+        
         // Show upload section
         const uploadSection = document.getElementById('uploadSection');
         if (uploadSection) {
@@ -1466,10 +1469,65 @@ function setupChangeRouteButton() {
             uploadSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
         
-        // Optionally hide stats section to reset view
-        // const statsSection = document.getElementById('statsSection');
-        // if (statsSection) statsSection.style.display = 'none';
+        // Show strategy box, hide edit button
+        const strategyBox = document.getElementById('heroRunnerLevel');
+        const editBtn = document.getElementById('editStrategyBtn');
+        if (strategyBox) strategyBox.style.display = 'block';
+        if (editBtn) editBtn.style.display = 'none';
+        
+        // Hide hero results until new calculation
+        const heroResults = document.getElementById('heroResults');
+        if (heroResults) heroResults.style.display = 'none';
     });
+}
+
+// Reset all strategy-related state for a new route
+function resetStrategyState() {
+    // Reset mode to manual
+    currentMode = 'manual';
+    
+    // Clear target time input
+    const heroTargetTime = document.getElementById('heroTargetTime');
+    if (heroTargetTime) {
+        heroTargetTime.value = '';
+        heroTargetTime.classList.remove('has-value');
+    }
+    
+    // Clear ITRA score
+    const mainItraInput = document.getElementById('mainItraScoreInput');
+    const mainItraClearBtn = document.getElementById('mainItraClearBtn');
+    if (mainItraInput) mainItraInput.value = '';
+    if (mainItraClearBtn) mainItraClearBtn.style.display = 'none';
+    
+    // Reset runner level to intermediate
+    const levelButtons = document.querySelectorAll('.race-level-btn');
+    levelButtons.forEach(btn => {
+        btn.classList.toggle('selected', btn.dataset.level === 'intermediate');
+    });
+    const runnerLevelSelect = document.getElementById('runnerLevel');
+    if (runnerLevelSelect) runnerLevelSelect.value = 'intermediate';
+    
+    // Clear weather data
+    raceWeatherData = null;
+    const heroWeatherWidget = document.getElementById('heroWeatherWidget');
+    if (heroWeatherWidget) heroWeatherWidget.style.display = 'none';
+    
+    // Reset date to default (this weekend)
+    const datePresetBtns = document.querySelectorAll('.race-date-preset');
+    datePresetBtns.forEach(btn => btn.classList.remove('selected'));
+    const weekendBtn = document.querySelector('.race-date-preset[data-preset="weekend"]');
+    if (weekendBtn) weekendBtn.click(); // Trigger preset to set date
+    
+    // Hide statement preview
+    const statementSection = document.getElementById('statementPreviewSection');
+    if (statementSection) statementSection.style.display = 'none';
+    
+    // Clear AID stations
+    aidStations = [];
+    const heroAidList = document.getElementById('heroAidList');
+    if (heroAidList) heroAidList.innerHTML = '';
+    
+    console.log('Strategy state reset for new route');
 }
 
 // Demo GPX loading
