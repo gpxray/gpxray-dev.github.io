@@ -2323,8 +2323,12 @@ function showAllSections() {
     
     // Fix rendering after containers become visible
     setTimeout(() => {
-        // Leaflet map needs invalidateSize
-        if (map) map.invalidateSize();
+        // Leaflet map needs invalidateSize + re-fit bounds
+        if (map && gpxData && gpxData.points) {
+            map.invalidateSize();
+            const latLngs = gpxData.points.map(p => [p.lat, p.lon]);
+            map.fitBounds(L.latLngBounds(latLngs), { padding: [20, 20] });
+        }
         // Chart.js charts need resize
         if (elevationChart) elevationChart.resize();
         if (gradientChart) gradientChart.resize();
