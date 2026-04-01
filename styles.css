@@ -4811,14 +4811,55 @@ h2 {
     font-size: 0.9rem;
 }
 
-.weather-adjustment {
-    margin-top: 12px;
-    padding: 8px 12px;
-    background: rgba(255, 193, 7, 0.1);
-    border: 1px solid rgba(255, 193, 7, 0.3);
-    border-radius: 8px;
-    color: #ffc107;
+/* Weather tip (race page widget) */
+.weather-tip {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 8px;
+    padding: 8px 14px;
+    background: rgba(76, 175, 80, 0.15);
+    border: 1px solid rgba(76, 175, 80, 0.3);
+    border-radius: 20px;
+}
+
+.weather-tip-icon {
+    font-size: 1rem;
+}
+
+.weather-tip-text {
     font-size: 0.85rem;
+    color: #81c784;
+    font-style: italic;
+}
+
+/* Weather adjustment (race page widget) */
+.weather-adjustment {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 8px;
+    padding: 8px 14px;
+    background: rgba(255, 152, 0, 0.15);
+    border: 1px solid rgba(255, 152, 0, 0.3);
+    border-radius: 20px;
+}
+
+.weather-adj-icon {
+    font-size: 1rem;
+}
+
+.weather-adj-text {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #ffb74d;
+}
+
+.weather-adj-label {
+    font-size: 0.8rem;
+    color: rgba(255, 183, 77, 0.8);
 }
 
 .weather-date {

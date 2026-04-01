@@ -7936,6 +7936,25 @@ async function fetchRaceWeather(config) {
         const weatherIcon = getWeatherIcon(weatherCode);
         const weatherDesc = getWeatherDescription(weatherCode);
         
+        // Get weather tip
+        const tip = getWeatherTip(raceWeatherData, weatherCode);
+        const tipHtml = tip ? `
+            <div class="weather-tip">
+                <span class="weather-tip-icon">${tip.icon}</span>
+                <span class="weather-tip-text">${tip.text}</span>
+            </div>
+        ` : '';
+        
+        // Get adjustment info
+        const adj = raceWeatherData.adjustment;
+        const adjHtml = (adj && adj.totalPenaltyPercent >= 1) ? `
+            <div class="weather-adjustment">
+                <span class="weather-adj-icon">⏱️</span>
+                <span class="weather-adj-text">+${Math.round(adj.totalPenaltyPercent)}%</span>
+                <span class="weather-adj-label">${adj.description}</span>
+            </div>
+        ` : '';
+        
         content.innerHTML = `
             <div class="weather-forecast">
                 <div class="weather-main">
@@ -7944,10 +7963,11 @@ async function fetchRaceWeather(config) {
                 </div>
                 <div class="weather-details">
                     <span class="weather-desc">${weatherDesc}</span>
-                    <span class="weather-rain">💧 ${rainChance}% rain</span>
+                    <span class="weather-rain">💧 ${rainChance}%</span>
                     <span class="weather-wind">💨 ${windSpeed} km/h</span>
                 </div>
-                <p class="weather-update">Updated: ${new Date().toLocaleDateString()}</p>
+                ${tipHtml}
+                ${adjHtml}
             </div>
         `;
         
