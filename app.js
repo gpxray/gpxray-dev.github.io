@@ -4166,6 +4166,12 @@ function displayApiResults(result) {
     lastCachedFatigue = fatigueMultiplier;
     lastCalculatedPaces = { flat: paces.flat, uphill: paces.uphill, downhill: paces.downhill };
     
+    // Show hero results section (hidden until Calculate is clicked)
+    const heroResults = document.getElementById('heroResults');
+    if (heroResults) {
+        heroResults.style.display = 'block';
+    }
+    
     // Display results
     document.getElementById('paceResults').style.display = 'block';
     document.getElementById('flatDistance').textContent = `${terrain.flatDistance.toFixed(2)} km`;
