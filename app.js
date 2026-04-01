@@ -910,13 +910,22 @@ function updateHeroWeatherWidget(weather, weatherCode, adjustment) {
     // Show weather tip based on conditions
     if (tipContainer && tipIconEl && tipTextEl) {
         const tip = getWeatherTip(weather, weatherCode);
+        console.log('Weather tip check:', { 
+            rainChance: weather.rainChance, 
+            weatherCode, 
+            tip,
+            tipContainer: !!tipContainer 
+        });
         if (tip) {
             tipIconEl.textContent = tip.icon;
             tipTextEl.textContent = tip.text;
             tipContainer.style.display = 'flex';
+            console.log('Tip displayed:', tip.text);
         } else {
             tipContainer.style.display = 'none';
         }
+    } else {
+        console.log('Tip elements not found:', { tipContainer: !!tipContainer, tipIconEl: !!tipIconEl, tipTextEl: !!tipTextEl });
     }
     
     // Show adjustment if applicable
