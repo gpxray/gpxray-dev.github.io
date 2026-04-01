@@ -838,12 +838,27 @@ function updateHeroWeatherWidget(weather, weatherCode, adjustment) {
     const windEl = document.getElementById('heroWeatherWind');
     const adjContainer = document.getElementById('heroWeatherAdjustment');
     const adjTextEl = document.getElementById('heroWeatherAdjText');
+    const tipContainer = document.getElementById('heroWeatherTip');
+    const tipIconEl = document.getElementById('heroWeatherTipIcon');
+    const tipTextEl = document.getElementById('heroWeatherTipText');
     
     if (iconEl) iconEl.textContent = weatherIcon;
     if (tempEl) tempEl.textContent = `${weather.tempMin}° - ${weather.tempMax}°C`;
     if (descEl) descEl.textContent = weatherDesc;
     if (rainEl) rainEl.textContent = weather.rainChance;
     if (windEl) windEl.textContent = weather.windSpeed;
+    
+    // Show weather tip based on conditions
+    if (tipContainer && tipIconEl && tipTextEl) {
+        const tip = getWeatherTip(weather, weatherCode);
+        if (tip) {
+            tipIconEl.textContent = tip.icon;
+            tipTextEl.textContent = tip.text;
+            tipContainer.style.display = 'flex';
+        } else {
+            tipContainer.style.display = 'none';
+        }
+    }
     
     // Show adjustment if applicable
     if (adjContainer && adjustment && adjustment.addedMinutes >= 1) {
@@ -854,6 +869,63 @@ function updateHeroWeatherWidget(weather, weatherCode, adjustment) {
     }
     
     heroWidget.style.display = 'flex';
+}
+
+// Get weather tip based on conditions
+function getWeatherTip(weather, weatherCode) {
+    const lang = getCurrentLanguage();
+    
+    // Check for rain (codes 51-67: drizzle, 71-77: snow, 80-82: rain showers, 95-99: thunderstorm)
+    const rainCodes = [51, 53, 55, 56, 57, 61, 63, 65, 66, 67, 80, 81, 82, 95, 96, 99];
+    const snowCodes = [71, 73, 75, 77, 85, 86];
+    
+    if (rainCodes.includes(weatherCode) || weather.rainChance >= 50) {
+        return {
+            icon: '🧥',
+            text: lang === 'de' ? 'Regenjacke nicht vergessen!' : "Don't forget your rain jacket!"
+        };
+    }
+    
+    if (snowCodes.includes(weatherCode)) {
+        return {
+            icon: '🧤',
+            text: lang === 'de' ? 'Handschuhe einpacken – es wird kalt!' : 'Pack gloves – it\'ll be cold!'
+        };
+    }
+    
+    // Hot weather (above 25°C)
+    if (weather.tempMax >= 25) {
+        return {
+            icon: '💧',
+            text: lang === 'de' ? 'Trinke extra viel Wasser!' : 'Drink extra water!'
+        };
+    }
+    
+    // Cold weather (below 5°C)
+    if (weather.tempMin <= 5) {
+        return {
+            icon: '🧥',
+            text: lang === 'de' ? 'Extra Schicht einpacken!' : 'Pack an extra layer!'
+        };
+    }
+    
+    // Windy conditions (above 30 km/h)
+    if (weather.windSpeed >= 30) {
+        return {
+            icon: '💨',
+            text: lang === 'de' ? 'Windjacke mitnehmen!' : 'Bring a wind jacket!'
+        };
+    }
+    
+    // Perfect conditions
+    if (weather.tempMax >= 10 && weather.tempMax <= 20 && weather.rainChance < 20) {
+        return {
+            icon: '✨',
+            text: lang === 'de' ? 'Perfektes Laufwetter!' : 'Perfect running weather!'
+        };
+    }
+    
+    return null;
 }
 
 // Pace Info Tooltip

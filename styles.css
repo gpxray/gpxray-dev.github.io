@@ -1857,6 +1857,15 @@ h2 {
     max-width: 350px;
 }
 
+.hero-weather-title {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: rgba(100, 181, 246, 0.8);
+    margin-bottom: 4px;
+}
+
 .hero-weather-header {
     display: flex;
     align-items: center;
@@ -1889,6 +1898,27 @@ h2 {
     display: flex;
     align-items: center;
     gap: 4px;
+}
+
+.hero-weather-tip {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    background: rgba(76, 175, 80, 0.15);
+    border: 1px solid rgba(76, 175, 80, 0.3);
+    border-radius: 20px;
+    margin-top: 4px;
+}
+
+.hero-weather-tip-icon {
+    font-size: 1rem;
+}
+
+.hero-weather-tip-text {
+    font-size: 0.85rem;
+    color: #81c784;
+    font-style: italic;
 }
 
 .hero-weather-adjustment {
