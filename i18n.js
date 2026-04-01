@@ -71,6 +71,7 @@ const TRANSLATIONS = {
         'hero.elevationGain': 'Elevation Gain',
         'hero.hint': 'Based on default paces',
         'hero.customize': 'Customize strategy ↓',
+        'hero.clickCalculate': '▼ Calculate below',
         
         // Race landing page
         'race.strategyTitle': 'Create Your Race Strategy',
@@ -456,6 +457,7 @@ const TRANSLATIONS = {
         'hero.elevationGain': 'Höhenmeter',
         'hero.hint': 'Basierend auf Standard-Paces',
         'hero.customize': 'Strategie anpassen ↓',
+        'hero.clickCalculate': '▼ Unten berechnen',
         
         // Race landing page
         'race.strategyTitle': 'Erstelle deine Rennstrategie',

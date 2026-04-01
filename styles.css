@@ -1749,6 +1749,15 @@ h2 {
     text-shadow: 0 0 30px rgba(0, 212, 255, 0.3);
 }
 
+/* Hero time preview state - before calculation */
+.hero-time-preview {
+    font-size: 1.2rem !important;
+    color: rgba(255, 255, 255, 0.6) !important;
+    text-shadow: none !important;
+    font-weight: 500 !important;
+    opacity: 0.9;
+}
+
 /* Cutoff Warning - pill style matching weather pill */
 .cutoff-warning {
     position: relative;

@@ -1556,6 +1556,9 @@ function parseGPX(gpxContent) {
     const heroCalculateBtn = document.getElementById('heroCalculateBtn');
     if (!heroCalculateBtn) {
         calculateRacePlan();
+    } else {
+        // On main page, show preview with known GPX data
+        showHeroPreview();
     }
     
     // Track GPX load
@@ -2266,6 +2269,36 @@ function showAllSections() {
     
     // Show Story button only for RET races (or all races on dev)
     updateStoryButtonVisibility();
+}
+
+// Show hero preview with GPX data (distance/elevation) before Calculate is clicked
+function showHeroPreview() {
+    if (!gpxData) return;
+    
+    const heroCalculateBtn = document.getElementById('heroCalculateBtn');
+    if (!heroCalculateBtn) return; // Only on main page
+    
+    const heroTime = document.getElementById('heroFinishTime');
+    const heroDistance = document.getElementById('heroDistance');
+    
+    // Show distance from GPX data
+    if (heroDistance) {
+        const dist = useMetric ? gpxData.totalDistance : gpxData.totalDistance * KM_TO_MILES;
+        const unit = useMetric ? 'km' : 'mi';
+        heroDistance.textContent = `${dist.toFixed(1)} ${unit}`;
+    }
+    
+    // Show elevation gain
+    const heroClimbLoad = document.getElementById('heroClimbLoad');
+    if (heroClimbLoad) {
+        heroClimbLoad.textContent = `+${Math.round(gpxData.elevationGain)}m`;
+    }
+    
+    // Show calculate prompt instead of "-" for time
+    if (heroTime) {
+        heroTime.textContent = t('hero.clickCalculate');
+        heroTime.classList.add('hero-time-preview');
+    }
 }
 
 // Check if Story card button should be visible
@@ -4725,8 +4758,9 @@ function updateHeroSection(totalTime) {
     
     if (!heroTime) return;
     
-    // Update finish time
+    // Update finish time and remove preview state
     heroTime.textContent = formatTime(totalTime);
+    heroTime.classList.remove('hero-time-preview');
     
     // Update weather impact pill if available
     const weatherPill = document.getElementById('weatherImpactPill');
