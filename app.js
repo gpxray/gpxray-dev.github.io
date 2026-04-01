@@ -1478,13 +1478,38 @@ function setupSunTimes() {
     }
 }
 
-// Change Route Button - show upload section again
+// Change Route Button - show upload section again (or race selection on race pages)
 function setupChangeRouteButton() {
     const changeBtn = document.getElementById('changeRouteBtn');
     if (!changeBtn) return;
     
     changeBtn.addEventListener('click', () => {
-        // Reset all state for new route
+        // Check if we're on a race page
+        const raceStep1 = document.getElementById('raceStep1');
+        const raceStep2 = document.getElementById('raceStep2');
+        
+        if (raceStep1) {
+            // Race page: scroll to distance selection, hide step 2
+            if (raceStep2) raceStep2.style.display = 'none';
+            
+            // Deselect current distance
+            document.querySelectorAll('.race-distance-btn').forEach(btn => btn.classList.remove('selected'));
+            
+            // Clear stored GPX content
+            if (currentDistanceConfig) {
+                currentDistanceConfig._gpxContent = null;
+            }
+            
+            // Hide results
+            const heroResults = document.getElementById('heroResults');
+            if (heroResults) heroResults.style.display = 'none';
+            
+            // Scroll to race selection
+            raceStep1.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            return;
+        }
+        
+        // Main page: Reset all state for new route
         resetStrategyState();
         
         // Show upload section
@@ -5588,11 +5613,11 @@ function updateHeroSection(totalTime) {
         let checkpointsHtml = '';
         
         if (lastCachedCheckpoints && lastCachedCheckpoints.length > 0) {
-            // Use API-calculated checkpoint times
+            // Use API-calculated checkpoint times (add + prefix for elapsed time)
             checkpointsHtml = lastCachedCheckpoints.map(cp => `
                 <div class="hero-checkpoint">
                     <span class="hero-checkpoint-name">${cp.name}</span>
-                    <span class="hero-checkpoint-time">${formatTime(cp.timeMinutes)}</span>
+                    <span class="hero-checkpoint-time">+${formatTime(cp.timeMinutes)}</span>
                 </div>
             `).join('');
         } else if (lastCalculatedPaces) {
