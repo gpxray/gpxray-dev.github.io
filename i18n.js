@@ -102,6 +102,7 @@ const TRANSLATIONS = {
         
         // Weather
         'weather.forecast': 'Weather Forecast',
+        'weather.adjustment': 'weather adjustment',
         
         // Downhill Load tooltip
         'ddl.title': 'Descent Load (DDL/km)',
@@ -496,6 +497,7 @@ const TRANSLATIONS = {
         
         // Weather
         'weather.forecast': 'Wettervorhersage',
+        'weather.adjustment': 'Wetteranpassung',
         
         // Downhill Load tooltip
         'ddl.title': 'Abstiegsbelastung (DDL/km)',

@@ -761,11 +761,23 @@ async function fetchGpxWeather() {
 }
 
 function showGpxWeatherWidget(weather, weatherCode, dateStr) {
-    // Find or create weather widget
+    const weatherIcon = getWeatherIcon(weatherCode);
+    const weatherDesc = getWeatherDescription(weatherCode);
+    
+    // Calculate adjustment info
+    const adjustment = getWeatherAdjustedTime(100); // Get percentage
+    
+    // Update hero weather widget (main page)
+    const heroWidget = document.getElementById('heroWeatherWidget');
+    if (heroWidget) {
+        updateHeroWeatherWidget(weather, weatherCode, adjustment);
+        return; // Hero widget is enough on main page
+    }
+    
+    // Fallback: create/update dynamic widget for other pages
     let widget = document.getElementById('gpxWeatherWidget');
     
     if (!widget) {
-        // Create widget and insert after hero-stats
         widget = document.createElement('div');
         widget.id = 'gpxWeatherWidget';
         widget.className = 'race-weather-widget gpx-weather';
@@ -776,8 +788,6 @@ function showGpxWeatherWidget(weather, weatherCode, dateStr) {
         }
     }
     
-    const weatherIcon = getWeatherIcon(weatherCode);
-    const weatherDesc = getWeatherDescription(weatherCode);
     const raceDate = new Date(dateStr);
     const formattedDate = raceDate.toLocaleDateString(currentLang === 'de' ? 'de-DE' : 'en-US', { 
         weekday: 'long', 
@@ -785,8 +795,6 @@ function showGpxWeatherWidget(weather, weatherCode, dateStr) {
         day: 'numeric' 
     });
     
-    // Calculate adjustment info
-    const adjustment = getWeatherAdjustedTime(100); // Get percentage
     let adjustmentText = '';
     if (adjustment && adjustment.penalty > 0) {
         adjustmentText = `<div class="weather-adjustment">⚠️ ${adjustment.description}</div>`;
@@ -812,6 +820,40 @@ function showGpxWeatherWidget(weather, weatherCode, dateStr) {
     `;
     
     widget.style.display = 'block';
+}
+
+// Update hero weather widget (in results section)
+function updateHeroWeatherWidget(weather, weatherCode, adjustment) {
+    const heroWidget = document.getElementById('heroWeatherWidget');
+    if (!heroWidget) return;
+    
+    const weatherIcon = getWeatherIcon(weatherCode);
+    const weatherDesc = getWeatherDescription(weatherCode);
+    
+    // Update elements
+    const iconEl = document.getElementById('heroWeatherIcon');
+    const tempEl = document.getElementById('heroWeatherTemp');
+    const descEl = document.getElementById('heroWeatherDesc');
+    const rainEl = document.getElementById('heroWeatherRain');
+    const windEl = document.getElementById('heroWeatherWind');
+    const adjContainer = document.getElementById('heroWeatherAdjustment');
+    const adjTextEl = document.getElementById('heroWeatherAdjText');
+    
+    if (iconEl) iconEl.textContent = weatherIcon;
+    if (tempEl) tempEl.textContent = `${weather.tempMin}° - ${weather.tempMax}°C`;
+    if (descEl) descEl.textContent = weatherDesc;
+    if (rainEl) rainEl.textContent = weather.rainChance;
+    if (windEl) windEl.textContent = weather.windSpeed;
+    
+    // Show adjustment if applicable
+    if (adjContainer && adjustment && adjustment.addedMinutes >= 1) {
+        adjTextEl.textContent = `+${adjustment.addedMinutes} min`;
+        adjContainer.style.display = 'flex';
+    } else if (adjContainer) {
+        adjContainer.style.display = 'none';
+    }
+    
+    heroWidget.style.display = 'flex';
 }
 
 // Pace Info Tooltip
