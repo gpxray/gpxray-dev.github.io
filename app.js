@@ -895,23 +895,21 @@ function showWeatherUnavailable(daysUntilRace) {
 // Update hero weather widget (in results section)
 function updateHeroWeatherWidget(weather, weatherCode, adjustment) {
     console.log('=== updateHeroWeatherWidget START ===');
-    try {
-        const heroWidget = document.getElementById('heroWeatherWidget');
-        console.log('heroWidget found:', !!heroWidget, heroWidget);
-        if (!heroWidget) {
-            console.log('ERROR: heroWeatherWidget element not found!');
-            alert('ERROR: heroWeatherWidget not found!');
-            return;
-        }
-        
-        // Force visibility first to debug
-        heroWidget.style.display = 'flex';
-        heroWidget.style.border = '3px solid red'; // Debug indicator
-        console.log('Forced widget visible with red border');
-        
-        const weatherIcon = getWeatherIcon(weatherCode);
-        const weatherDesc = getWeatherDescription(weatherCode);
-        console.log('Weather data:', weatherIcon, weatherDesc, weather.tempMin + '-' + weather.tempMax + '°C');
+    const heroWidget = document.getElementById('heroWeatherWidget');
+    console.log('heroWidget found:', !!heroWidget, heroWidget);
+    if (!heroWidget) {
+        console.log('ERROR: heroWeatherWidget element not found!');
+        return;
+    }
+    
+    // Force visibility first to debug
+    heroWidget.style.display = 'flex';
+    heroWidget.style.border = '3px solid red'; // Debug indicator
+    console.log('Forced widget visible with red border');
+    
+    const weatherIcon = getWeatherIcon(weatherCode);
+    const weatherDesc = getWeatherDescription(weatherCode);
+    console.log('Weather data:', weatherIcon, weatherDesc, weather.tempMin + '-' + weather.tempMax + '°C');
     
     // Update elements
     const iconEl = document.getElementById('heroWeatherIcon');
