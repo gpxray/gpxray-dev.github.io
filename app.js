@@ -1559,6 +1559,14 @@ function parseGPX(gpxContent) {
     } else {
         // On main page, show preview with known GPX data
         showHeroPreview();
+        
+        // Auto-scroll to Strategy Box after short delay for rendering
+        setTimeout(() => {
+            const strategyBox = document.getElementById('heroRunnerLevel');
+            if (strategyBox) {
+                strategyBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }, 100);
     }
     
     // Track GPX load
