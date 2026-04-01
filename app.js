@@ -8319,6 +8319,9 @@ async function selectRaceDistance(distanceConfig, buttonEl) {
             distance_km: distanceConfig.distance 
         });
         
+        // Show statement preview and story button for race pages
+        updateStoryButtonVisibility();
+        
         // Scroll to results
         setTimeout(() => {
             document.getElementById('statsSection')?.scrollIntoView({ behavior: 'smooth' });
