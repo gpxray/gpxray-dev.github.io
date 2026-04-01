@@ -91,6 +91,7 @@ const TRANSLATIONS = {
         'race.presetWeekend': 'This Weekend',
         'race.presetCustom': 'Custom',
         'race.calculate': '🚀 Calculate Strategy',
+        'race.editStrategy': '✏️ Edit Strategy',
         
         // Weather
         'weather.forecast': 'Weather Forecast',
@@ -477,6 +478,7 @@ const TRANSLATIONS = {
         'race.presetWeekend': 'Am Wochenende',
         'race.presetCustom': 'Individuell',
         'race.calculate': '🚀 Strategie berechnen',
+        'race.editStrategy': '✏️ Strategie ändern',
         
         // Weather
         'weather.forecast': 'Wettervorhersage',

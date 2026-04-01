@@ -583,6 +583,25 @@ function setupDatePresets() {
                 
                 // Fetch weather for GPX upload (if date is within 16 days)
                 fetchGpxWeather();
+                
+                // Hide strategy box and show edit button
+                const strategyBox = document.getElementById('heroRunnerLevel');
+                const editBtn = document.getElementById('editStrategyBtn');
+                if (strategyBox) strategyBox.style.display = 'none';
+                if (editBtn) editBtn.style.display = 'inline-flex';
+            }
+        });
+    }
+    
+    // Edit Strategy button handler
+    const editStrategyBtn = document.getElementById('editStrategyBtn');
+    if (editStrategyBtn) {
+        editStrategyBtn.addEventListener('click', () => {
+            const strategyBox = document.getElementById('heroRunnerLevel');
+            if (strategyBox) {
+                strategyBox.style.display = 'block';
+                editStrategyBtn.style.display = 'none';
+                strategyBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
             }
         });
     }
