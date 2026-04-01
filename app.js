@@ -717,18 +717,10 @@ function setDateFromPreset(preset, dateInput, timeInput) {
 
 // Fetch weather for custom GPX uploads
 async function fetchGpxWeather() {
-    console.log('=== fetchGpxWeather START ===');
-    if (!gpxData || !gpxData.points || gpxData.points.length === 0) {
-        console.log('No gpxData, exiting');
-        return;
-    }
+    if (!gpxData || !gpxData.points || gpxData.points.length === 0) return;
     
     const dateInput = document.getElementById('heroRaceDate') || document.getElementById('raceStartDate');
-    console.log('dateInput:', dateInput, 'value:', dateInput?.value);
-    if (!dateInput || !dateInput.value) {
-        console.log('No date input or value, exiting');
-        return;
-    }
+    if (!dateInput || !dateInput.value) return;
     
     // Get coordinates from first GPX point
     const firstPoint = gpxData.points[0];
@@ -794,23 +786,16 @@ async function fetchGpxWeather() {
 }
 
 function showGpxWeatherWidget(weather, weatherCode, dateStr) {
-    console.log('=== showGpxWeatherWidget called ===');
-    console.log('Weather:', weather);
-    console.log('Code:', weatherCode);
-    
     const weatherIcon = getWeatherIcon(weatherCode);
     const weatherDesc = getWeatherDescription(weatherCode);
     
     // Calculate adjustment info
     const adjustment = getWeatherAdjustedTime(100); // Get percentage
-    console.log('Adjustment:', adjustment);
     
     // Update hero weather widget (main page)
     const heroWidget = document.getElementById('heroWeatherWidget');
-    console.log('heroWidget element for check:', heroWidget);
     
     if (heroWidget) {
-        console.log('Calling updateHeroWeatherWidget...');
         updateHeroWeatherWidget(weather, weatherCode, adjustment);
         return; // Hero widget is enough on main page
     }
@@ -894,22 +879,13 @@ function showWeatherUnavailable(daysUntilRace) {
 
 // Update hero weather widget (in results section)
 function updateHeroWeatherWidget(weather, weatherCode, adjustment) {
-    console.log('=== updateHeroWeatherWidget START ===');
     const heroWidget = document.getElementById('heroWeatherWidget');
-    console.log('heroWidget found:', !!heroWidget, heroWidget);
-    if (!heroWidget) {
-        console.log('ERROR: heroWeatherWidget element not found!');
-        return;
-    }
+    if (!heroWidget) return;
     
-    // Force visibility first to debug
     heroWidget.style.display = 'flex';
-    heroWidget.style.border = '3px solid red'; // Debug indicator
-    console.log('Forced widget visible with red border');
     
     const weatherIcon = getWeatherIcon(weatherCode);
     const weatherDesc = getWeatherDescription(weatherCode);
-    console.log('Weather data:', weatherIcon, weatherDesc, weather.tempMin + '-' + weather.tempMax + '°C');
     
     // Update elements
     const iconEl = document.getElementById('heroWeatherIcon');
@@ -923,8 +899,6 @@ function updateHeroWeatherWidget(weather, weatherCode, adjustment) {
     const tipContainer = document.getElementById('heroWeatherTip');
     const tipIconEl = document.getElementById('heroWeatherTipIcon');
     const tipTextEl = document.getElementById('heroWeatherTipText');
-    
-    console.log('Element check - icon:', !!iconEl, 'temp:', !!tempEl, 'desc:', !!descEl);
     
     if (iconEl) iconEl.textContent = weatherIcon;
     if (tempEl) tempEl.textContent = `${weather.tempMin}° - ${weather.tempMax}°C`;
@@ -953,11 +927,6 @@ function updateHeroWeatherWidget(weather, weatherCode, adjustment) {
         adjContainer.style.display = 'none';
     }
     
-    console.log('Setting heroWidget display to flex');
-    heroWidget.style.display = 'flex';
-    console.log('heroWidget display is now:', heroWidget.style.display);
-    console.log('heroWidget computed style:', window.getComputedStyle(heroWidget).display);
-    console.log('=== updateHeroWeatherWidget END ===');
 }
 
 // Get weather tip based on conditions
