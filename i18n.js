@@ -289,7 +289,8 @@ const TRANSLATIONS = {
         
         // Share card preview
         'share.previewLabel': 'On your Share Card:',
-        
+        'share.rerollHint': 'Get different statement',
+
         // Race browser
         'races.noResults': 'No races found matching your criteria.',
         
@@ -684,7 +685,8 @@ const TRANSLATIONS = {
         
         // Share card preview
         'share.previewLabel': 'Auf deiner Share Card:',
-        
+        'share.rerollHint': 'Anderen Spruch',
+
         // Race browser
         'races.noResults': 'Keine Rennen gefunden, die deinen Kriterien entsprechen.',
         
