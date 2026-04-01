@@ -41,6 +41,9 @@ const TRANSLATIONS = {
         'upload.demoHintFull': 'Browse our curated race database',
         'upload.privacy': '100% Local Processing – Your GPX data never leaves your device',
         
+        // Route name
+        'route.changeRoute': '↻ Change',
+        
         // Dev gate
         'beta.title': 'GPXray',
         'beta.badge': 'DEV',
@@ -430,6 +433,9 @@ const TRANSLATIONS = {
         'upload.demoHint': 'Lade einen Beispiel-Trail um die Funktionen zu entdecken',
         'upload.demoHintFull': 'Durchsuche unsere Renndatenbank',
         'upload.privacy': '100% lokale Verarbeitung – Deine GPX-Daten verlassen nie dein Gerät',
+        
+        // Route name
+        'route.changeRoute': '↻ Ändern',
         
         // Dev gate
         'beta.title': 'GPXray',

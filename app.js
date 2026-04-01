@@ -206,6 +206,7 @@ document.addEventListener('DOMContentLoaded', () => {
     setupDatePresets();
     setupPaceInfoTooltip();
     setupFeaturePillTooltips();
+    setupChangeRouteButton();
     
     // Check for race landing page mode
     initRaceMode();
@@ -1208,6 +1209,25 @@ function setupSunTimes() {
     }
 }
 
+// Change Route Button - show upload section again
+function setupChangeRouteButton() {
+    const changeBtn = document.getElementById('changeRouteBtn');
+    if (!changeBtn) return;
+    
+    changeBtn.addEventListener('click', () => {
+        // Show upload section
+        const uploadSection = document.getElementById('uploadSection');
+        if (uploadSection) {
+            uploadSection.style.display = 'block';
+            uploadSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+        
+        // Optionally hide stats section to reset view
+        // const statsSection = document.getElementById('statsSection');
+        // if (statsSection) statsSection.style.display = 'none';
+    });
+}
+
 // Demo GPX loading
 function setupDemo() {
     const demoBtn = document.getElementById('loadDemoBtn');
@@ -1613,6 +1633,12 @@ function parseGPX(gpxContent) {
                 strategyBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
             }
         }, 100);
+    }
+    
+    // Hide upload section after GPX is loaded
+    const uploadSection = document.getElementById('uploadSection');
+    if (uploadSection) {
+        uploadSection.style.display = 'none';
     }
     
     // Track GPX load

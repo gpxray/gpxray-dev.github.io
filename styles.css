@@ -1621,6 +1621,26 @@ h2 {
     font-size: 1.6rem;
     color: #fff;
     font-weight: 600;
+    flex: 1;
+}
+
+/* Change Route Button */
+.change-route-btn {
+    padding: 6px 12px;
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 6px;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.change-route-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.4);
+    color: #fff;
 }
 
 .section-subtitle {
