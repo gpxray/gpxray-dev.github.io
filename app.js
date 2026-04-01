@@ -911,7 +911,7 @@ function showWeatherUnavailable(daysUntilRace) {
         return;
     }
     
-    const lang = getCurrentLanguage();
+    const lang = typeof getLang === 'function' ? getLang() : 'en';
     const iconEl = document.getElementById('heroWeatherIcon');
     const tempEl = document.getElementById('heroWeatherTemp');
     const descEl = document.getElementById('heroWeatherDesc');
@@ -977,19 +977,8 @@ function updateHeroWeatherWidget(weather, weatherCode, adjustment) {
     if (detailsEl) detailsEl.style.display = 'flex'; // Re-show if was hidden
     
     // Show weather tip based on conditions
-    // DEBUG: Alert with weather data - IMPOSSIBLE TO MISS
-    alert(`WEATHER DEBUG:\ntempMin=${weather.tempMin}\ntempMax=${weather.tempMax}\nrain=${weather.rainChance}%\nwindSpeed=${weather.windSpeed}\ncode=${weatherCode}\ntipContainer=${!!tipContainer}`);
-    
     if (tipContainer && tipIconEl && tipTextEl) {
-        console.log('Getting weather tip for:', weather, 'code:', weatherCode);
-        let tip = null;
-        try {
-            tip = getWeatherTip(weather, weatherCode);
-            alert(`TIP RESULT: ${tip ? tip.text : 'NULL'}`);
-        } catch (err) {
-            alert(`ERROR in getWeatherTip: ${err.message}`);
-        }
-        console.log('Weather tip result:', tip);
+        const tip = getWeatherTip(weather, weatherCode);
         if (tip) {
             tipIconEl.textContent = tip.icon;
             tipTextEl.textContent = tip.text;
@@ -997,9 +986,6 @@ function updateHeroWeatherWidget(weather, weatherCode, adjustment) {
         } else {
             tipContainer.style.display = 'none';
         }
-    } else {
-        alert('TIP ELEMENTS NOT FOUND!');
-        console.log('Tip elements not found:', { tipContainer, tipIconEl, tipTextEl });
     }
     
     // Show adjustment if applicable
@@ -1014,7 +1000,7 @@ function updateHeroWeatherWidget(weather, weatherCode, adjustment) {
 
 // Get weather tip based on conditions
 function getWeatherTip(weather, weatherCode) {
-    const lang = getCurrentLanguage();
+    const lang = typeof getLang === 'function' ? getLang() : 'en';
     const code = Number(weatherCode);
     
     console.log('getWeatherTip called with:', { 
