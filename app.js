@@ -744,10 +744,18 @@ function setDateFromPreset(preset, dateInput, timeInput) {
 
 // Fetch weather for custom GPX uploads
 async function fetchGpxWeather() {
-    if (!gpxData || !gpxData.points || gpxData.points.length === 0) return;
+    if (!gpxData || !gpxData.points || gpxData.points.length === 0) {
+        console.log('fetchGpxWeather: No GPX data');
+        return;
+    }
     
     const dateInput = document.getElementById('heroRaceDate') || document.getElementById('raceStartDate');
-    if (!dateInput || !dateInput.value) return;
+    if (!dateInput || !dateInput.value) {
+        console.log('fetchGpxWeather: No date input', dateInput?.id);
+        return;
+    }
+    
+    console.log('fetchGpxWeather: Date is', dateInput.value);
     
     // Get coordinates from first GPX point
     const firstPoint = gpxData.points[0];
@@ -879,7 +887,10 @@ function showGpxWeatherWidget(weather, weatherCode, dateStr) {
 // Show weather unavailable message
 function showWeatherUnavailable(daysUntilRace) {
     const heroWidget = document.getElementById('heroWeatherWidget');
-    if (!heroWidget) return;
+    if (!heroWidget) {
+        console.log('heroWeatherWidget not found');
+        return;
+    }
     
     const lang = getCurrentLanguage();
     const iconEl = document.getElementById('heroWeatherIcon');
@@ -888,21 +899,27 @@ function showWeatherUnavailable(daysUntilRace) {
     const detailsEl = heroWidget.querySelector('.hero-weather-details');
     const tipContainer = document.getElementById('heroWeatherTip');
     const adjContainer = document.getElementById('heroWeatherAdjustment');
+    const titleEl = heroWidget.querySelector('.hero-weather-title');
     
-    if (iconEl) iconEl.textContent = '🌐';
-    if (tempEl) tempEl.textContent = '--';
+    if (iconEl) iconEl.textContent = '📅';
+    if (tempEl) tempEl.textContent = '';
     
+    let message;
     if (daysUntilRace < 0) {
-        if (descEl) descEl.textContent = lang === 'de' ? 'Datum in der Vergangenheit' : 'Date is in the past';
+        message = lang === 'de' ? 'Datum in der Vergangenheit' : 'Date is in the past';
     } else {
-        if (descEl) descEl.textContent = lang === 'de' ? 'Vorhersage max. 16 Tage' : 'Forecast max 16 days';
+        message = lang === 'de' ? `Vorhersage verfügbar in ${daysUntilRace - 16} Tagen` : `Forecast available in ${daysUntilRace - 16} days`;
     }
+    
+    if (descEl) descEl.textContent = message;
+    if (titleEl) titleEl.textContent = lang === 'de' ? 'Wettervorhersage' : 'Weather Forecast';
     
     if (detailsEl) detailsEl.style.display = 'none';
     if (tipContainer) tipContainer.style.display = 'none';
     if (adjContainer) adjContainer.style.display = 'none';
     
     heroWidget.style.display = 'flex';
+    console.log('Weather unavailable shown, days:', daysUntilRace);
 }
 
 // Update hero weather widget (in results section)
