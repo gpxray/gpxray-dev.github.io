@@ -921,11 +921,13 @@ function updateHeroWeatherWidget(weather, weatherCode, adjustment) {
     }
     
     // Show adjustment if applicable
-    if (adjContainer && adjustment && adjustment.addedMinutes >= 1) {
-        adjTextEl.textContent = `+${adjustment.addedMinutes} min`;
+    console.log('Adjustment check:', adjustment);
+    if (adjContainer && adjTextEl) {
+        // DEBUG: Force adjustment display
+        adjTextEl.textContent = `+15 min`;
         adjContainer.style.display = 'flex';
-    } else if (adjContainer) {
-        adjContainer.style.display = 'none';
+        adjContainer.style.border = '2px solid red';
+        console.log('Forced adjustment display');
     }
     
 }
