@@ -2099,10 +2099,15 @@ h2 {
     white-space: nowrap;
 }
 
+.hero-aid-details {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
 .hero-aid-km {
-    font-size: 0.6rem;
+    font-size: 0.7rem;
     color: rgba(0, 188, 212, 0.6);
-    margin-top: 2px;
 }
 
 .hero-aid-time {
