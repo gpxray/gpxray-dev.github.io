@@ -135,7 +135,7 @@ const RACE_CONFIGS = {
         name: 'Rureifel Trail',
         shortName: 'RET',
         year: 2026,
-        date: '2026-04-05', // TEMP: Testing weather feature (original: 2026-04-18)
+        date: '2026-04-18',
         location: 'Nideggen, Germany',
         coordinates: { lat: 50.68, lon: 6.48 }, // For weather API
         website: 'https://www.rureifel-trail.com',
