@@ -2822,21 +2822,31 @@ function updateHeroAidWidget() {
     }
     
     // Check if we have AID stations and checkpoint times
-    if (!lastCachedCheckpoints || lastCachedCheckpoints.length === 0) {
+    if (lastCachedCheckpoints && lastCachedCheckpoints.length > 0) {
+        // Use API-calculated checkpoint times
+        const html = lastCachedCheckpoints.map(cp => `
+            <div class="hero-aid-item">
+                <span class="hero-aid-name">${cp.name}</span>
+                <span class="hero-aid-time">+${formatTime(cp.timeMinutes)}</span>
+            </div>
+        `).join('');
+        
+        listContainer.innerHTML = html;
+        widget.style.display = 'flex';
+    } else if (aidStations && aidStations.length > 0) {
+        // Fallback: show AID stations without times (they'll get times after recalculation)
+        const html = aidStations.map(aid => `
+            <div class="hero-aid-item">
+                <span class="hero-aid-name">${aid.name}</span>
+                <span class="hero-aid-time">--:--</span>
+            </div>
+        `).join('');
+        
+        listContainer.innerHTML = html;
+        widget.style.display = 'flex';
+    } else {
         widget.style.display = 'none';
-        return;
     }
-    
-    // Build AID station HTML
-    const html = lastCachedCheckpoints.map(cp => `
-        <div class="hero-aid-item">
-            <span class="hero-aid-name">${cp.name}</span>
-            <span class="hero-aid-time">+${formatTime(cp.timeMinutes)}</span>
-        </div>
-    `).join('');
-    
-    listContainer.innerHTML = html;
-    widget.style.display = 'flex';
 }
 
 // Show hidden sections
