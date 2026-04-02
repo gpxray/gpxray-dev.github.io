@@ -1162,10 +1162,6 @@ function updatePaceInfoContent() {
     const content = document.getElementById('paceInfoContent');
     if (!content) return;
     
-    const levelSelect = document.getElementById('runnerLevel');
-    const level = levelSelect ? levelSelect.value : 'intermediate';
-    const preset = RUNNER_LEVELS[level] || RUNNER_LEVELS.intermediate;
-    
     // Format pace as MM:SS
     const formatPace = (pace) => {
         const mins = Math.floor(pace);
@@ -1173,9 +1169,69 @@ function updatePaceInfoContent() {
         return `${mins}:${secs.toString().padStart(2, '0')}/km`;
     };
     
-    const flatPace = preset.flatPace;
-    const uphillPace = flatPace * preset.uphillRatio;
-    const downhillPace = flatPace * preset.downhillRatio;
+    // Determine the calculation basis and paces based on mode
+    let basisLabel = '';
+    let basisValue = '';
+    let flatPace, uphillPace, downhillPace;
+    
+    if (currentMode === 'target') {
+        // Target time mode - show target time and calculated paces
+        const heroTargetTime = document.getElementById('heroTargetTime');
+        const raceTargetTime = document.getElementById('raceTargetTime');
+        const targetValue = heroTargetTime?.value || raceTargetTime?.value || '';
+        
+        basisLabel = 'Target Time';
+        basisValue = targetValue || '-';
+        
+        // Use calculated paces if available
+        if (lastCalculatedPaces) {
+            flatPace = lastCalculatedPaces.flat;
+            uphillPace = lastCalculatedPaces.uphill;
+            downhillPace = lastCalculatedPaces.downhill;
+        } else {
+            // Fallback to intermediate
+            const preset = RUNNER_LEVELS.intermediate;
+            flatPace = preset.flatPace;
+            uphillPace = flatPace * preset.uphillRatio;
+            downhillPace = flatPace * preset.downhillRatio;
+        }
+    } else if (currentMode === 'itra' && activeItraScore) {
+        // ITRA mode - show score and calculated paces
+        basisLabel = 'ITRA Score';
+        basisValue = activeItraScore.toString();
+        
+        // Use calculated paces if available
+        if (lastCalculatedPaces) {
+            flatPace = lastCalculatedPaces.flat;
+            uphillPace = lastCalculatedPaces.uphill;
+            downhillPace = lastCalculatedPaces.downhill;
+        } else {
+            // Fallback to intermediate
+            const preset = RUNNER_LEVELS.intermediate;
+            flatPace = preset.flatPace;
+            uphillPace = flatPace * preset.uphillRatio;
+            downhillPace = flatPace * preset.downhillRatio;
+        }
+    } else {
+        // Manual/Runner level mode - show level and preset paces
+        const levelSelect = document.getElementById('runnerLevel');
+        const level = levelSelect ? levelSelect.value : 'intermediate';
+        const preset = RUNNER_LEVELS[level] || RUNNER_LEVELS.intermediate;
+        
+        basisLabel = 'Runner Level';
+        basisValue = preset.name;
+        
+        // Use calculated paces if available (they may differ due to fatigue)
+        if (lastCalculatedPaces) {
+            flatPace = lastCalculatedPaces.flat;
+            uphillPace = lastCalculatedPaces.uphill;
+            downhillPace = lastCalculatedPaces.downhill;
+        } else {
+            flatPace = preset.flatPace;
+            uphillPace = flatPace * preset.uphillRatio;
+            downhillPace = flatPace * preset.downhillRatio;
+        }
+    }
     
     // Get fatigue multiplier from API cache
     let fatigueInfo = '';
@@ -1206,8 +1262,8 @@ function updatePaceInfoContent() {
     
     content.innerHTML = `
         <div class="pace-info-row">
-            <span class="pace-info-label">Runner Level</span>
-            <span class="pace-info-value highlight">${preset.name}</span>
+            <span class="pace-info-label">${basisLabel}</span>
+            <span class="pace-info-value highlight">${basisValue}</span>
         </div>
         <div class="pace-info-row">
             <span class="pace-info-label">Flat Pace</span>
@@ -5230,6 +5286,9 @@ function displayApiResults(result) {
     lastCachedCheckpoints = checkpoints;
     lastCachedFatigue = fatigueMultiplier;
     lastCalculatedPaces = { flat: paces.flat, uphill: paces.uphill, downhill: paces.downhill };
+    
+    // Update the pace info tooltip with actual calculated values
+    updatePaceInfoContent();
     
     // Update finish clock time in hero section
     const heroFinishClock = document.getElementById('heroFinishClock');
