@@ -2833,7 +2833,7 @@ function updateHeroAidWidget() {
         
         listContainer.innerHTML = html;
         widget.style.display = 'flex';
-    } else if (aidStations && aidStations.length > 0) {
+    } else if (typeof aidStations !== 'undefined' && aidStations && aidStations.length > 0) {
         // Fallback: show AID stations without times (they'll get times after recalculation)
         const html = aidStations.map(aid => `
             <div class="hero-aid-item">
@@ -2845,6 +2845,8 @@ function updateHeroAidWidget() {
         listContainer.innerHTML = html;
         widget.style.display = 'flex';
     } else {
+        // No AID stations - hide widget completely
+        listContainer.innerHTML = '';
         widget.style.display = 'none';
     }
 }
