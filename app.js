@@ -1689,6 +1689,7 @@ async function loadDemoGpx() {
             { km: 18.5, name: 'VP3 Hausberg', stopMin: 3 }
         ];
         renderAidStations();
+        renderHeroAidList(); // Update main page AID list
         
         demoBtn.textContent = t('btn.demoLoaded');
         setTimeout(() => {
