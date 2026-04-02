@@ -4765,11 +4765,15 @@ h2 {
     
     /* Edit Strategy Button - Mobile */
     .edit-strategy-btn {
-        position: static;
+        position: static !important;
+        top: auto !important;
+        right: auto !important;
         width: 100%;
+        display: flex !important;
         justify-content: center;
         margin-top: 15px;
-        padding: 10px 16px;
+        margin-bottom: 10px;
+        padding: 12px 16px;
     }
     
     /* Hero Insights Row - Mobile */
@@ -4780,6 +4784,7 @@ h2 {
     
     .hero-insight-widget {
         max-width: 100%;
+        min-height: auto;
         padding: 12px 14px;
     }
     
