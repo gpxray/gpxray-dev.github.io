@@ -3119,16 +3119,21 @@ function updateStoryButtonVisibility() {
     const previewSection = document.getElementById('statementPreviewSection');
     if (!storyBtn) return;
     
-    // Always show on dev, only RET races on production
+    // Always show on dev, only RET races on production, or in demo mode (for early access prompt)
     const isRETRace = currentRouteName && 
         (currentRouteName.toLowerCase().includes('ret') || 
          currentRouteName.toLowerCase().includes('rureifel'));
     
-    if (IS_DEV || isRETRace) {
+    if (IS_DEV || isRETRace || isDemoMode) {
         storyBtn.style.display = 'inline-flex';
         if (previewSection) {
-            previewSection.style.display = 'block';
-            initStatementPreview();
+            // Don't show preview section in demo mode (only show early access prompt)
+            if (isDemoMode && !IS_DEV && !isRETRace) {
+                previewSection.style.display = 'none';
+            } else {
+                previewSection.style.display = 'block';
+                initStatementPreview();
+            }
         }
     } else {
         storyBtn.style.display = 'none';
@@ -7187,6 +7192,16 @@ async function exportShareCard() {
 
 // Instagram Story Card Export - Fun shareable story with witty time-based statements
 async function exportStoryCard() {
+    // In demo mode on production, show early access prompt
+    const isRETRace = currentRouteName && 
+        (currentRouteName.toLowerCase().includes('ret') || 
+         currentRouteName.toLowerCase().includes('rureifel'));
+    
+    if (isDemoMode && !IS_DEV && !isRETRace) {
+        showEarlyAccessModal();
+        return;
+    }
+    
     if (!gpxData || segments.length === 0) {
         alert('Please load a GPX file and calculate your race strategy first.');
         return;
