@@ -751,13 +751,16 @@ function setupDatePresets() {
     const editStrategyBtn = document.getElementById('editStrategyBtn');
     if (editStrategyBtn) {
         editStrategyBtn.addEventListener('click', () => {
-            // Check if we're on a race page (has raceStep2)
-            const raceStep2 = document.getElementById('raceStep2');
-            if (raceStep2) {
+            // Check if we're on a race page by URL (not by element existence)
+            const isRacePage = typeof detectRaceMode === 'function' && detectRaceMode();
+            if (isRacePage) {
                 // Race page: show race strategy box
-                raceStep2.style.display = 'block';
-                editStrategyBtn.style.display = 'none';
-                raceStep2.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                const raceStep2 = document.getElementById('raceStep2');
+                if (raceStep2) {
+                    raceStep2.style.display = 'block';
+                    editStrategyBtn.style.display = 'none';
+                    raceStep2.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
             } else {
                 // Main page: show hero strategy box
                 const strategyBox = document.getElementById('heroRunnerLevel');
