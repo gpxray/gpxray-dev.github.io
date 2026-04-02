@@ -2940,11 +2940,8 @@ function showSections() {
         // Only show stats section (basic info), hide the rest until Calculate
         document.getElementById('statsSection').style.display = 'block';
         
-        // Show hero results section with strategy box for main page
-        const heroResults = document.getElementById('heroResults');
-        if (heroResults) heroResults.style.display = 'block';
-        
         // Show strategy box (for creating strategy), hide edit button
+        // Note: heroRunnerLevel is OUTSIDE heroResults, so we can show it separately
         const strategyBox = document.getElementById('heroRunnerLevel');
         const editBtn = document.getElementById('editStrategyBtn');
         if (strategyBox) strategyBox.style.display = 'block';
@@ -2953,6 +2950,9 @@ function showSections() {
         // Show Start Over button
         const changeBtn = document.getElementById('changeRouteBtn');
         if (changeBtn) changeBtn.style.display = 'inline-flex';
+        
+        // Keep heroResults HIDDEN until Calculate is clicked
+        // It contains insight widgets (Top Climbs, DDL, etc.) that need data
         
         return;
     }
