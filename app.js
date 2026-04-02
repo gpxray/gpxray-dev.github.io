@@ -209,10 +209,46 @@ document.addEventListener('DOMContentLoaded', () => {
     setupChangeRouteButton();
     setupHeroAidStations();
     setupTargetTimeInput();
+    setupHeroSurfaceToggle();
     
     // Check for race landing page mode
     initRaceMode();
 });
+
+// Hero Surface Toggle - syncs with the original surfaceEnabled checkbox
+function setupHeroSurfaceToggle() {
+    const heroToggle = document.getElementById('heroSurfaceEnabled');
+    const originalToggle = document.getElementById('surfaceEnabled');
+    
+    if (!heroToggle) return;
+    
+    // Sync initial state
+    if (originalToggle) {
+        heroToggle.checked = originalToggle.checked;
+    }
+    
+    // When hero toggle changes, sync to original and recalculate
+    heroToggle.addEventListener('change', () => {
+        surfaceEnabled = heroToggle.checked;
+        
+        // Sync to original toggle if it exists
+        if (originalToggle) {
+            originalToggle.checked = heroToggle.checked;
+        }
+        
+        // Recalculate if we have data
+        if (gpxData && segments.length > 0) {
+            calculateRacePlan();
+        }
+    });
+    
+    // When original toggle changes, sync to hero
+    if (originalToggle) {
+        originalToggle.addEventListener('change', () => {
+            heroToggle.checked = originalToggle.checked;
+        });
+    }
+}
 
 // Target Time Input styling
 function setupTargetTimeInput() {
@@ -2624,6 +2660,22 @@ function showSurfaceLoading() {
     if (loadingEl) loadingEl.style.display = 'flex';
     if (statsRow) statsRow.style.display = 'none';
     if (toggleLabel) toggleLabel.style.display = 'none';
+    
+    // Also show loading in hero surface widget
+    showHeroSurfaceLoading();
+}
+
+// Show loading state in hero surface widget
+function showHeroSurfaceLoading() {
+    const widget = document.getElementById('heroSurfaceWidget');
+    const loadingEl = document.getElementById('heroSurfaceLoading');
+    const barsContainer = document.getElementById('heroSurfaceBars');
+    const toggle = document.getElementById('heroSurfaceToggle');
+    
+    if (widget) widget.style.display = 'flex';
+    if (loadingEl) loadingEl.style.display = 'flex';
+    if (barsContainer) barsContainer.style.display = 'none';
+    if (toggle) toggle.style.display = 'none';
 }
 
 // Display surface stats under map
@@ -2676,6 +2728,11 @@ function displaySurfaceStats() {
 function updateHeroSurfaceWidget() {
     const widget = document.getElementById('heroSurfaceWidget');
     const barsContainer = document.getElementById('heroSurfaceBars');
+    const loadingEl = document.getElementById('heroSurfaceLoading');
+    const toggle = document.getElementById('heroSurfaceToggle');
+    
+    // Hide loading
+    if (loadingEl) loadingEl.style.display = 'none';
     
     if (!widget || !barsContainer || segments.length === 0) {
         if (widget) widget.style.display = 'none';
@@ -2725,7 +2782,9 @@ function updateHeroSurfaceWidget() {
     }
     
     barsContainer.innerHTML = html;
+    barsContainer.style.display = 'flex';
     widget.style.display = html ? 'flex' : 'none';
+    if (toggle) toggle.style.display = 'flex';
 }
 
 // Update Hero Climb Profile Widget (uphill/flat/downhill percentages)

@@ -626,9 +626,17 @@
                     <!-- Hero Surface Widget -->
                     <div class="hero-insight-widget hero-surface-widget" id="heroSurfaceWidget" style="display: none;">
                         <div class="hero-widget-title" data-i18n="surface.title">Surface Analysis</div>
+                        <div class="hero-surface-loading" id="heroSurfaceLoading" style="display: none;">
+                            <span class="loading-spinner-small"></span>
+                            <span data-i18n="surface.loading">Analyzing...</span>
+                        </div>
                         <div class="hero-surface-bars" id="heroSurfaceBars">
                             <!-- Filled by JS -->
                         </div>
+                        <label class="hero-surface-toggle" id="heroSurfaceToggle">
+                            <input type="checkbox" id="heroSurfaceEnabled" checked>
+                            <span data-i18n="surface.applyMultipliers">Apply to pace</span>
+                        </label>
                     </div>
                     
                     <!-- Hero Climb Profile Widget -->

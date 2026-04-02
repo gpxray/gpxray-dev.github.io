@@ -109,6 +109,8 @@ const TRANSLATIONS = {
         'surface.road': 'Road',
         'surface.trail': 'Trail',
         'surface.technical': 'Technical',
+        'surface.loading': 'Analyzing...',
+        'surface.applyMultipliers': 'Apply to pace',
         
         // Climb Profile
         'climb.profile': 'Climb Profile',
@@ -519,6 +521,8 @@ const TRANSLATIONS = {
         'surface.road': 'Straße',
         'surface.trail': 'Trail',
         'surface.technical': 'Technisch',
+        'surface.loading': 'Analysiere...',
+        'surface.applyMultipliers': 'Auf Tempo anwenden',
         
         // Climb Profile
         'climb.profile': 'Höhenprofil',

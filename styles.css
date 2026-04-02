@@ -2044,6 +2044,42 @@ h2 {
     min-width: 55px;
 }
 
+.hero-surface-loading {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.8rem;
+}
+
+.loading-spinner-small {
+    width: 14px;
+    height: 14px;
+    border: 2px solid rgba(139, 195, 74, 0.3);
+    border-top-color: #8bc34a;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+.hero-surface-toggle {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    font-size: 0.7rem;
+    color: rgba(255, 255, 255, 0.6);
+    cursor: pointer;
+}
+
+.hero-surface-toggle input[type="checkbox"] {
+    width: 14px;
+    height: 14px;
+    accent-color: #8bc34a;
+    cursor: pointer;
+}
+
 /* Climb Profile Widget */
 .hero-climb-widget {
     background: rgba(156, 39, 176, 0.1);
