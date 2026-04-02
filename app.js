@@ -8878,9 +8878,9 @@ function setupRaceCreateStrategyButton() {
             
             // Scroll to hero results (time display)
             setTimeout(() => {
-                const heroResults = document.getElementById('heroResults');
-                if (heroResults) {
-                    heroResults.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                const statsSection = document.getElementById('statsSection');
+                if (statsSection) {
+                    statsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 }
             }, 300);
             
