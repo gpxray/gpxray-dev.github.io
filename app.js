@@ -38,6 +38,9 @@ const API_CONFIG = {
     aiStatementEndpoint: IS_DEV
         ? 'https://gpxray-dev.azurewebsites.net/api/ai/statement'
         : 'https://api.gpxray.run/api/ai/statement',
+    itraPacesEndpoint: IS_DEV
+        ? 'https://gpxray-dev.azurewebsites.net/api/itra-paces'
+        : 'https://api.gpxray.run/api/itra-paces',
     useBackend: true,
     timeout: 15000
 };
@@ -70,50 +73,32 @@ const RUNNER_LEVELS = {
 
 // ITRA score state
 let activeItraScore = null;
+let cachedItraPaces = null; // Cache API response to avoid repeated calls
 
-// Convert ITRA score to pace preset using continuous interpolation
-function itraScoreToPaces(score) {
-    // ITRA ranges mapped to runner levels:
-    // < 300: Very beginner (slower than beginner preset)
-    // 300-450: Beginner to Intermediate
-    // 450-600: Intermediate to Advanced
-    // 600-750: Advanced to Elite
-    // > 750: Elite to Pro
-    
-    let flatPace, uphillRatio, downhillRatio;
-    
-    if (score < 300) {
-        // Very beginner - slower than preset
-        flatPace = 8.5 - (score / 300) * 1.0; // 8.5 → 7.5
-        uphillRatio = 1.6 - (score / 300) * 0.1;
-        downhillRatio = 0.95 - (score / 300) * 0.05;
-    } else if (score < 450) {
-        // Beginner to Intermediate
-        const t = (score - 300) / 150;
-        flatPace = 7.5 - t * 1.0; // 7.5 → 6.5
-        uphillRatio = 1.5 - t * 0.1;
-        downhillRatio = 0.9 - t * 0.05;
-    } else if (score < 600) {
-        // Intermediate to Advanced
-        const t = (score - 450) / 150;
-        flatPace = 6.5 - t * 1.0; // 6.5 → 5.5
-        uphillRatio = 1.4 - t * 0.1;
-        downhillRatio = 0.85 - t * 0.05;
-    } else if (score < 750) {
-        // Advanced to Elite
-        const t = (score - 600) / 150;
-        flatPace = 5.5 - t * 1.0; // 5.5 → 4.5
-        uphillRatio = 1.3 - t * 0.05;
-        downhillRatio = 0.8 - t * 0.05;
-    } else {
-        // Elite to Pro (cap at 3.5 min/km flat)
-        const t = Math.min((score - 750) / 250, 1);
-        flatPace = 4.5 - t * 1.0; // 4.5 → 3.5
-        uphillRatio = 1.25 - t * 0.05;
-        downhillRatio = 0.75 - t * 0.05;
+// Fetch ITRA paces from API (protected business logic)
+async function fetchItraPaces(score) {
+    // Return cached result if same score
+    if (cachedItraPaces && cachedItraPaces.itraScore === score) {
+        return cachedItraPaces;
     }
     
-    return { flatPace, uphillRatio, downhillRatio };
+    try {
+        const response = await fetch(`${API_CONFIG.itraPacesEndpoint}?score=${score}`);
+        if (!response.ok) {
+            throw new Error(`ITRA API error: ${response.status}`);
+        }
+        cachedItraPaces = await response.json();
+        return cachedItraPaces;
+    } catch (error) {
+        console.error('Failed to fetch ITRA paces:', error);
+        // Fallback to intermediate preset on error
+        return {
+            flatPace: 6.5,
+            uphillRatio: 1.4,
+            downhillRatio: 0.85,
+            itraScore: score
+        };
+    }
 }
 
 // Surface type display properties (calculations are server-side)
@@ -551,6 +536,7 @@ function setupItraForElements(els) {
 
 function clearItraOverride() {
     activeItraScore = null;
+    cachedItraPaces = null; // Clear API cache
     
     // Clear race page elements
     const itraInput = document.getElementById('itraScoreInput');
@@ -1591,6 +1577,10 @@ function resetStrategyState() {
     // Reset mode to manual
     currentMode = 'manual';
     
+    // Clear ITRA state
+    activeItraScore = null;
+    cachedItraPaces = null;
+    
     // Clear target time input
     const heroTargetTime = document.getElementById('heroTargetTime');
     if (heroTargetTime) {
@@ -1598,7 +1588,7 @@ function resetStrategyState() {
         heroTargetTime.classList.remove('has-value');
     }
     
-    // Clear ITRA score
+    // Clear ITRA score inputs
     const mainItraInput = document.getElementById('mainItraScoreInput');
     const mainItraClearBtn = document.getElementById('mainItraClearBtn');
     if (mainItraInput) mainItraInput.value = '';
@@ -4737,15 +4727,15 @@ function getPaceInMinutes(minInput, secInput) {
 }
 
 // Apply runner level paces to manual inputs
-function applyRunnerLevelPaces() {
+async function applyRunnerLevelPaces() {
     let flatPace, uphillPace, downhillPace;
     
     if (activeItraScore !== null) {
-        // Use ITRA-derived paces
-        const itraPaces = itraScoreToPaces(activeItraScore);
+        // Use ITRA-derived paces from API (protected business logic)
+        const itraPaces = await fetchItraPaces(activeItraScore);
         flatPace = itraPaces.flatPace;
-        uphillPace = flatPace * itraPaces.uphillRatio;
-        downhillPace = flatPace * itraPaces.downhillRatio;
+        uphillPace = itraPaces.uphillPace || (flatPace * itraPaces.uphillRatio);
+        downhillPace = itraPaces.downhillPace || (flatPace * itraPaces.downhillRatio);
     } else {
         // Use runner level preset
         const levelSelect = document.getElementById('runnerLevel');
