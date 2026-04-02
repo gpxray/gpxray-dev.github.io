@@ -1565,6 +1565,9 @@ function setupChangeRouteButton() {
         
         // Main page: Show upload section while keeping current results visible
         
+        // Reset strategy state (clears AID stations, weather, etc. for new route)
+        resetStrategyState();
+        
         // Remove race-mode class to allow upload section to show (overrides early hide CSS)
         document.documentElement.classList.remove('race-mode');
         
@@ -1628,6 +1631,12 @@ function resetStrategyState() {
     aidStations = [];
     const heroAidList = document.getElementById('heroAidList');
     if (heroAidList) heroAidList.innerHTML = '';
+    
+    // Clear AID station widget in hero section
+    const heroAidWidget = document.getElementById('heroAidWidget');
+    const heroAidWidgetList = document.getElementById('heroAidWidgetList');
+    if (heroAidWidget) heroAidWidget.style.display = 'none';
+    if (heroAidWidgetList) heroAidWidgetList.innerHTML = '';
     
     console.log('Strategy state reset for new route');
 }
