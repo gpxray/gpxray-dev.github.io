@@ -2929,6 +2929,21 @@ function showSections() {
     if (heroCalculateBtn) {
         // Only show stats section (basic info), hide the rest until Calculate
         document.getElementById('statsSection').style.display = 'block';
+        
+        // Show hero results section with strategy box for main page
+        const heroResults = document.getElementById('heroResults');
+        if (heroResults) heroResults.style.display = 'block';
+        
+        // Show strategy box (for creating strategy), hide edit button
+        const strategyBox = document.getElementById('heroRunnerLevel');
+        const editBtn = document.getElementById('editStrategyBtn');
+        if (strategyBox) strategyBox.style.display = 'block';
+        if (editBtn) editBtn.style.display = 'none';
+        
+        // Show Start Over button
+        const changeBtn = document.getElementById('changeRouteBtn');
+        if (changeBtn) changeBtn.style.display = 'inline-flex';
+        
         return;
     }
     
