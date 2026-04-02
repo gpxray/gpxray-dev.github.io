@@ -4727,13 +4727,15 @@ h2 {
     
     .hero-metrics {
         flex-direction: column;
-        gap: 10px;
+        gap: 8px;
     }
     
     .hero-metric {
+        flex: none;
         max-width: 100%;
-        min-height: auto;
-        padding: 12px;
+        min-width: 0;
+        min-height: 0 !important;
+        padding: 10px 12px;
     }
     
     .hero-metric-value {
@@ -4780,13 +4782,13 @@ h2 {
     /* Hero Insights Row - Mobile */
     .hero-insights-row {
         flex-direction: column;
-        gap: 10px;
+        gap: 8px;
     }
     
     .hero-insight-widget {
         max-width: 100%;
-        min-height: auto;
-        padding: 12px 14px;
+        min-height: 0 !important;
+        padding: 10px 12px;
     }
     
     .hero-widget-title {
@@ -4795,9 +4797,9 @@ h2 {
     
     /* Weather Widget - Mobile (compact) */
     .hero-weather-widget {
-        padding: 12px 16px;
+        padding: 10px 12px;
         max-width: 100%;
-        gap: 6px;
+        gap: 4px;
     }
     
     .hero-weather-header {
