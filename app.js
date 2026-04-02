@@ -1563,8 +1563,7 @@ function setupChangeRouteButton() {
             return;
         }
         
-        // Main page: Reset all state for new route
-        resetStrategyState();
+        // Main page: Show upload section while keeping current results visible
         
         // Remove race-mode class to allow upload section to show (overrides early hide CSS)
         document.documentElement.classList.remove('race-mode');
@@ -1573,9 +1572,7 @@ function setupChangeRouteButton() {
         const raceLanding = document.getElementById('raceLanding');
         if (raceLanding) raceLanding.style.display = 'none';
         
-        // Hide stats section (contains route name, results)
-        const statsSection = document.getElementById('statsSection');
-        if (statsSection) statsSection.style.display = 'none';
+        // Keep statsSection visible so user can see last results as reference
         
         // Show upload section
         const uploadSection = document.getElementById('uploadSection');
