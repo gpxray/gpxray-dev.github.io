@@ -1564,6 +1564,9 @@ function setupChangeRouteButton() {
         // Main page: Reset all state for new route
         resetStrategyState();
         
+        // Remove race-mode class to allow upload section to show (overrides early hide CSS)
+        document.documentElement.classList.remove('race-mode');
+        
         // Show upload section
         const uploadSection = document.getElementById('uploadSection');
         if (uploadSection) {
