@@ -2934,7 +2934,22 @@ function updateHeroAidWidget() {
 
 // Show hidden sections
 function showSections() {
-    // On main page with Calculate button, don't auto-show sections
+    // Check if we're on a race page (not main page)
+    const isRacePage = typeof detectRaceMode === 'function' && detectRaceMode();
+    
+    // On race pages, don't show heroRunnerLevel (race pages use raceStep2 instead)
+    if (isRacePage) {
+        document.getElementById('statsSection').style.display = 'block';
+        document.getElementById('mapSection').style.display = 'block';
+        document.getElementById('elevationSection').style.display = 'block';
+        document.getElementById('paceSection').style.display = 'block';
+        
+        // Show Story button only for RET races (or all races on dev)
+        updateStoryButtonVisibility();
+        return;
+    }
+    
+    // On main page with Calculate button, don't auto-show result sections
     const heroCalculateBtn = document.getElementById('heroCalculateBtn');
     if (heroCalculateBtn) {
         // Only show stats section (basic info), hide the rest until Calculate
@@ -2957,7 +2972,7 @@ function showSections() {
         return;
     }
     
-    // On race landing pages, show everything immediately
+    // Fallback: show everything
     document.getElementById('statsSection').style.display = 'block';
     document.getElementById('mapSection').style.display = 'block';
     document.getElementById('elevationSection').style.display = 'block';
