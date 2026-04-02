@@ -751,11 +751,21 @@ function setupDatePresets() {
     const editStrategyBtn = document.getElementById('editStrategyBtn');
     if (editStrategyBtn) {
         editStrategyBtn.addEventListener('click', () => {
-            const strategyBox = document.getElementById('heroRunnerLevel');
-            if (strategyBox) {
-                strategyBox.style.display = 'block';
+            // Check if we're on a race page (has raceStep2)
+            const raceStep2 = document.getElementById('raceStep2');
+            if (raceStep2) {
+                // Race page: show race strategy box
+                raceStep2.style.display = 'block';
                 editStrategyBtn.style.display = 'none';
-                strategyBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                raceStep2.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            } else {
+                // Main page: show hero strategy box
+                const strategyBox = document.getElementById('heroRunnerLevel');
+                if (strategyBox) {
+                    strategyBox.style.display = 'block';
+                    editStrategyBtn.style.display = 'none';
+                    strategyBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
             }
         });
     }
@@ -8840,6 +8850,12 @@ function setupRaceCreateStrategyButton() {
             
             // Show all result sections (map, elevation, splits, etc.)
             showAllSections();
+            
+            // Hide the strategy box (Step 2) and show Edit Strategy button
+            const step2 = document.getElementById('raceStep2');
+            const editBtn = document.getElementById('editStrategyBtn');
+            if (step2) step2.style.display = 'none';
+            if (editBtn) editBtn.style.display = 'inline-flex';
             
             // Scroll to results
             setTimeout(() => {
