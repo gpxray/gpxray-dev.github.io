@@ -2818,18 +2818,20 @@ function updateHeroAidWidget() {
     const listContainer = document.getElementById('heroAidList');
     
     if (!widget || !listContainer) {
+        console.log('updateHeroAidWidget: Missing elements');
         return;
     }
     
     // Debug: log what data we have
     console.log('updateHeroAidWidget:', { 
-        lastCachedCheckpoints: lastCachedCheckpoints?.length || 0, 
-        aidStations: aidStations?.length || 0 
+        lastCachedCheckpoints: lastCachedCheckpoints,
+        aidStations: aidStations
     });
     
     // Check if we have AID stations and checkpoint times
     if (lastCachedCheckpoints && Array.isArray(lastCachedCheckpoints) && lastCachedCheckpoints.length > 0) {
         // Use API-calculated checkpoint times
+        console.log('Branch 1: Using lastCachedCheckpoints');
         const html = lastCachedCheckpoints.map(cp => `
             <div class="hero-aid-item">
                 <span class="hero-aid-name">${cp.name}</span>
@@ -2841,6 +2843,7 @@ function updateHeroAidWidget() {
         widget.style.display = 'flex';
     } else if (typeof aidStations !== 'undefined' && aidStations && Array.isArray(aidStations) && aidStations.length > 0) {
         // Fallback: show AID stations without times (they'll get times after recalculation)
+        console.log('Branch 2: Using aidStations fallback');
         const html = aidStations.map(aid => `
             <div class="hero-aid-item">
                 <span class="hero-aid-name">${aid.name}</span>
@@ -2852,6 +2855,7 @@ function updateHeroAidWidget() {
         widget.style.display = 'flex';
     } else {
         // No AID stations - hide widget completely
+        console.log('Branch 3: Hiding widget - no data');
         listContainer.innerHTML = '';
         widget.style.display = 'none';
     }
@@ -4975,6 +4979,9 @@ async function calculateRacePlanFromAPI() {
         stopMin: station.stopMin || 0
     }));
     
+    // Debug: log what we're sending to API
+    console.log('Sending to API - aidStations:', aidStations.length, 'stations:', apiAidStations);
+    
     // Build request based on current mode
     const payload = {
         segments: apiSegments,
@@ -5050,6 +5057,10 @@ async function calculateRacePlanFromAPI() {
 // Display results from API response
 function displayApiResults(result) {
     const { paces, terrain, totalTimeMinutes, fatigueMultiplier, checkpoints, stopTimeMinutes, ddl, finishClockTime } = result;
+    
+    // Debug: log API checkpoints
+    console.log('API returned checkpoints:', checkpoints);
+    console.log('Current aidStations:', aidStations);
     
     // Cache API results for use in other functions
     lastCachedCheckpoints = checkpoints;
