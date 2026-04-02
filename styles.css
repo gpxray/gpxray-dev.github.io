@@ -2394,15 +2394,23 @@ h2 {
     }
 }
 
-/* Hero Metrics Grid */
+/* Hero Metrics Grid - same sizing as insight widgets */
 .hero-metrics {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    justify-content: center;
     margin-bottom: 20px;
+    max-width: 900px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .hero-metric {
+    flex: 1 1 260px;
+    min-width: 240px;
+    max-width: 280px;
+    min-height: 140px;
     display: flex;
     gap: 12px;
     align-items: flex-start;
@@ -4718,11 +4726,13 @@ h2 {
     }
     
     .hero-metrics {
-        grid-template-columns: 1fr;
-        gap: 12px;
+        flex-direction: column;
+        gap: 10px;
     }
     
     .hero-metric {
+        max-width: 100%;
+        min-height: auto;
         padding: 12px;
     }
     
