@@ -1852,16 +1852,12 @@ h2 {
 
 /* Hero Weather Widget */
 .hero-weather-widget {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 8px;
-    padding: 16px 24px;
     background: rgba(100, 181, 246, 0.1);
     border: 1px solid rgba(100, 181, 246, 0.2);
-    border-radius: 12px;
-    margin: 15px auto;
-    max-width: 350px;
+}
+
+.hero-weather-widget .hero-widget-title {
+    color: rgba(100, 181, 246, 0.8);
 }
 
 .hero-weather-title {
@@ -1965,9 +1961,10 @@ h2 {
 }
 
 .hero-insight-widget {
-    flex: 1;
-    min-width: 200px;
+    flex: 1 1 260px;
+    min-width: 240px;
     max-width: 280px;
+    min-height: 180px;
     display: flex;
     flex-direction: column;
     align-items: center;
