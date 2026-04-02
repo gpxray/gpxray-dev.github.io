@@ -1520,12 +1520,12 @@ function setupChangeRouteButton() {
     if (!changeBtn) return;
     
     changeBtn.addEventListener('click', () => {
-        // Check if we're on a race page
+        // Check if we're on a race page (multi-distance with step selection)
         const raceStep1 = document.getElementById('raceStep1');
         const raceStep2 = document.getElementById('raceStep2');
         
         if (raceStep1) {
-            // Race page: scroll to distance selection, hide step 2
+            // Multi-distance race page: scroll to distance selection, hide step 2
             if (raceStep2) raceStep2.style.display = 'none';
             
             // Deselect current distance
@@ -1542,6 +1542,22 @@ function setupChangeRouteButton() {
             
             // Scroll to race selection
             raceStep1.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            return;
+        }
+        
+        // Check if we're on a single-distance race page
+        const isRacePage = typeof detectRaceMode === 'function' && detectRaceMode();
+        if (isRacePage) {
+            // Single-distance race page: scroll to strategy box to edit settings
+            const strategyBox = document.getElementById('heroRunnerLevel');
+            const editBtn = document.getElementById('editStrategyBtn');
+            
+            // Show strategy box, hide edit button
+            if (strategyBox) {
+                strategyBox.style.display = 'block';
+                strategyBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+            if (editBtn) editBtn.style.display = 'none';
             return;
         }
         
