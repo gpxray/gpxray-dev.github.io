@@ -865,17 +865,25 @@ async function fetchGpxWeather() {
     }
     
     try {
-        // Use our cached weather API
-        const url = `${API_CONFIG.weatherEndpoint}?lat=${lat}&lon=${lon}&date=${dateInput.value}`;
+        // Check client-side cache first
+        let data = getClientWeatherCache(lat, lon, dateInput.value);
         
-        const response = await fetch(url);
-        if (!response.ok) throw new Error('Weather API error');
-        
-        const result = await response.json();
-        const data = result.data; // Our API wraps the Open-Meteo response
-        
-        if (result.cached) {
-            console.log('Weather data served from cache');
+        if (!data) {
+            // Fetch from our cached weather API
+            const url = `${API_CONFIG.weatherEndpoint}?lat=${lat}&lon=${lon}&date=${dateInput.value}`;
+            
+            const response = await fetch(url);
+            if (!response.ok) throw new Error('Weather API error');
+            
+            const result = await response.json();
+            data = result.data; // Our API wraps the Open-Meteo response
+            
+            // Cache on client side
+            setClientWeatherCache(lat, lon, dateInput.value, data);
+            
+            if (result.cached) {
+                console.log('Weather data served from server cache');
+            }
         }
         
         // Find race day in forecast - dateInput.value is already YYYY-MM-DD format from input type="date"
@@ -8648,6 +8656,28 @@ function populateRaceLanding(config) {
     }
 }
 
+// Client-side weather cache (1 hour TTL)
+const WEATHER_CLIENT_CACHE_TTL = 60 * 60 * 1000; // 1 hour in ms
+
+function getClientWeatherCache(lat, lon, date) {
+    const key = `weather_${lat.toFixed(2)}_${lon.toFixed(2)}_${date}`;
+    const cached = localStorage.getItem(key);
+    if (cached) {
+        const { data, timestamp } = JSON.parse(cached);
+        if (Date.now() - timestamp < WEATHER_CLIENT_CACHE_TTL) {
+            console.log('Weather client cache HIT:', key);
+            return data;
+        }
+        localStorage.removeItem(key); // Expired
+    }
+    return null;
+}
+
+function setClientWeatherCache(lat, lon, date, data) {
+    const key = `weather_${lat.toFixed(2)}_${lon.toFixed(2)}_${date}`;
+    localStorage.setItem(key, JSON.stringify({ data, timestamp: Date.now() }));
+}
+
 // Weather forecast for race landing page
 async function fetchRaceWeather(config) {
     console.log('=== fetchRaceWeather CALLED ===', config.name);
@@ -8670,17 +8700,26 @@ async function fetchRaceWeather(config) {
     
     try {
         const { lat, lon } = config.coordinates;
-        // Use our cached weather API
-        const url = `${API_CONFIG.weatherEndpoint}?lat=${lat}&lon=${lon}&date=${config.date}`;
         
-        const response = await fetch(url);
-        if (!response.ok) throw new Error('Weather API error');
+        // Check client-side cache first
+        let data = getClientWeatherCache(lat, lon, config.date);
         
-        const result = await response.json();
-        const data = result.data; // Our API wraps the Open-Meteo response
-        
-        if (result.cached) {
-            console.log('Race weather data served from cache');
+        if (!data) {
+            // Fetch from our cached weather API
+            const url = `${API_CONFIG.weatherEndpoint}?lat=${lat}&lon=${lon}&date=${config.date}`;
+            
+            const response = await fetch(url);
+            if (!response.ok) throw new Error('Weather API error');
+            
+            const result = await response.json();
+            data = result.data; // Our API wraps the Open-Meteo response
+            
+            // Cache on client side
+            setClientWeatherCache(lat, lon, config.date, data);
+            
+            if (result.cached) {
+                console.log('Race weather data served from server cache');
+            }
         }
         
         // Find race day in forecast

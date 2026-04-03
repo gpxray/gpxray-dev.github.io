@@ -865,6 +865,64 @@ def weather_endpoint(req: func.HttpRequest) -> func.HttpResponse:
         )
 
 
+# Configured race coordinates for weather pre-warming
+RACE_WEATHER_CONFIGS = [
+    # RET - Rureifel Trail 2026
+    {'name': 'RET', 'lat': 50.68, 'lon': 6.48, 'date': '2026-04-18'},
+    # Add more races here as needed
+]
+
+
+@app.timer_trigger(schedule="0 0 */6 * * *", arg_name="timer", run_on_startup=False)
+def weather_prewarm(timer: func.TimerRequest) -> None:
+    """
+    Pre-warm weather cache for configured races.
+    Runs every 6 hours to keep cache fresh before users hit the API.
+    """
+    import urllib.request
+    import urllib.error
+    
+    logging.info("Weather pre-warm started")
+    
+    today = datetime.now().date()
+    warmed_count = 0
+    
+    for race in RACE_WEATHER_CONFIGS:
+        race_date = datetime.strptime(race['date'], '%Y-%m-%d').date()
+        days_until_race = (race_date - today).days
+        
+        # Only pre-warm if race is within 16-day forecast window
+        if 0 <= days_until_race <= 16:
+            lat, lon, date = race['lat'], race['lon'], race['date']
+            
+            # Check if already cached
+            cached = get_cached_weather(lat, lon, date)
+            if cached:
+                logging.info(f"Weather already cached for {race['name']} on {date}")
+                continue
+            
+            try:
+                url = (
+                    f"https://api.open-meteo.com/v1/forecast?"
+                    f"latitude={lat}&longitude={lon}"
+                    f"&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max,weathercode,windspeed_10m_max"
+                    f"&timezone=auto"
+                )
+                
+                request = urllib.request.Request(url, headers={'User-Agent': 'GPXray/1.0'})
+                with urllib.request.urlopen(request, timeout=10) as response:
+                    weather_data = json.loads(response.read().decode('utf-8'))
+                
+                set_cached_weather(lat, lon, date, weather_data)
+                warmed_count += 1
+                logging.info(f"Pre-warmed weather for {race['name']} on {date}")
+                
+            except Exception as e:
+                logging.error(f"Failed to pre-warm weather for {race['name']}: {e}")
+    
+    logging.info(f"Weather pre-warm completed: {warmed_count} new, {len(RACE_WEATHER_CONFIGS)} total configs")
+
+
 # ============================================================================
 # ACCESS CODE VALIDATION - Protected
 # ============================================================================
