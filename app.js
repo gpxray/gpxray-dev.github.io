@@ -7885,11 +7885,11 @@ async function exportCrewCard() {
 
         // Build station rows HTML
         let stationsHtml = stationData.map((station, index) => {
-            // Truncate long station names - allow longer names now that crew badge is separate
+            // Truncate long station names - station names can be longer since we have CSS overflow handling
             let stationName = station.name;
-            const maxNameLen = stationCount <= 4 ? 30 : (stationCount <= 6 ? 26 : (stationCount <= 8 ? 24 : 22));
+            const maxNameLen = stationCount <= 4 ? 35 : (stationCount <= 6 ? 32 : (stationCount <= 8 ? 30 : 28));
             if (stationName.length > maxNameLen) {
-                stationName = stationName.substring(0, maxNameLen - 2) + '...';
+                stationName = stationName.substring(0, maxNameLen - 1) + '…';
             }
             
             // Show arrival time, and time range if there's a stop
@@ -7908,14 +7908,14 @@ async function exportCrewCard() {
             
             const iconMargin = stationCount <= 6 ? '10px' : (stationCount <= 8 ? '8px' : '6px');
             const crewBadgeSize = stationCount <= 6 ? '10px' : '9px';
-            const crewBadge = station.crewAllowed ? `<div style="position: absolute; top: 6px; right: 6px; background: rgba(76,175,80,0.5); padding: 2px 6px; border-radius: 4px; font-size: ${crewBadgeSize}; color: #90EE90;">👥 Crew</div>` : '';
+            const crewBadge = station.crewAllowed ? `<div style="position: absolute; top: 6px; right: 6px; background: rgba(76,175,80,0.5); padding: 3px 8px; border-radius: 4px; font-size: ${crewBadgeSize}; color: #90EE90; display: flex; align-items: center; justify-content: center; line-height: 1;">👥 Crew</div>` : '';
             
             return `
                 <div style="display: flex; align-items: center; padding: ${rowPadding}; background: rgba(255,255,255,0.1); border-radius: 10px; margin-bottom: ${rowGap}; position: relative;">
                     ${crewBadge}
                     <div style="font-size: ${iconSize}; margin-right: ${iconMargin};">📍</div>
                     <div style="flex: 1; min-width: 0;">
-                        <div style="font-size: ${nameSize}; font-weight: 700; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding-right: ${station.crewAllowed ? '60px' : '0'};">${stationName}</div>
+                        <div style="font-size: ${nameSize}; font-weight: 700; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${stationName}</div>
                         <div style="font-size: ${detailSize}; opacity: 0.8;">${detailLine1}</div>
                         <div style="font-size: ${detailSize}; opacity: 0.7;">${detailLine2}</div>
                         ${station.crewInsight ? `<div style="font-size: ${detailSize}; font-weight: 600; color: #ffd700;">${station.crewInsight}</div>` : ''}
