@@ -9023,8 +9023,12 @@ function setupRaceCreateStrategyButton() {
             // Parse GPX (this will trigger calculateRacePlan with correct aidStations)
             parseGPX(currentDistanceConfig._gpxContent);
             
-            // Note: We use the GPX-calculated elevation for internal consistency
-            // (sum of leg gains will match total shown in header)
+            // Ensure stats are displayed and race plan is calculated
+            // (parseGPX may skip this on race pages due to heroCalculateBtn check)
+            if (gpxData) {
+                displayStats();
+                calculateRacePlan();
+            }
             
             // Set fixed race date and start time if configured
             if (currentDistanceConfig.raceDate || currentDistanceConfig.startTime) {
