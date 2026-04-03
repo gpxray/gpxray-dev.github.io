@@ -7647,15 +7647,29 @@ async function exportShareCard() {
         // Gather Key Challenges info for lockscreen
         const topClimbs = findTopClimbs(3);
         let challengesHtml = '';
-        const challengeItems = [];
         
-        // Top Climbs - show each climb with km range
-        if (topClimbs.length > 0) {
-            for (let i = 0; i < topClimbs.length; i++) {
-                const c = topClimbs[i];
-                challengeItems.push(`⛰️ km ${Math.round(c.start)}-${Math.round(c.end)} (+${Math.round(c.gain)}m)`);
-            }
+        // Sort climbs by start km (race sequence order)
+        const sortedClimbs = [...topClimbs].sort((a, b) => a.start - b.start);
+        
+        // Build climbs grid (2 columns)
+        let climbsGrid = '';
+        if (sortedClimbs.length > 0) {
+            const climbItems = sortedClimbs.map(c => 
+                `<div style="background: rgba(255,165,0,0.15); border-radius: 6px; padding: 6px 8px; text-align: center;">
+                    <div style="font-size: 13px; font-weight: 600; color: #ffaa00;">⛰️ km ${Math.round(c.start)}</div>
+                    <div style="font-size: 11px; color: #999;">+${Math.round(c.gain)}m</div>
+                </div>`
+            ).join('');
+            climbsGrid = `
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 8px;">
+                    ${climbItems}
+                </div>
+            `;
         }
+        
+        // Night and DDL in a row
+        let nightDdlRow = '';
+        const extraItems = [];
         
         // Night Running - show km ranges
         if (sunTimes && !sunTimes.midnightSun) {
@@ -7684,7 +7698,7 @@ async function exportShareCard() {
                     cumDist += seg.distance;
                 }
                 if (totalNightDist >= 0.5 && nightStart !== null) {
-                    challengeItems.push(`🌙 Night: km ${Math.round(nightStart)}-${Math.round(nightEnd)} (${totalNightDist.toFixed(0)} km) 🔦`);
+                    extraItems.push(`<span style="color: #9090ff;">🌙 km ${Math.round(nightStart)}-${Math.round(nightEnd)}</span>`);
                 }
             }
         }
@@ -7692,22 +7706,21 @@ async function exportShareCard() {
         // DDL
         if (lastCachedDDL && gpxData) {
             const ddlPerKm = Math.round(lastCachedDDL.ddlTotal / gpxData.totalDistance);
-            if (ddlPerKm > 150) {
-                let ddlText = `🦵 ${ddlPerKm} DDL/km`;
-                if (lastCachedDDL.paceLossSeconds >= 10 && lastCachedDDL.fatigueOnsetKm) {
-                    ddlText += ` | Heavy legs after km ${Math.round(lastCachedDDL.fatigueOnsetKm)}`;
-                }
-                challengeItems.push(ddlText);
+            if (ddlPerKm > 150 && lastCachedDDL.fatigueOnsetKm) {
+                extraItems.push(`<span style="color: #ff9090;">🦵 Legs @ km ${Math.round(lastCachedDDL.fatigueOnsetKm)}</span>`);
             }
         }
         
-        if (challengeItems.length > 0) {
+        if (extraItems.length > 0) {
+            nightDdlRow = `<div style="display: flex; justify-content: center; gap: 20px; font-size: 12px; color: #ccc;">${extraItems.join('')}</div>`;
+        }
+        
+        if (sortedClimbs.length > 0 || extraItems.length > 0) {
             challengesHtml = `
-                <div style="background: rgba(255,255,255,0.05); border-radius: 10px; padding: 12px 15px; margin-bottom: 15px;">
-                    <div style="font-size: 11px; color: #888; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; text-align: center;">🎯 Key Challenges</div>
-                    <div style="display: flex; flex-direction: column; gap: 6px; font-size: 12px; color: #ccc;">
-                        ${challengeItems.map(item => `<div style="text-align: center;">${item}</div>`).join('')}
-                    </div>
+                <div style="background: rgba(255,255,255,0.05); border-radius: 10px; padding: 10px 12px; margin-bottom: 15px;">
+                    <div style="font-size: 10px; color: #666; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; text-align: center;">🎯 Key Challenges</div>
+                    ${climbsGrid}
+                    ${nightDdlRow}
                 </div>
             `;
         }
