@@ -7183,7 +7183,7 @@ async function exportShareCard() {
             const icon = isOver ? '⚠️' : '✓';
             const color = isOver ? '#f44336' : '#4CAF50';
             cutoffHtml = `
-                <div style="text-align: center; margin: 10px 0; font-size: 16px; font-weight: 600; color: ${color};">
+                <div style="text-align: center; margin: 8px 0; font-size: 14px; font-weight: 600; color: ${color};">
                     ${icon} ${t('lockscreen.cutoff')}: ${cutoff}
                 </div>
             `;
@@ -7193,7 +7193,7 @@ async function exportShareCard() {
         let sunTimesHtml = '';
         if (sunTimes && !sunTimes.polarNight && !sunTimes.midnightSun) {
             sunTimesHtml = `
-                <div style="display: flex; gap: 30px; justify-content: center; margin: 15px 0; font-size: 18px; font-weight: 600;">
+                <div style="display: flex; gap: 25px; justify-content: center; margin: 10px 0; font-size: 16px; font-weight: 600;">
                     <span>🌅 ${formatSunTime(sunTimes.sunrise)}</span>
                     <span>🌇 ${formatSunTime(sunTimes.sunset)}</span>
                 </div>
@@ -7209,34 +7209,24 @@ async function exportShareCard() {
         }
 
         card.innerHTML = `
-            <div style="text-align: center; margin-bottom: 20px;">
+            <div style="text-align: center; margin-bottom: 15px;">
                 <div style="display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 5px;">
-                    <img src="img/gpxray-icon-mountain.png" style="height: 32px; width: auto;">
-                    <span style="font-family: 'Sora', sans-serif; font-weight: 600; font-size: 28px; color: #00E5FF; letter-spacing: 0.01em;">GPXray</span>
+                    <img src="img/gpxray-icon-mountain.png" style="height: 28px; width: auto;">
+                    <span style="font-family: 'Sora', sans-serif; font-weight: 600; font-size: 24px; color: #00E5FF; letter-spacing: 0.01em;">GPXray</span>
                 </div>
-                <div style="font-size: 14px; color: #aaa; text-transform: uppercase; letter-spacing: 2px; font-weight: 500;">${t('lockscreen.subtitle')}</div>
+                <div style="font-size: 12px; color: #aaa; text-transform: uppercase; letter-spacing: 2px; font-weight: 500;">${t('lockscreen.subtitle')}</div>
             </div>
             
-            <div style="background: rgba(0,212,255,0.15); border-radius: 12px; padding: 20px; margin-bottom: 20px;">
-                <div style="font-size: 22px; font-weight: bold; text-align: center; margin-bottom: 15px;">${routeName}</div>
-                
-                <div style="display: flex; justify-content: space-around; text-align: center;">
-                    <div>
-                        <div style="font-size: 32px; font-weight: bold;">${distance.toFixed(1)}</div>
-                        <div style="font-size: 14px; color: #aaa; font-weight: 500;">${unitLabel}</div>
-                    </div>
-                    <div>
-                        <div style="font-size: 32px; font-weight: bold;">+${gpxData.elevationGain.toFixed(0)}</div>
-                        <div style="font-size: 14px; color: #aaa; font-weight: 500;">${t('lockscreen.mGain')}</div>
-                    </div>
-                    <div>
-                        <div style="font-size: 32px; font-weight: bold;">-${gpxData.elevationLoss.toFixed(0)}</div>
-                        <div style="font-size: 14px; color: #aaa; font-weight: 500;">${t('lockscreen.mLoss')}</div>
-                    </div>
+            <div style="background: rgba(0,212,255,0.15); border-radius: 10px; padding: 12px 15px; margin-bottom: 15px;">
+                <div style="font-size: 18px; font-weight: bold; text-align: center; margin-bottom: 8px;">${routeName}</div>
+                <div style="display: flex; justify-content: center; gap: 20px; font-size: 14px; color: #ccc;">
+                    <span>${distance.toFixed(1)} ${unitLabel}</span>
+                    <span>+${gpxData.elevationGain.toFixed(0)}m</span>
+                    <span>-${gpxData.elevationLoss.toFixed(0)}m</span>
                 </div>
             </div>
             
-            ${timesSection ? `<div style="text-align: center; margin-bottom: 20px;">${timesSection}</div>` : ''}
+            ${timesSection ? `<div style="text-align: center; margin-bottom: 15px;">${timesSection}</div>` : ''}
             
             ${aidStationsList ? `
                 <div style="background: rgba(255,255,255,0.05); border-radius: 12px; padding: 15px; margin-bottom: 20px;">
