@@ -7884,9 +7884,9 @@ async function exportCrewCard() {
 
         // Build station rows HTML
         let stationsHtml = stationData.map((station, index) => {
-            // Truncate long station names
+            // Truncate long station names - allow longer names now that crew badge is separate
             let stationName = station.name;
-            const maxNameLen = stationCount <= 4 ? 25 : (stationCount <= 6 ? 22 : (stationCount <= 8 ? 20 : 18));
+            const maxNameLen = stationCount <= 4 ? 30 : (stationCount <= 6 ? 26 : (stationCount <= 8 ? 24 : 22));
             if (stationName.length > maxNameLen) {
                 stationName = stationName.substring(0, maxNameLen - 2) + '...';
             }
@@ -7906,17 +7906,18 @@ async function exportCrewCard() {
             const nextLegLine = station.nextLeg + timeToNextText;
             
             const iconMargin = stationCount <= 6 ? '12px' : (stationCount <= 8 ? '10px' : '8px');
-            const crewBadge = station.crewAllowed ? `<span style="background: rgba(76,175,80,0.3); padding: 1px 6px; border-radius: 4px; font-size: ${detailSize}; margin-left: 6px;">👥 ${t('crew.crewAllowed')}</span>` : '';
+            const crewBadgeLine = station.crewAllowed ? `<div style="font-size: ${detailSize}; margin-top: 2px;"><span style="background: rgba(76,175,80,0.4); padding: 2px 8px; border-radius: 4px; color: #90EE90;">👥 ${t('crew.crewAllowed')}</span></div>` : '';
             
             return `
                 <div style="display: flex; align-items: center; padding: ${rowPadding}; background: rgba(255,255,255,0.1); border-radius: 10px; margin-bottom: ${rowGap};">
                     <div style="font-size: ${iconSize}; margin-right: ${iconMargin};">📍</div>
                     <div style="flex: 1; min-width: 0;">
-                        <div style="font-size: ${nameSize}; font-weight: 700; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${stationName}${crewBadge}</div>
+                        <div style="font-size: ${nameSize}; font-weight: 700; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${stationName}</div>
                         <div style="font-size: ${detailSize}; opacity: 0.8;">${detailLine1}</div>
                         <div style="font-size: ${detailSize}; opacity: 0.7;">${detailLine2}</div>
                         ${station.crewInsight ? `<div style="font-size: ${detailSize}; font-weight: 600; margin-top: 2px; color: #ffd700;">${station.crewInsight}</div>` : ''}
                         <div style="font-size: ${detailSize}; opacity: 0.8; margin-top: 2px; color: #90EE90;">${nextLegLine}</div>
+                        ${crewBadgeLine}
                     </div>
                     <div style="text-align: right; margin-left: 10px;">
                         <div style="font-size: ${timeFontSize}; font-weight: 800;">${timeDisplay}</div>
