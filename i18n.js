@@ -205,6 +205,18 @@ const TRANSLATIONS = {
         'pace.downhillHint': 'Grade < -5%',
         'pace.calculate': 'Calculate Race Plan',
         
+        // Pace Info Tooltip
+        'paceInfo.header': 'Calculation based on:',
+        'paceInfo.runnerLevel': 'Runner Level',
+        'paceInfo.itraScore': 'ITRA Score',
+        'paceInfo.targetTime': 'Target Time',
+        'paceInfo.flatPace': 'Flat Pace',
+        'paceInfo.uphillPace': 'Uphill Pace',
+        'paceInfo.downhillPace': 'Downhill Pace',
+        'paceInfo.fatigueFactor': 'Fatigue Factor',
+        'paceInfo.surfaceFactors': 'Surface Factors',
+        'paceInfo.enabled': 'Enabled',
+        
         // Splits section
         'splits.title': 'Splits Table',
         'splits.km': 'KM',
@@ -627,6 +639,18 @@ const TRANSLATIONS = {
         'pace.downhill': 'Bergab-Tempo',
         'pace.downhillHint': 'Gefälle < -5%',
         'pace.calculate': 'Rennplan berechnen',
+        
+        // Pace Info Tooltip
+        'paceInfo.header': 'Berechnung basiert auf:',
+        'paceInfo.runnerLevel': 'Läufer-Level',
+        'paceInfo.itraScore': 'ITRA-Score',
+        'paceInfo.targetTime': 'Zielzeit',
+        'paceInfo.flatPace': 'Flach-Tempo',
+        'paceInfo.uphillPace': 'Bergauf-Tempo',
+        'paceInfo.downhillPace': 'Bergab-Tempo',
+        'paceInfo.fatigueFactor': 'Ermüdungsfaktor',
+        'paceInfo.surfaceFactors': 'Untergrund-Faktoren',
+        'paceInfo.enabled': 'Aktiviert',
         
         // Splits section
         'splits.title': 'Splits-Tabelle',

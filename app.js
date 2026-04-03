@@ -1185,10 +1185,21 @@ function updatePaceInfoContent() {
     let basisValue = '';
     let flatPace, uphillPace, downhillPace;
     
+    // Translation helpers
+    const labelRunnerLevel = typeof t === 'function' ? t('paceInfo.runnerLevel') : 'Runner Level';
+    const labelFlatPace = typeof t === 'function' ? t('paceInfo.flatPace') : 'Flat Pace';
+    const labelUphillPace = typeof t === 'function' ? t('paceInfo.uphillPace') : 'Uphill Pace';
+    const labelDownhillPace = typeof t === 'function' ? t('paceInfo.downhillPace') : 'Downhill Pace';
+    const labelFatigueFactor = typeof t === 'function' ? t('paceInfo.fatigueFactor') : 'Fatigue Factor';
+    const labelSurfaceFactors = typeof t === 'function' ? t('paceInfo.surfaceFactors') : 'Surface Factors';
+    const labelEnabled = typeof t === 'function' ? t('paceInfo.enabled') : 'Enabled';
+    const labelItraScore = typeof t === 'function' ? t('paceInfo.itraScore') : 'ITRA Score';
+    const labelTargetTime = typeof t === 'function' ? t('paceInfo.targetTime') : 'Target Time';
+    
     // Check ITRA first (activeItraScore indicates ITRA is being used)
     if (activeItraScore) {
         // ITRA mode - show score and calculated paces
-        basisLabel = 'ITRA Score';
+        basisLabel = labelItraScore;
         basisValue = activeItraScore.toString();
         
         // Use calculated paces if available
@@ -1211,7 +1222,7 @@ function updatePaceInfoContent() {
         
         if (currentMode === 'target' || targetValue) {
             // Target time mode - show target time and calculated paces
-            basisLabel = 'Target Time';
+            basisLabel = labelTargetTime;
             basisValue = targetValue || '-';
             
             // Use calculated paces if available
@@ -1232,8 +1243,8 @@ function updatePaceInfoContent() {
             const level = levelSelect ? levelSelect.value : 'intermediate';
             const preset = RUNNER_LEVELS[level] || RUNNER_LEVELS.intermediate;
             
-            basisLabel = 'Runner Level';
-            basisValue = preset.name;
+            basisLabel = labelRunnerLevel;
+            basisValue = typeof t === 'function' ? t('hero.' + level) : preset.name;
             
             // Use calculated paces if available (they may differ due to fatigue)
             if (lastCalculatedPaces) {
@@ -1256,7 +1267,7 @@ function updatePaceInfoContent() {
             const pct = Math.round((fatigue - 1) * 100);
             fatigueInfo = `
                 <div class="pace-info-row">
-                    <span class="pace-info-label">Fatigue Factor</span>
+                    <span class="pace-info-label">${labelFatigueFactor}</span>
                     <span class="pace-info-value highlight">+${pct}%</span>
                 </div>
             `;
@@ -1269,8 +1280,8 @@ function updatePaceInfoContent() {
     if (surfaceToggle && surfaceToggle.checked) {
         surfaceInfo = `
             <div class="pace-info-row">
-                <span class="pace-info-label">Surface Factors</span>
-                <span class="pace-info-value">Enabled</span>
+                <span class="pace-info-label">${labelSurfaceFactors}</span>
+                <span class="pace-info-value">${labelEnabled}</span>
             </div>
         `;
     }
@@ -1281,15 +1292,15 @@ function updatePaceInfoContent() {
             <span class="pace-info-value highlight">${basisValue}</span>
         </div>
         <div class="pace-info-row">
-            <span class="pace-info-label">Flat Pace</span>
+            <span class="pace-info-label">${labelFlatPace}</span>
             <span class="pace-info-value">${formatPace(flatPace)}</span>
         </div>
         <div class="pace-info-row">
-            <span class="pace-info-label">Uphill Pace</span>
+            <span class="pace-info-label">${labelUphillPace}</span>
             <span class="pace-info-value">${formatPace(uphillPace)}</span>
         </div>
         <div class="pace-info-row">
-            <span class="pace-info-label">Downhill Pace</span>
+            <span class="pace-info-label">${labelDownhillPace}</span>
             <span class="pace-info-value">${formatPace(downhillPace)}</span>
         </div>
         ${fatigueInfo}
