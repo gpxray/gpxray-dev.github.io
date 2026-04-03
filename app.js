@@ -4633,42 +4633,96 @@ function getElevationAtDistance(distanceKm) {
     return gpxData.points[gpxData.points.length - 1].elevation || 0;
 }
 
-// Calculate elevation gain between two distances
+// Calculate elevation gain between two distances (with smoothing to match GPX parsing)
 function calculateElevationGainBetween(fromKm, toKm) {
     if (!gpxData) return 0;
     
-    let gain = 0;
-    let prevElev = null;
+    // Use same smoothing algorithm as calculateElevationWithSmoothing
+    const SEGMENT_DISTANCE = 0.05; // km (50 meters)
+    const MIN_CHANGE_THRESHOLD = 1; // minimum meters to count
+    
+    // Get points in range and group into 50m segments
+    const segmentElevations = [];
+    let segmentStart = fromKm;
+    let segmentSum = 0;
+    let segmentCount = 0;
     
     for (const point of gpxData.points) {
-        if (point.distance >= fromKm && point.distance <= toKm) {
-            if (prevElev !== null && point.elevation > prevElev) {
-                gain += point.elevation - prevElev;
-            }
-            prevElev = point.elevation;
-        } else if (point.distance > toKm) {
-            break;
+        if (point.distance < fromKm) continue;
+        if (point.distance > toKm) break;
+        if (point.elevation === null) continue;
+        
+        segmentSum += point.elevation;
+        segmentCount++;
+        
+        // Check if we've covered enough distance for a new segment
+        if (point.distance - segmentStart >= SEGMENT_DISTANCE && segmentCount > 0) {
+            segmentElevations.push(segmentSum / segmentCount);
+            segmentStart = point.distance;
+            segmentSum = 0;
+            segmentCount = 0;
+        }
+    }
+    
+    // Don't forget the last segment
+    if (segmentCount > 0) {
+        segmentElevations.push(segmentSum / segmentCount);
+    }
+    
+    // Calculate gain between smoothed segment averages
+    let gain = 0;
+    for (let i = 1; i < segmentElevations.length; i++) {
+        const change = segmentElevations[i] - segmentElevations[i - 1];
+        if (change >= MIN_CHANGE_THRESHOLD) {
+            gain += change;
         }
     }
     
     return gain;
 }
 
-// Calculate elevation loss between two distances
+// Calculate elevation loss between two distances (with smoothing to match GPX parsing)
 function calculateElevationLossBetween(fromKm, toKm) {
     if (!gpxData) return 0;
     
-    let loss = 0;
-    let prevElev = null;
+    // Use same smoothing algorithm as calculateElevationWithSmoothing
+    const SEGMENT_DISTANCE = 0.05; // km (50 meters)
+    const MIN_CHANGE_THRESHOLD = 1; // minimum meters to count
+    
+    // Get points in range and group into 50m segments
+    const segmentElevations = [];
+    let segmentStart = fromKm;
+    let segmentSum = 0;
+    let segmentCount = 0;
     
     for (const point of gpxData.points) {
-        if (point.distance >= fromKm && point.distance <= toKm) {
-            if (prevElev !== null && point.elevation < prevElev) {
-                loss += prevElev - point.elevation;
-            }
-            prevElev = point.elevation;
-        } else if (point.distance > toKm) {
-            break;
+        if (point.distance < fromKm) continue;
+        if (point.distance > toKm) break;
+        if (point.elevation === null) continue;
+        
+        segmentSum += point.elevation;
+        segmentCount++;
+        
+        // Check if we've covered enough distance for a new segment
+        if (point.distance - segmentStart >= SEGMENT_DISTANCE && segmentCount > 0) {
+            segmentElevations.push(segmentSum / segmentCount);
+            segmentStart = point.distance;
+            segmentSum = 0;
+            segmentCount = 0;
+        }
+    }
+    
+    // Don't forget the last segment
+    if (segmentCount > 0) {
+        segmentElevations.push(segmentSum / segmentCount);
+    }
+    
+    // Calculate loss between smoothed segment averages
+    let loss = 0;
+    for (let i = 1; i < segmentElevations.length; i++) {
+        const change = segmentElevations[i] - segmentElevations[i - 1];
+        if (change <= -MIN_CHANGE_THRESHOLD) {
+            loss += Math.abs(change);
         }
     }
     
