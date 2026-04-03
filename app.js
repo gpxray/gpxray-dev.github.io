@@ -5319,7 +5319,7 @@ function updateHeroSunTimes() {
 }
 
 // Update Hero Night Running Widget
-function updateHeroNightWidget(startTimeInMinutes, totalRaceTime, paces) {
+function updateHeroNightWidget() {
     const widget = document.getElementById('heroNightWidget');
     const statsContainer = document.getElementById('heroNightStats');
     
@@ -5331,15 +5331,25 @@ function updateHeroNightWidget(startTimeInMinutes, totalRaceTime, paces) {
         return;
     }
     
+    // Get start time from DOM
+    const startTimeInput = document.getElementById('raceStartTime');
+    if (!startTimeInput || !startTimeInput.value) {
+        widget.style.display = 'none';
+        return;
+    }
+    const [startHours, startMinutes] = startTimeInput.value.split(':').map(Number);
+    const startTimeInMinutes = startHours * 60 + startMinutes;
+    
+    // Get paces from cache or defaults
+    const flatPace = lastCalculatedPaces?.flat || 6.5;
+    const uphillPace = lastCalculatedPaces?.uphill || 8.5;
+    const downhillPace = lastCalculatedPaces?.downhill || 5.5;
+    
     // Calculate night sections by traversing the course
     const nightSections = [];
     let currentNightSection = null;
     let cumulativeTime = 0;
     let totalNightDistance = 0;
-    
-    const flatPace = paces?.flatPace || 6.5;
-    const uphillPace = paces?.uphillPace || 8.5;
-    const downhillPace = paces?.downhillPace || 5.5;
     
     for (let i = 0; i < segments.length; i++) {
         const segment = segments[i];
@@ -6367,7 +6377,7 @@ function updateHeroSection(totalTime) {
     updateHeroSurfaceWidget();
     updateHeroClimbWidget();
     updateHeroAidWidget();
-    updateHeroNightWidget(startTimeInMinutes, totalTime, { flatPace, uphillPace, downhillPace });
+    updateHeroNightWidget();
     
     // Hide old heroCheckpoints (now using heroAidWidget)
     if (heroCheckpoints) {
