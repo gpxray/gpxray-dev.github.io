@@ -1715,14 +1715,26 @@ function setupSunTimes() {
         dateInput.value = dateStr;
         
         // Update sun times when date changes
-        dateInput.addEventListener('change', updateSunTimesDisplay);
+        dateInput.addEventListener('change', () => {
+            updateSunTimesDisplay();
+            // Refresh elevation chart with night overlay
+            if (gpxData && segments.length > 0) {
+                displayElevationChart();
+                // Update night widget
+                updateHeroNightWidget();
+            }
+        });
     }
     
-    // Update splits table when time changes (for night section highlighting)
+    // Update splits table and elevation chart when time changes (for night section highlighting)
     if (timeInput) {
         timeInput.addEventListener('change', () => {
             if (segments.length > 0) {
                 generateSplitsTable();
+                // Refresh elevation chart with night overlay
+                displayElevationChart();
+                // Update night widget
+                updateHeroNightWidget();
             }
         });
     }
@@ -3439,6 +3451,9 @@ function displayElevationChart() {
         return 'rgba(76, 175, 80, 0.8)';
     });
     
+    // Calculate night annotations if sun times and paces are available
+    const nightAnnotations = calculateNightAnnotations();
+    
     elevationChart = new Chart(ctx, {
         type: 'line',
         data: {
@@ -3478,6 +3493,9 @@ function displayElevationChart() {
                             return `Elevation: ${context.raw.toFixed(0)} m`;
                         }
                     }
+                },
+                annotation: {
+                    annotations: nightAnnotations
                 }
             },
             scales: {
@@ -3514,6 +3532,176 @@ function displayElevationChart() {
     
     // Make chart container responsive
     document.querySelector('.chart-container').style.height = '300px';
+}
+
+// Calculate night overlay annotations for elevation chart
+function calculateNightAnnotations() {
+    // Need sun times, paces, and start time
+    if (!sunTimes || !gpxData || segments.length === 0 || sunTimes.midnightSun) {
+        return {};
+    }
+    
+    const startTimeInput = document.getElementById('raceStartTime');
+    if (!startTimeInput || !startTimeInput.value) {
+        return {};
+    }
+    
+    const [startHours, startMinutes] = startTimeInput.value.split(':').map(Number);
+    const startTimeInMinutes = startHours * 60 + startMinutes;
+    
+    // Get paces
+    const flatPace = lastCalculatedPaces?.flat || 6.5;
+    const uphillPace = lastCalculatedPaces?.uphill || 8.5;
+    const downhillPace = lastCalculatedPaces?.downhill || 5.5;
+    
+    // Find night sections
+    const nightSections = [];
+    let currentNightSection = null;
+    let cumulativeTime = 0;
+    
+    // Sample at every 0.5 km for efficiency
+    const totalDist = gpxData.totalDistance;
+    const sampleStep = 0.5;
+    
+    for (let km = 0; km <= totalDist; km += sampleStep) {
+        // Calculate time to reach this km using segments
+        let timeToKm = 0;
+        for (const segment of segments) {
+            if (segment.endDistance <= km) {
+                const gradientMultiplier = getGradientPaceMultiplier(segment.grade, flatPace, uphillPace, downhillPace);
+                timeToKm += segment.distance * flatPace * gradientMultiplier;
+            } else if (segment.startDistance < km) {
+                const overlapDist = km - segment.startDistance;
+                const gradientMultiplier = getGradientPaceMultiplier(segment.grade, flatPace, uphillPace, downhillPace);
+                timeToKm += overlapDist * flatPace * gradientMultiplier;
+                break;
+            }
+        }
+        
+        const clockTime = (startTimeInMinutes + timeToKm) % 1440;
+        const isNight = isNightTime(clockTime);
+        
+        if (isNight) {
+            if (!currentNightSection) {
+                currentNightSection = { startKm: km };
+            }
+            currentNightSection.endKm = km;
+        } else {
+            if (currentNightSection) {
+                nightSections.push(currentNightSection);
+                currentNightSection = null;
+            }
+        }
+    }
+    
+    // Close last section
+    if (currentNightSection) {
+        currentNightSection.endKm = totalDist;
+        nightSections.push(currentNightSection);
+    }
+    
+    // Convert to Chart.js annotation format
+    const annotations = {};
+    nightSections.forEach((section, index) => {
+        // Find the label indices for this section
+        const startIndex = Math.floor(section.startKm / totalDist * gpxData.points.length);
+        const endIndex = Math.ceil(section.endKm / totalDist * gpxData.points.length);
+        
+        annotations[`night${index}`] = {
+            type: 'box',
+            xMin: section.startKm.toFixed(2),
+            xMax: section.endKm.toFixed(2),
+            yMin: 'min',
+            yMax: 'max',
+            backgroundColor: 'rgba(63, 81, 181, 0.15)',
+            borderColor: 'rgba(63, 81, 181, 0.3)',
+            borderWidth: 1,
+            label: {
+                display: index === 0,
+                content: '🌙',
+                position: { x: 'start', y: 'start' },
+                font: { size: 14 }
+            }
+        };
+    });
+    
+    // Add sunrise/sunset markers if they fall within race time
+    if (sunTimes.sunrise && sunTimes.sunset) {
+        // Find km where sunrise occurs
+        let sunriseKm = null;
+        let sunsetKm = null;
+        
+        for (let km = 0; km <= totalDist; km += sampleStep) {
+            let timeToKm = 0;
+            for (const segment of segments) {
+                if (segment.endDistance <= km) {
+                    const gradientMultiplier = getGradientPaceMultiplier(segment.grade, flatPace, uphillPace, downhillPace);
+                    timeToKm += segment.distance * flatPace * gradientMultiplier;
+                } else if (segment.startDistance < km) {
+                    const overlapDist = km - segment.startDistance;
+                    const gradientMultiplier = getGradientPaceMultiplier(segment.grade, flatPace, uphillPace, downhillPace);
+                    timeToKm += overlapDist * flatPace * gradientMultiplier;
+                    break;
+                }
+            }
+            
+            const clockTime = (startTimeInMinutes + timeToKm) % 1440;
+            
+            // Check for sunrise crossing
+            if (sunriseKm === null && km > 0) {
+                const prevClockTime = (startTimeInMinutes + timeToKm - sampleStep * flatPace) % 1440;
+                if (prevClockTime < sunTimes.sunrise && clockTime >= sunTimes.sunrise) {
+                    sunriseKm = km;
+                }
+            }
+            
+            // Check for sunset crossing
+            if (sunsetKm === null && km > 0) {
+                const prevClockTime = (startTimeInMinutes + timeToKm - sampleStep * flatPace) % 1440;
+                if (prevClockTime < sunTimes.sunset && clockTime >= sunTimes.sunset) {
+                    sunsetKm = km;
+                }
+            }
+        }
+        
+        // Add sunrise line
+        if (sunriseKm !== null && sunriseKm > 0 && sunriseKm < totalDist) {
+            annotations['sunrise'] = {
+                type: 'line',
+                xMin: sunriseKm.toFixed(2),
+                xMax: sunriseKm.toFixed(2),
+                borderColor: 'rgba(255, 193, 7, 0.7)',
+                borderWidth: 2,
+                borderDash: [5, 5],
+                label: {
+                    display: true,
+                    content: '🌅',
+                    position: 'start',
+                    font: { size: 16 }
+                }
+            };
+        }
+        
+        // Add sunset line
+        if (sunsetKm !== null && sunsetKm > 0 && sunsetKm < totalDist) {
+            annotations['sunset'] = {
+                type: 'line',
+                xMin: sunsetKm.toFixed(2),
+                xMax: sunsetKm.toFixed(2),
+                borderColor: 'rgba(255, 152, 0, 0.7)',
+                borderWidth: 2,
+                borderDash: [5, 5],
+                label: {
+                    display: true,
+                    content: '🌇',
+                    position: 'start',
+                    font: { size: 16 }
+                }
+            };
+        }
+    }
+    
+    return annotations;
 }
 
 // Display gradient chart
@@ -5716,6 +5904,9 @@ function displayApiResults(result) {
     
     // Update export buttons state (disable in demo mode)
     updateExportButtonsState();
+    
+    // Refresh elevation chart with night overlay (now that paces are known)
+    displayElevationChart();
     
     console.log('Race plan calculated via API', { fatigueMultiplier, checkpoints, ddl });
 }
