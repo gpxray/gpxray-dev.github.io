@@ -132,6 +132,7 @@ function getGradientPaceMultiplier(gradePercent, flatPace, uphillPace, downhillP
 // Night pace penalty - running at night is slower due to reduced visibility
 // Returns multiplier (e.g., 1.08 = 8% slower)
 const NIGHT_PACE_PENALTY = 0.08; // 8% slower at night
+const TWILIGHT_BUFFER = 30; // 30 minutes of civil twilight before sunrise / after sunset
 
 function getNightPaceMultiplier(clockMinutes, surfaceType = 'trail') {
     // Check if we have sun times
@@ -139,8 +140,11 @@ function getNightPaceMultiplier(clockMinutes, surfaceType = 'trail') {
         return 1.0;
     }
     
-    // Night is before sunrise or after sunset
-    const isNight = clockMinutes < sunTimes.sunrise || clockMinutes > sunTimes.sunset;
+    // Night includes twilight: before (sunrise - buffer) or after (sunset + buffer)
+    // Civil twilight is when headlamp is typically needed
+    const effectiveSunrise = sunTimes.sunrise - TWILIGHT_BUFFER;
+    const effectiveSunset = sunTimes.sunset + TWILIGHT_BUFFER;
+    const isNight = clockMinutes < effectiveSunrise || clockMinutes > effectiveSunset;
     
     if (!isNight) {
         return 1.0;
@@ -3664,38 +3668,42 @@ function calculateNightAnnotations() {
             }
         }
         
-        // Add sunrise line
+        // Add sunrise line - bright yellow, prominent
         if (sunriseKm !== null && sunriseKm > 0 && sunriseKm < totalDist) {
             annotations['sunrise'] = {
                 type: 'line',
                 xMin: sunriseKm.toFixed(2),
                 xMax: sunriseKm.toFixed(2),
-                borderColor: 'rgba(255, 193, 7, 0.7)',
-                borderWidth: 2,
-                borderDash: [5, 5],
+                borderColor: 'rgba(255, 193, 7, 1)',
+                borderWidth: 3,
                 label: {
                     display: true,
-                    content: '🌅',
+                    content: '🌅 ' + formatSunTime(sunTimes.sunrise),
                     position: 'start',
-                    font: { size: 16 }
+                    backgroundColor: 'rgba(255, 193, 7, 0.8)',
+                    color: '#000',
+                    font: { size: 12, weight: 'bold' },
+                    padding: 4
                 }
             };
         }
         
-        // Add sunset line
+        // Add sunset line - orange, prominent
         if (sunsetKm !== null && sunsetKm > 0 && sunsetKm < totalDist) {
             annotations['sunset'] = {
                 type: 'line',
                 xMin: sunsetKm.toFixed(2),
                 xMax: sunsetKm.toFixed(2),
-                borderColor: 'rgba(255, 152, 0, 0.7)',
-                borderWidth: 2,
-                borderDash: [5, 5],
+                borderColor: 'rgba(255, 152, 0, 1)',
+                borderWidth: 3,
                 label: {
                     display: true,
-                    content: '🌇',
+                    content: '🌇 ' + formatSunTime(sunTimes.sunset),
                     position: 'start',
-                    font: { size: 16 }
+                    backgroundColor: 'rgba(255, 152, 0, 0.8)',
+                    color: '#000',
+                    font: { size: 12, weight: 'bold' },
+                    padding: 4
                 }
             };
         }
@@ -5627,8 +5635,10 @@ function isNightTime(clockMinutes) {
     if (!sunTimes || sunTimes.polarNight) return true;
     if (sunTimes.midnightSun) return false;
     
-    // Night is before sunrise or after sunset
-    return clockMinutes < sunTimes.sunrise || clockMinutes > sunTimes.sunset;
+    // Night includes twilight buffer (30 min before sunrise, 30 min after sunset)
+    const effectiveSunrise = sunTimes.sunrise - TWILIGHT_BUFFER;
+    const effectiveSunset = sunTimes.sunset + TWILIGHT_BUFFER;
+    return clockMinutes < effectiveSunrise || clockMinutes > effectiveSunset;
 }
 
 function calculateTerrainDistances() {
