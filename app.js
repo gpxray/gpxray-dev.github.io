@@ -7644,6 +7644,65 @@ async function exportShareCard() {
             routeName = routeName.substring(0, 32) + '...';
         }
 
+        // Gather Key Challenges info for lockscreen
+        const topClimbs = findTopClimbs(3);
+        let challengesHtml = '';
+        const challengeItems = [];
+        
+        // Top Climbs
+        if (topClimbs.length > 0) {
+            const hardestClimb = topClimbs.reduce((max, c) => c.gain > max.gain ? c : max, topClimbs[0]);
+            challengeItems.push(`⛰️ ${topClimbs.length} major climb${topClimbs.length > 1 ? 's' : ''} | Hardest: +${Math.round(hardestClimb.gain)}m @ km ${Math.round(hardestClimb.start)}`);
+        }
+        
+        // Night Running
+        if (sunTimes && !sunTimes.midnightSun) {
+            const stInput = document.getElementById('raceStartTime');
+            if (stInput?.value) {
+                const [sh, sm] = stInput.value.split(':').map(Number);
+                const startMins = sh * 60 + sm;
+                const fPace = lastCalculatedPaces?.flat || 6.5;
+                const uPace = lastCalculatedPaces?.uphill || 8.5;
+                const dPace = lastCalculatedPaces?.downhill || 5.5;
+                let totalNightDist = 0;
+                let cumTime = 0;
+                for (const seg of segments) {
+                    const gMult = getGradientPaceMultiplier(seg.grade, fPace, uPace, dPace);
+                    const segTime = seg.distance * fPace * gMult;
+                    const clockTime = (startMins + cumTime) % 1440;
+                    if (isNightTime(clockTime)) totalNightDist += seg.distance;
+                    cumTime += segTime;
+                }
+                if (totalNightDist >= 0.5) {
+                    const nightPct = Math.round((totalNightDist / gpxData.totalDistance) * 100);
+                    challengeItems.push(`🌙 ${totalNightDist.toFixed(0)} km at night (${nightPct}%) | 🔦 Headlamp`);
+                }
+            }
+        }
+        
+        // DDL
+        if (lastCachedDDL && gpxData) {
+            const ddlPerKm = Math.round(lastCachedDDL.ddlTotal / gpxData.totalDistance);
+            if (ddlPerKm > 150) {
+                let ddlText = `🦵 ${ddlPerKm} DDL/km`;
+                if (lastCachedDDL.paceLossSeconds >= 10 && lastCachedDDL.fatigueOnsetKm) {
+                    ddlText += ` | Heavy legs after km ${Math.round(lastCachedDDL.fatigueOnsetKm)}`;
+                }
+                challengeItems.push(ddlText);
+            }
+        }
+        
+        if (challengeItems.length > 0) {
+            challengesHtml = `
+                <div style="background: rgba(255,255,255,0.05); border-radius: 10px; padding: 12px 15px; margin-bottom: 15px;">
+                    <div style="font-size: 11px; color: #888; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; text-align: center;">🎯 Key Challenges</div>
+                    <div style="display: flex; flex-direction: column; gap: 6px; font-size: 12px; color: #ccc;">
+                        ${challengeItems.map(item => `<div style="text-align: center;">${item}</div>`).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
         // Base64 encoded GPXray logo for html2canvas compatibility
         const logoBase64 = 'data:image/png;base64,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';
         
@@ -7666,6 +7725,8 @@ async function exportShareCard() {
             </div>
             
             ${timesSection ? `<div style="text-align: center; margin-bottom: 15px;">${timesSection}</div>` : ''}
+            
+            ${challengesHtml}
             
             ${aidStationsList ? `
                 <div style="background: rgba(255,255,255,0.05); border-radius: 12px; padding: 15px; margin-bottom: 20px;">
@@ -7813,87 +7874,6 @@ async function exportStoryCard() {
                 : `${weekday}, ${month} ${day}, ${year}`;
         }
 
-        // Gather Top Climbs info
-        const topClimbs = findTopClimbs(3);
-        let topClimbsHtml = '';
-        if (topClimbs.length > 0) {
-            const hardestClimb = topClimbs.reduce((max, c) => c.gain > max.gain ? c : max, topClimbs[0]);
-            topClimbsHtml = `
-                <div style="display: flex; align-items: center; gap: 10px; justify-content: center;">
-                    <span style="font-size: 18px;">⛰️</span>
-                    <span>${topClimbs.length} ${topClimbs.length === 1 ? 'major climb' : 'major climbs'} | Hardest: +${Math.round(hardestClimb.gain)}m @ km ${Math.round(hardestClimb.start)}</span>
-                </div>
-            `;
-        }
-
-        // Gather Night Running info
-        let nightHtml = '';
-        if (sunTimes && !sunTimes.midnightSun) {
-            const startTimeInput = document.getElementById('raceStartTime');
-            if (startTimeInput?.value) {
-                const [sh, sm] = startTimeInput.value.split(':').map(Number);
-                const startMins = sh * 60 + sm;
-                const flatPace = lastCalculatedPaces?.flat || 6.5;
-                const uphillPace = lastCalculatedPaces?.uphill || 8.5;
-                const downhillPace = lastCalculatedPaces?.downhill || 5.5;
-                
-                let totalNightDist = 0;
-                let cumTime = 0;
-                for (const seg of segments) {
-                    const gradMult = getGradientPaceMultiplier(seg.grade, flatPace, uphillPace, downhillPace);
-                    const segTime = seg.distance * flatPace * gradMult;
-                    const clockTime = (startMins + cumTime) % 1440;
-                    if (isNightTime(clockTime)) {
-                        totalNightDist += seg.distance;
-                    }
-                    cumTime += segTime;
-                }
-                
-                if (totalNightDist >= 0.5) {
-                    const nightPct = Math.round((totalNightDist / gpxData.totalDistance) * 100);
-                    nightHtml = `
-                        <div style="display: flex; align-items: center; gap: 10px; justify-content: center;">
-                            <span style="font-size: 18px;">🌙</span>
-                            <span>${totalNightDist.toFixed(0)} km at night (${nightPct}%) | 🔦 Headlamp needed</span>
-                        </div>
-                    `;
-                }
-            }
-        }
-
-        // Gather DDL (Downhill Load) info
-        let ddlHtml = '';
-        if (lastCachedDDL && gpxData) {
-            const ddlPerKm = Math.round(lastCachedDDL.ddlTotal / gpxData.totalDistance);
-            if (ddlPerKm > 150) {
-                let ddlText = `${ddlPerKm} DDL/km`;
-                if (lastCachedDDL.paceLossSeconds >= 10 && lastCachedDDL.fatigueOnsetKm) {
-                    ddlText += ` | Legs heavy after km ${Math.round(lastCachedDDL.fatigueOnsetKm)}`;
-                }
-                ddlHtml = `
-                    <div style="display: flex; align-items: center; gap: 10px; justify-content: center;">
-                        <span style="font-size: 18px;">🦵</span>
-                        <span>${ddlText}</span>
-                    </div>
-                `;
-            }
-        }
-
-        // Build insights section if any data exists
-        let insightsHtml = '';
-        if (topClimbsHtml || nightHtml || ddlHtml) {
-            insightsHtml = `
-                <div style="background: rgba(255,255,255,0.05); border-radius: 12px; padding: 16px 20px; width: 100%; max-width: 460px;">
-                    <div style="font-size: 12px; color: #888; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; text-align: center;">🎯 Key Challenges</div>
-                    <div style="display: flex; flex-direction: column; gap: 10px; font-size: 16px; color: #ccc;">
-                        ${topClimbsHtml}
-                        ${nightHtml}
-                        ${ddlHtml}
-                    </div>
-                </div>
-            `;
-        }
-
         // Create Instagram Story sized card (1080x1920)
         const card = document.createElement('div');
         card.id = 'storyCardContainer';
@@ -7911,37 +7891,36 @@ async function exportStoryCard() {
             flex-direction: column;
             align-items: center;
             justify-content: space-between;
-            padding: 40px 30px;
+            padding: 60px 40px;
         `;
 
         card.innerHTML = `
             <!-- Logo at Top -->
-            <div style="text-align: center; padding-top: 10px;">
-                <img id="storyCardLogo" crossorigin="anonymous" src="img/gpxray-icon-256.png" style="height: 120px; width: 120px; border-radius: 24px;">
+            <div style="text-align: center; padding-top: 20px;">
+                <img id="storyCardLogo" crossorigin="anonymous" src="img/gpxray-icon-256.png" style="height: 160px; width: 160px; border-radius: 28px;">
             </div>
             
             <!-- Witty Statement -->
             <div style="text-align: center;">
-                <div style="font-size: 32px; font-weight: 600; font-style: italic; color: #00E5FF; line-height: 1.3; max-width: 440px;">
+                <div style="font-size: 36px; font-weight: 600; font-style: italic; color: #00E5FF; line-height: 1.4; max-width: 440px;">
                     ${wittyStatement}
                 </div>
             </div>
             
             <!-- Race Strategy Block -->
-            <div style="text-align: center; width: 100%;">
-                <div style="font-size: 16px; color: #888; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 12px;">👟 ${t('story.myStrategy')}</div>
-                <div style="font-size: 26px; font-weight: 700; margin-bottom: 8px; max-width: 400px;">${routeName}</div>
-                ${raceDateFormatted ? `<div style="font-size: 16px; color: #00E5FF; margin-bottom: 12px;">📅 ${raceDateFormatted}</div>` : ''}
-                <div style="font-size: 24px; font-weight: 500; color: #ddd; margin-bottom: 16px;">${distance.toFixed(0)}${unitLabel} | +${gpxData.elevationGain.toFixed(0)}m ↗</div>
-                <div style="font-size: 18px; color: #aaa; margin-bottom: 6px;">${t('story.start')}: ${formatStartTime(startTime)}</div>
-                <div style="font-size: 18px; color: #aaa; margin-bottom: 16px;">${t('story.target')}: ${targetTime}</div>
-                ${insightsHtml}
+            <div style="text-align: center;">
+                <div style="font-size: 18px; color: #888; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 16px;">👟 ${t('story.myStrategy')}</div>
+                <div style="font-size: 30px; font-weight: 700; margin-bottom: 12px; max-width: 400px;">${routeName}</div>
+                ${raceDateFormatted ? `<div style="font-size: 18px; color: #00E5FF; margin-bottom: 16px;">📅 ${raceDateFormatted}</div>` : ''}
+                <div style="font-size: 26px; font-weight: 500; color: #ddd; margin-bottom: 20px;">${distance.toFixed(0)}${unitLabel} | ${gpxData.elevationGain.toFixed(0)}m</div>
+                <div style="font-size: 20px; color: #aaa; margin-bottom: 8px;">${t('story.start')}: ${formatStartTime(startTime)}</div>
+                <div style="font-size: 20px; color: #aaa;">${t('story.target')}: ${targetTime}</div>
             </div>
             
             <!-- Footer Wordmark Only -->
-            <div style="text-align: center; padding-bottom: 10px;">
-                <div style="font-size: 12px; color: #666; margin-bottom: 6px;">${t('story.createdBy')}</div>
-                <div style="font-size: 24px; font-weight: 700; color: #00E5FF; letter-spacing: 1px;">GPXray</div>
+            <div style="text-align: center; padding-bottom: 20px;">
+                <div style="font-size: 14px; color: #666; margin-bottom: 8px;">${t('story.createdBy')}</div>
+                <div style="font-size: 28px; font-weight: 700; color: #00E5FF; letter-spacing: 1px;">GPXray</div>
             </div>
         `;
 
