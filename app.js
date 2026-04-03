@@ -3636,8 +3636,8 @@ function calculateNightAnnotations(labels) {
             xMax: endIndex,
             yMin: 'min',
             yMax: 'max',
-            backgroundColor: 'rgba(63, 81, 181, 0.15)',
-            borderColor: 'rgba(63, 81, 181, 0.3)',
+            backgroundColor: 'rgba(20, 25, 45, 0.35)',
+            borderColor: 'rgba(100, 120, 180, 0.5)',
             borderWidth: 1,
             label: {
                 display: index === 0,
