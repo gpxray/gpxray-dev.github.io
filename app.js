@@ -8651,7 +8651,8 @@ async function fetchRaceWeather(config) {
         const dayIndex = data.daily.time.indexOf(raceDateStr);
         
         if (dayIndex === -1) {
-            content.innerHTML = `<p class="weather-note">Forecast not yet available for ${raceDate.toLocaleDateString()}</p>`;
+            const notAvailableText = typeof t === 'function' ? t('weather.notAvailable') : 'Forecast not yet available for';
+            content.innerHTML = `<p class="weather-note">${notAvailableText} ${raceDate.toLocaleDateString()}</p>`;
             return;
         }
         

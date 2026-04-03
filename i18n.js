@@ -17,7 +17,10 @@ const TRANSLATIONS = {
         'intro.shareCard': 'Share Card',
         'intro.lockscreenCard': 'Lockscreen Card',
         'intro.nutritionPlanner': 'Nutrition Planner',
+        'intro.downhillLoad': 'Downhill Load',
+        'intro.crewCard': 'Crew Card',
         'intro.comingSoon': 'coming soon',
+        'intro.raceText': 'Create your personalized race strategy. Analyze terrain, estimate pace, and plan your AID station stops.',
         
         // Feature pill tooltips
         'pill.smartPace.info': 'Hit every split on target. Realistic pace predictions that adapt to climbs and descents — no more blowing up on mile 15.',
@@ -100,9 +103,13 @@ const TRANSLATIONS = {
         'race.units': 'Units:',
         'race.targetTime': 'Target time:',
         'race.targetOptional': '(optional)',        'race.createStrategy': 'Create Strategy',        'race.addAidStations': 'Add AID Stations',
+        'race.visitWebsite': 'Visit Official Website',
         
         // Weather
         'weather.forecast': 'Weather Forecast',
+        'weather.raceDayForecast': 'Race Day Weather Forecast',
+        'weather.notAvailable': 'Forecast not yet available for',
+        'weather.loading': 'Loading forecast...',
         'weather.adjustment': 'weather adjustment',
         
         // Surface Analysis
@@ -431,7 +438,10 @@ const TRANSLATIONS = {
         'intro.shareCard': 'Teilen',
         'intro.lockscreenCard': 'Sperrbildschirm',
         'intro.nutritionPlanner': 'Ernährungsplaner',
+        'intro.downhillLoad': 'Abstiegsbelastung',
+        'intro.crewCard': 'Crew-Karte',
         'intro.comingSoon': 'bald verfügbar',
+        'intro.raceText': 'Erstelle deine persönliche Rennstrategie. Analysiere das Gelände, schätze dein Tempo ein und plane deine Verpflegungsstopps.',
         
         // Feature pill tooltips
         'pill.smartPace.info': 'Triff jeden Split. Realistische Pace-Vorhersagen, die sich an Anstiege und Abfahrten anpassen — nie wieder einbrechen auf KM 25.',
@@ -516,9 +526,13 @@ const TRANSLATIONS = {
         'race.targetOptional': '(optional)',
         'race.createStrategy': 'Strategie erstellen',
         'race.addAidStations': 'Verpflegungsstationen hinzufügen',
+        'race.visitWebsite': 'Offizielle Website besuchen',
         
         // Weather
         'weather.forecast': 'Wettervorhersage',
+        'weather.raceDayForecast': 'Wettervorhersage am Renntag',
+        'weather.notAvailable': 'Vorhersage noch nicht verfügbar für',
+        'weather.loading': 'Lade Vorhersage...',
         'weather.adjustment': 'Wetteranpassung',
         
         // Surface Analysis
