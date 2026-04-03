@@ -7801,43 +7801,43 @@ async function exportCrewCard() {
         
         if (stationCount <= 4) {
             // Normal mode
-            rowPadding = '15px 20px';
-            iconSize = '28px';
-            nameSize = '17px';
-            detailSize = '13px';
-            timeSize = '26px';
-            etaSize = '11px';
-            rowGap = '10px';
-            headerPadding = '25px';
-        } else if (stationCount <= 6) {
-            // Medium compact
             rowPadding = '12px 16px';
             iconSize = '24px';
-            nameSize = '15px';
+            nameSize = '16px';
             detailSize = '12px';
-            timeSize = '22px';
+            timeSize = '24px';
             etaSize = '10px';
             rowGap = '8px';
             headerPadding = '20px';
-        } else if (stationCount <= 8) {
-            // Compact mode (7-8 stations)
+        } else if (stationCount <= 6) {
+            // Medium compact
             rowPadding = '10px 14px';
-            iconSize = '20px';
-            nameSize = '14px';
+            iconSize = '22px';
+            nameSize = '15px';
             detailSize = '11px';
-            timeSize = '20px';
+            timeSize = '22px';
             etaSize = '9px';
             rowGap = '6px';
+            headerPadding = '18px';
+        } else if (stationCount <= 8) {
+            // Compact mode (7-8 stations)
+            rowPadding = '8px 12px';
+            iconSize = '20px';
+            nameSize = '14px';
+            detailSize = '10px';
+            timeSize = '20px';
+            etaSize = '8px';
+            rowGap = '5px';
             headerPadding = '15px';
         } else {
             // Ultra-compact mode (9-10+ stations)
-            rowPadding = '8px 12px';
+            rowPadding = '6px 10px';
             iconSize = '18px';
             nameSize = '13px';
-            detailSize = '10px';
+            detailSize = '9px';
             timeSize = '18px';
             etaSize = '8px';
-            rowGap = '5px';
+            rowGap = '4px';
             headerPadding = '12px';
         }
 
@@ -7845,17 +7845,18 @@ async function exportCrewCard() {
         // Use 9:16 aspect ratio (social media friendly) with width of 540px
         const cardWidth = 540;
         const targetHeight = 960; // 540 * 16/9 = 960 for 9:16 ratio
-        // Increased row heights to accommodate new info lines (elevation, next leg, etc.)
-        const rowHeightEstimate = stationCount <= 4 ? 110 : (stationCount <= 6 ? 95 : (stationCount <= 8 ? 85 : 75));
-        const headerHeight = stationCount <= 4 ? 140 : (stationCount <= 6 ? 120 : (stationCount <= 8 ? 100 : 85));
-        const footerHeight = 80;
-        const contentHeight = headerHeight + (stationData.length + 1) * rowHeightEstimate + footerHeight + 60;
+        // Compact row heights
+        const rowHeightEstimate = stationCount <= 4 ? 90 : (stationCount <= 6 ? 80 : (stationCount <= 8 ? 70 : 60));
+        const headerHeight = stationCount <= 4 ? 120 : (stationCount <= 6 ? 100 : (stationCount <= 8 ? 85 : 70));
+        const footerHeight = 60;
+        const contentHeight = headerHeight + (stationData.length + 1) * rowHeightEstimate + footerHeight + 40;
         // Always use 9:16 ratio (960px), expand only if content requires more
         const cardHeight = Math.max(targetHeight, contentHeight);
 
         // Create card container
         const card = document.createElement('div');
         card.id = 'crewCardContainer';
+        const cardPadding = stationCount <= 6 ? '25px' : (stationCount <= 8 ? '20px' : '15px');
         card.style.cssText = `
             position: fixed;
             left: -9999px;
@@ -7865,7 +7866,7 @@ async function exportCrewCard() {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             color: white;
-            padding: 30px;
+            padding: ${cardPadding};
             box-sizing: border-box;
             display: flex;
             flex-direction: column;
@@ -7873,11 +7874,11 @@ async function exportCrewCard() {
 
         // Handle title - allow 2 lines, adjust font size for long names
         let routeName = currentRouteName || 'Race';
-        let titleSize = '24px';
+        let titleSize = stationCount <= 6 ? '22px' : (stationCount <= 8 ? '20px' : '18px');
         let titleLineHeight = '1.2';
         
         if (routeName.length > 40) {
-            titleSize = '20px';
+            titleSize = stationCount <= 6 ? '18px' : '16px';
         } else if (routeName.length > 30) {
             titleSize = '22px';
         }
@@ -7905,19 +7906,20 @@ async function exportCrewCard() {
             const timeToNextText = station.timeToNext ? ` · ~${station.timeToNext} ${t('crew.toNext')}` : '';
             const nextLegLine = station.nextLeg + timeToNextText;
             
-            const iconMargin = stationCount <= 6 ? '12px' : (stationCount <= 8 ? '10px' : '8px');
-            const crewBadgeLine = station.crewAllowed ? `<div style="font-size: ${detailSize}; margin-top: 2px;"><span style="background: rgba(76,175,80,0.4); padding: 2px 8px; border-radius: 4px; color: #90EE90;">👥 ${t('crew.crewAllowed')}</span></div>` : '';
+            const iconMargin = stationCount <= 6 ? '10px' : (stationCount <= 8 ? '8px' : '6px');
+            const crewBadgeSize = stationCount <= 6 ? '10px' : '9px';
+            const crewBadge = station.crewAllowed ? `<div style="position: absolute; top: 6px; right: 6px; background: rgba(76,175,80,0.5); padding: 2px 6px; border-radius: 4px; font-size: ${crewBadgeSize}; color: #90EE90;">👥 Crew</div>` : '';
             
             return `
-                <div style="display: flex; align-items: center; padding: ${rowPadding}; background: rgba(255,255,255,0.1); border-radius: 10px; margin-bottom: ${rowGap};">
+                <div style="display: flex; align-items: center; padding: ${rowPadding}; background: rgba(255,255,255,0.1); border-radius: 10px; margin-bottom: ${rowGap}; position: relative;">
+                    ${crewBadge}
                     <div style="font-size: ${iconSize}; margin-right: ${iconMargin};">📍</div>
                     <div style="flex: 1; min-width: 0;">
-                        <div style="font-size: ${nameSize}; font-weight: 700; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${stationName}</div>
+                        <div style="font-size: ${nameSize}; font-weight: 700; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding-right: ${station.crewAllowed ? '60px' : '0'};">${stationName}</div>
                         <div style="font-size: ${detailSize}; opacity: 0.8;">${detailLine1}</div>
                         <div style="font-size: ${detailSize}; opacity: 0.7;">${detailLine2}</div>
-                        ${station.crewInsight ? `<div style="font-size: ${detailSize}; font-weight: 600; margin-top: 2px; color: #ffd700;">${station.crewInsight}</div>` : ''}
-                        <div style="font-size: ${detailSize}; opacity: 0.8; margin-top: 2px; color: #90EE90;">${nextLegLine}</div>
-                        ${crewBadgeLine}
+                        ${station.crewInsight ? `<div style="font-size: ${detailSize}; font-weight: 600; color: #ffd700;">${station.crewInsight}</div>` : ''}
+                        <div style="font-size: ${detailSize}; opacity: 0.8; color: #90EE90;">${nextLegLine}</div>
                     </div>
                     <div style="text-align: right; margin-left: 10px;">
                         <div style="font-size: ${timeFontSize}; font-weight: 800;">${timeDisplay}</div>
@@ -7930,7 +7932,7 @@ async function exportCrewCard() {
         // Add finish row
         const finishTimeDisplay = finishClockTime ? finishClockTime.substring(0, 5) : finishClockTime;
         const totalElevGain = Math.round(gpxData.elevationGain);
-        const finishIconMargin = stationCount <= 6 ? '12px' : (stationCount <= 8 ? '10px' : '8px');
+        const finishIconMargin = stationCount <= 6 ? '10px' : (stationCount <= 8 ? '8px' : '6px');
         
         // Check cutoff for Crew Card
         let crewCutoffHtml = '';
@@ -7943,7 +7945,7 @@ async function exportCrewCard() {
             const isOver = finishMins > cutoffMins;
             const icon = isOver ? '⚠️' : '✓';
             const color = isOver ? '#f44336' : '#90EE90';
-            crewCutoffHtml = `<div style="font-size: ${detailSize}; font-weight: 600; color: ${color}; margin-top: 2px;">${icon} Cutoff: ${cutoff}</div>`;
+            crewCutoffHtml = `<div style="font-size: ${detailSize}; font-weight: 600; color: ${color};">${icon} Cutoff: ${cutoff}</div>`;
         }
         
         stationsHtml += `
@@ -7952,7 +7954,7 @@ async function exportCrewCard() {
                 <div style="flex: 1; min-width: 0;">
                     <div style="font-size: ${nameSize}; font-weight: 700; margin-bottom: 2px;">${t('crew.finish')}</div>
                     <div style="font-size: ${detailSize}; opacity: 0.8;">${distance.toFixed(1)} ${unitLabel} · 100%</div>
-                    <div style="font-size: ${detailSize}; opacity: 0.7;">Total D+ ${totalElevGain}m · ${totalTime.split('(')[0].trim()}</div>
+                    <div style="font-size: ${detailSize}; opacity: 0.7;">D+ ${totalElevGain}m · ${totalTime.split('(')[0].trim()}</div>
                     ${crewCutoffHtml}
                 </div>
                 <div style="text-align: right; margin-left: 10px;">
@@ -7962,11 +7964,16 @@ async function exportCrewCard() {
             </div>
         `;
 
+        const headerFontSize = stationCount <= 6 ? '12px' : '10px';
+        const headerDateSize = stationCount <= 6 ? '14px' : '12px';
+        const footerPadding = stationCount <= 6 ? '15px' : '10px';
+        const footerLogoSize = stationCount <= 6 ? '18px' : '14px';
+
         card.innerHTML = `
             <div style="text-align: center; margin-bottom: ${headerPadding};">
-                <div style="font-size: 12px; text-transform: uppercase; letter-spacing: 3px; opacity: 0.8; margin-bottom: 8px;">👥 ${t('crew.title')}</div>
-                <div style="font-size: ${titleSize}; font-weight: 800; margin-bottom: 8px; line-height: ${titleLineHeight}; padding: 0 10px;">${routeName}</div>
-                <div style="font-size: 14px; opacity: 0.9;">
+                <div style="font-size: ${headerFontSize}; text-transform: uppercase; letter-spacing: 3px; opacity: 0.8; margin-bottom: 6px;">👥 ${t('crew.title')}</div>
+                <div style="font-size: ${titleSize}; font-weight: 800; margin-bottom: 6px; line-height: ${titleLineHeight}; padding: 0 10px;">${routeName}</div>
+                <div style="font-size: ${headerDateSize}; opacity: 0.9;">
                     ${formattedDate ? `📅 ${formattedDate} · ` : ''}🏃 ${t('crew.start')}: ${raceTime}
                 </div>
             </div>
@@ -7975,8 +7982,8 @@ async function exportCrewCard() {
                 ${stationsHtml}
             </div>
             
-            <div style="text-align: center; padding-top: 15px; margin-top: auto; border-top: 1px solid rgba(255,255,255,0.2);">
-                <div style="font-family: 'Sora', sans-serif; font-weight: 600; font-size: 18px; color: #00E5FF; letter-spacing: 0.01em;">GPXray</div>
+            <div style="text-align: center; padding-top: ${footerPadding}; margin-top: auto; border-top: 1px solid rgba(255,255,255,0.2);">
+                <div style="font-family: 'Sora', sans-serif; font-weight: 600; font-size: ${footerLogoSize}; color: #00E5FF; letter-spacing: 0.01em;">GPXray</div>
                 <div style="font-size: 10px; opacity: 0.6; margin-top: 2px;">gpxray.run</div>
             </div>
         `;
