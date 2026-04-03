@@ -75,6 +75,56 @@ SURFACE_TYPES = {
     'sand': {'flat': 1.25, 'uphill': 1.30, 'downhill': 1.15}
 }
 
+# Grade threshold for terrain classification (percentage)
+GRADE_THRESHOLD = 2.0
+
+
+def get_gradient_pace_multiplier(grade_percent: float, uphill_ratio: float, downhill_ratio: float) -> float:
+    """
+    Gradient-based pace scaling - Protected Algorithm
+    
+    More accurate than binary uphill/downhill classification.
+    Returns a multiplier relative to flat pace.
+    
+    Research basis:
+    - ~6% slower per 1% uphill grade
+    - ~3% faster per 1% downhill (up to moderate steepness)
+    - Very steep descents are slower (technical, braking)
+    """
+    if abs(grade_percent) < GRADE_THRESHOLD:
+        # Flat terrain
+        return 1.0
+    
+    if grade_percent > 0:
+        # Uphill: continuous scaling based on grade
+        # At threshold (2%): use flat pace
+        # At ~15%: use full uphill pace (typical uphillRatio)
+        # Above 15%: even slower (hiking territory)
+        if grade_percent <= 15:
+            t = (grade_percent - GRADE_THRESHOLD) / (15 - GRADE_THRESHOLD)
+            return 1.0 + t * (uphill_ratio - 1.0)
+        else:
+            # Very steep: add extra penalty (~3% per additional 1% grade)
+            extra_grade = grade_percent - 15
+            return uphill_ratio + (extra_grade * 0.03)
+    else:
+        # Downhill: more complex - faster for gentle, slower for very steep
+        abs_grade = abs(grade_percent)
+        
+        if abs_grade <= 10:
+            # Gentle to moderate downhill: interpolate to faster pace
+            t = (abs_grade - GRADE_THRESHOLD) / (10 - GRADE_THRESHOLD)
+            return 1.0 - t * (1.0 - downhill_ratio)
+        elif abs_grade <= 20:
+            # Steep downhill: starts getting slower (technical, braking)
+            t = (abs_grade - 10) / 10
+            return downhill_ratio + t * (1.0 - downhill_ratio)
+        else:
+            # Very steep: slower than flat (careful descent)
+            extra_grade = abs_grade - 20
+            return 1.0 + (extra_grade * 0.02)
+
+
 # ============================================================================
 # PROTECTED ALGORITHMS - Core IP
 # ============================================================================
@@ -251,10 +301,23 @@ def calculate_paces_from_target(
     # Get fatigue multiplier
     fatigue_multiplier = get_fatigue_multiplier(total_distance)
     
-    # Calculate terrain breakdown
-    flat_dist = sum(s.get('distance', 0) for s in segments if s.get('terrainType') == 'flat')
-    uphill_dist = sum(s.get('distance', 0) for s in segments if s.get('terrainType') == 'uphill')
-    downhill_dist = sum(s.get('distance', 0) for s in segments if s.get('terrainType') == 'downhill')
+    # Calculate gradient-weighted distance (using continuous gradient scaling)
+    gradient_weighted_distance = 0.0
+    for segment in segments:
+        grade = segment.get('grade', 0)
+        distance = segment.get('distance', 0)
+        gradient_mult = get_gradient_pace_multiplier(grade, uphill_ratio, downhill_ratio)
+        gradient_weighted_distance += distance * gradient_mult
+    
+    # Fallback if no segments
+    if gradient_weighted_distance <= 0:
+        flat_dist = sum(s.get('distance', 0) for s in segments if s.get('terrainType') == 'flat')
+        uphill_dist = sum(s.get('distance', 0) for s in segments if s.get('terrainType') == 'uphill')
+        downhill_dist = sum(s.get('distance', 0) for s in segments if s.get('terrainType') == 'downhill')
+        gradient_weighted_distance = flat_dist + (uphill_dist * uphill_ratio) + (downhill_dist * downhill_ratio)
+    
+    if gradient_weighted_distance <= 0:
+        gradient_weighted_distance = total_distance
     
     # Calculate weighted surface factor if enabled
     weighted_surface_factor = 1.0
@@ -263,18 +326,14 @@ def calculate_paces_from_target(
         total_base_time = 0
         
         for segment in segments:
+            grade = segment.get('grade', 0)
+            gradient_mult = get_gradient_pace_multiplier(grade, uphill_ratio, downhill_ratio)
             terrain = segment.get('terrainType', 'flat')
-            if terrain == 'uphill':
-                base_pace_ratio = uphill_ratio
-            elif terrain == 'downhill':
-                base_pace_ratio = downhill_ratio
-            else:
-                base_pace_ratio = 1.0
             
             surface = segment.get('surfaceType', 'trail')
             surface_multiplier = SURFACE_TYPES.get(surface, {}).get(terrain, 1.0)
             
-            base_time = segment.get('distance', 0) * base_pace_ratio
+            base_time = segment.get('distance', 0) * gradient_mult
             total_base_time += base_time
             total_weighted_time += base_time * surface_multiplier
         
@@ -285,7 +344,7 @@ def calculate_paces_from_target(
     pure_running_time = running_time_target / fatigue_multiplier / weighted_surface_factor
     
     # Solve for flat pace
-    weighted_distance = flat_dist + (uphill_dist * uphill_ratio) + (downhill_dist * downhill_ratio)
+    weighted_distance = gradient_weighted_distance
     
     if weighted_distance <= 0:
         weighted_distance = total_distance

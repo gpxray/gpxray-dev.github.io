@@ -129,6 +129,34 @@ function getGradientPaceMultiplier(gradePercent, flatPace, uphillPace, downhillP
     }
 }
 
+// Night pace penalty - running at night is slower due to reduced visibility
+// Returns multiplier (e.g., 1.08 = 8% slower)
+const NIGHT_PACE_PENALTY = 0.08; // 8% slower at night
+
+function getNightPaceMultiplier(clockMinutes, surfaceType = 'trail') {
+    // Check if we have sun times
+    if (!sunTimes || sunTimes.polarNight || sunTimes.midnightSun) {
+        return 1.0;
+    }
+    
+    // Night is before sunrise or after sunset
+    const isNight = clockMinutes < sunTimes.sunrise || clockMinutes > sunTimes.sunset;
+    
+    if (!isNight) {
+        return 1.0;
+    }
+    
+    // More penalty on technical terrain (harder to see obstacles)
+    let penalty = NIGHT_PACE_PENALTY;
+    if (surfaceType === 'technical' || surfaceType === 'rocky') {
+        penalty = 0.12; // 12% slower on technical terrain at night
+    } else if (surfaceType === 'road') {
+        penalty = 0.05; // Only 5% slower on road at night
+    }
+    
+    return 1.0 + penalty;
+}
+
 // Runner level presets - display names only (calculations are server-side)
 // Runner level presets - display defaults for UI (core calculations are server-side)
 const RUNNER_LEVELS = {
@@ -5800,8 +5828,14 @@ function generateSplitsTable(flatPace, uphillPace, downhillPace) {
             }
         }
         
-        // Apply fatigue multiplier to running time
-        const adjustedUnitTime = unitTime * fatigueMultiplier;
+        // Calculate clock time at START of this unit (for night penalty)
+        const clockTimeAtUnitStart = startTimeInMinutes + cumulativeTime;
+        
+        // Apply night pace penalty if applicable
+        const nightMultiplier = getNightPaceMultiplier(clockTimeAtUnitStart, dominantSurface);
+        
+        // Apply fatigue multiplier and night penalty to running time
+        const adjustedUnitTime = unitTime * fatigueMultiplier * nightMultiplier;
         cumulativeTime += adjustedUnitTime;
         
         // Get target pace for dominant terrain (display pace for selected unit)
@@ -5833,7 +5867,10 @@ function generateSplitsTable(flatPace, uphillPace, downhillPace) {
         const clockTimeMinutes = startTimeInMinutes + cumulativeTime;
         const clockTime = formatClockTime(clockTimeMinutes);
         
-        // Split time is the time for this unit (with fatigue, not including stop)
+        // Track if this split includes night penalty for display
+        const isNightSplit = nightMultiplier > 1.0;
+        
+        // Split time is the time for this unit (with fatigue and night, not including stop)
         const splitTime = adjustedUnitTime;
         
         const row = document.createElement('tr');
@@ -6025,8 +6062,31 @@ function renderLegSummary(flatPace, uphillPace, downhillPace, applySurface, star
             }
         }
         
-        // Apply fatigue multiplier to leg running time
-        const adjustedLegTime = legTime * fatigueMultiplier;
+        // Calculate clock time at start of this leg for night penalty
+        const clockTimeAtLegStart = startTimeInMinutes + cumulativeTime + leg.stopMin;
+        
+        // Determine dominant surface for night penalty calculation
+        let dominantSurface = 'trail';
+        let maxSurfaceDist = 0;
+        for (const segment of segments) {
+            if (segment.endDistance >= leg.fromKm && segment.startDistance < leg.toKm) {
+                if (segment.surfaceType && segment.surfaceType !== 'unknown') {
+                    const overlapStart = Math.max(segment.startDistance, leg.fromKm);
+                    const overlapEnd = Math.min(segment.endDistance, leg.toKm);
+                    const overlapDistance = overlapEnd - overlapStart;
+                    if (overlapDistance > maxSurfaceDist) {
+                        maxSurfaceDist = overlapDistance;
+                        dominantSurface = segment.surfaceType;
+                    }
+                }
+            }
+        }
+        
+        // Apply night penalty if running at night
+        const nightMultiplier = getNightPaceMultiplier(clockTimeAtLegStart, dominantSurface);
+        
+        // Apply fatigue multiplier and night penalty to leg running time
+        const adjustedLegTime = legTime * fatigueMultiplier * nightMultiplier;
         
         // Add previous stop time to cumulative
         cumulativeTime += leg.stopMin;
@@ -6483,49 +6543,62 @@ function calculateCheckpointTimes() {
     const surfaceToggle = document.getElementById('surfaceEnabled');
     const applySurface = surfaceToggle ? surfaceToggle.checked : false;
     
+    // Get start time for night calculations
+    const startTimeInput = document.getElementById('raceStartTime');
+    const startTimeValue = startTimeInput ? startTimeInput.value : '09:00';
+    const [startHours, startMinutes] = startTimeValue.split(':').map(Number);
+    const startTimeInMinutes = startHours * 60 + startMinutes;
+    
     // Get fatigue multiplier (same as splits table, from API)
     const fatigueMultiplier = lastCachedFatigue || 1.0;
     
     let checkpointsHtml = '';
+    let cumulativeTime = 0;
     
     aidStations.forEach((station, index) => {
         const stationKm = station.km;
-        let timeToStation = 0;
-        let stopTimeAccumulated = 0;
+        let legTime = 0;
+        const prevStationKm = index === 0 ? 0 : aidStations[index - 1].km;
         
-        // Calculate time to reach this station
+        // Calculate time for this leg (from previous station to this one)
+        let dominantSurface = 'trail';
+        let maxSurfaceDist = 0;
+        
         for (const segment of segments) {
-            if (segment.endDistance <= stationKm) {
-                // Full segment before station - use gradient-based pace
-                const surfaceMultiplier = 1.0;
+            if (segment.endDistance >= prevStationKm && segment.startDistance < stationKm) {
+                const overlapStart = Math.max(segment.startDistance, prevStationKm);
+                const overlapEnd = Math.min(segment.endDistance, stationKm);
+                const overlapDistance = overlapEnd - overlapStart;
+                
+                // Track dominant surface
+                if (segment.surfaceType && segment.surfaceType !== 'unknown') {
+                    if (overlapDistance > maxSurfaceDist) {
+                        maxSurfaceDist = overlapDistance;
+                        dominantSurface = segment.surfaceType;
+                    }
+                }
+                
                 const gradientMultiplier = getGradientPaceMultiplier(segment.grade, flatPace, uphillPace, downhillPace);
                 const pace = flatPace * gradientMultiplier;
-                timeToStation += segment.distance * pace * surfaceMultiplier * fatigueMultiplier;
-            } else if (segment.startDistance < stationKm) {
-                // Partial segment - use gradient-based pace
-                const partialDist = stationKm - segment.startDistance;
-                const surfaceMultiplier = 1.0;
-                const gradientMultiplier = getGradientPaceMultiplier(segment.grade, flatPace, uphillPace, downhillPace);
-                const pace = flatPace * gradientMultiplier;
-                timeToStation += partialDist * pace * surfaceMultiplier * fatigueMultiplier;
-                break;
-            }
-            
-            // Add stop time from previous AID stations
-            const passedStation = aidStations.find(s => 
-                Math.abs(s.km - segment.endDistance) < 0.1 && s.km < stationKm
-            );
-            if (passedStation) {
-                stopTimeAccumulated += passedStation.stopMin || 0;
+                legTime += overlapDistance * pace * fatigueMultiplier;
             }
         }
         
-        timeToStation += stopTimeAccumulated;
+        // Apply night penalty if running at night
+        const clockTimeAtLegStart = startTimeInMinutes + cumulativeTime;
+        const nightMultiplier = getNightPaceMultiplier(clockTimeAtLegStart, dominantSurface);
+        legTime *= nightMultiplier;
+        
+        // Add previous station's stop time
+        if (index > 0) {
+            cumulativeTime += aidStations[index - 1].stopMin || 0;
+        }
+        cumulativeTime += legTime;
         
         checkpointsHtml += `
             <div class="hero-checkpoint">
                 <span class="hero-checkpoint-name">${station.name}</span>
-                <span class="hero-checkpoint-time">${formatTime(timeToStation)}</span>
+                <span class="hero-checkpoint-time">${formatTime(cumulativeTime)}</span>
             </div>
         `;
     });
