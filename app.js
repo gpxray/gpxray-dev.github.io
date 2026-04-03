@@ -7649,13 +7649,15 @@ async function exportShareCard() {
         let challengesHtml = '';
         const challengeItems = [];
         
-        // Top Climbs
+        // Top Climbs - show each climb with km range
         if (topClimbs.length > 0) {
-            const hardestClimb = topClimbs.reduce((max, c) => c.gain > max.gain ? c : max, topClimbs[0]);
-            challengeItems.push(`⛰️ ${topClimbs.length} major climb${topClimbs.length > 1 ? 's' : ''} | Hardest: +${Math.round(hardestClimb.gain)}m @ km ${Math.round(hardestClimb.start)}`);
+            for (let i = 0; i < topClimbs.length; i++) {
+                const c = topClimbs[i];
+                challengeItems.push(`⛰️ km ${Math.round(c.start)}-${Math.round(c.end)} (+${Math.round(c.gain)}m)`);
+            }
         }
         
-        // Night Running
+        // Night Running - show km ranges
         if (sunTimes && !sunTimes.midnightSun) {
             const stInput = document.getElementById('raceStartTime');
             if (stInput?.value) {
@@ -7666,16 +7668,23 @@ async function exportShareCard() {
                 const dPace = lastCalculatedPaces?.downhill || 5.5;
                 let totalNightDist = 0;
                 let cumTime = 0;
+                let nightStart = null;
+                let nightEnd = null;
+                let cumDist = 0;
                 for (const seg of segments) {
                     const gMult = getGradientPaceMultiplier(seg.grade, fPace, uPace, dPace);
                     const segTime = seg.distance * fPace * gMult;
                     const clockTime = (startMins + cumTime) % 1440;
-                    if (isNightTime(clockTime)) totalNightDist += seg.distance;
+                    if (isNightTime(clockTime)) {
+                        totalNightDist += seg.distance;
+                        if (nightStart === null) nightStart = cumDist;
+                        nightEnd = cumDist + seg.distance;
+                    }
                     cumTime += segTime;
+                    cumDist += seg.distance;
                 }
-                if (totalNightDist >= 0.5) {
-                    const nightPct = Math.round((totalNightDist / gpxData.totalDistance) * 100);
-                    challengeItems.push(`🌙 ${totalNightDist.toFixed(0)} km at night (${nightPct}%) | 🔦 Headlamp`);
+                if (totalNightDist >= 0.5 && nightStart !== null) {
+                    challengeItems.push(`🌙 Night: km ${Math.round(nightStart)}-${Math.round(nightEnd)} (${totalNightDist.toFixed(0)} km) 🔦`);
                 }
             }
         }
@@ -7708,10 +7717,6 @@ async function exportShareCard() {
         
         card.innerHTML = `
             <div style="text-align: center; margin-bottom: 15px;">
-                <div style="display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 5px;">
-                    <img src="${logoBase64}" style="height: 28px; width: auto;">
-                    <span style="font-family: 'Sora', sans-serif; font-weight: 600; font-size: 24px; color: #00E5FF; letter-spacing: 0.01em;">GPXray</span>
-                </div>
                 <div style="font-size: 12px; color: #aaa; text-transform: uppercase; letter-spacing: 2px; font-weight: 500;">${t('lockscreen.subtitle')}</div>
             </div>
             
