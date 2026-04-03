@@ -82,6 +82,53 @@ const HISTORY_KEY = 'gpxray_history'; // localStorage key for history
 const KM_TO_MILES = 0.621371;
 const MILES_TO_KM = 1.60934;
 
+// Gradient-based pace scaling (more accurate than binary uphill/downhill)
+// Based on research: ~6% slower per 1% uphill grade, ~3% faster per 1% downhill (up to a point)
+function getGradientPaceMultiplier(gradePercent, flatPace, uphillPace, downhillPace) {
+    // Grade is positive for uphill, negative for downhill
+    if (Math.abs(gradePercent) < GRADE_THRESHOLD) {
+        // Flat terrain
+        return 1.0;
+    }
+    
+    if (gradePercent > 0) {
+        // Uphill: continuous scaling based on grade
+        // At 2% (threshold): use flat pace
+        // At ~15%: use full uphill pace (typical uphillRatio)
+        // Above 15%: even slower (hiking territory)
+        const uphillRatio = uphillPace / flatPace;
+        
+        if (gradePercent <= 15) {
+            // Linear interpolation from flat to uphill pace
+            const t = (gradePercent - GRADE_THRESHOLD) / (15 - GRADE_THRESHOLD);
+            return 1.0 + t * (uphillRatio - 1.0);
+        } else {
+            // Very steep: add extra penalty (~3% per additional 1% grade)
+            const extraGrade = gradePercent - 15;
+            return uphillRatio + (extraGrade * 0.03);
+        }
+    } else {
+        // Downhill: more complex - faster for gentle, slower for very steep
+        const absGrade = Math.abs(gradePercent);
+        const downhillRatio = downhillPace / flatPace;
+        
+        if (absGrade <= 10) {
+            // Gentle to moderate downhill: interpolate to faster pace
+            const t = (absGrade - GRADE_THRESHOLD) / (10 - GRADE_THRESHOLD);
+            return 1.0 - t * (1.0 - downhillRatio);
+        } else if (absGrade <= 20) {
+            // Steep downhill: starts getting slower (technical, braking)
+            const t = (absGrade - 10) / 10;
+            // From downhillRatio back towards 1.0 (flat pace)
+            return downhillRatio + t * (1.0 - downhillRatio);
+        } else {
+            // Very steep: slower than flat (careful descent)
+            const extraGrade = absGrade - 20;
+            return 1.0 + (extraGrade * 0.02);
+        }
+    }
+}
+
 // Runner level presets - display names only (calculations are server-side)
 // Runner level presets - display defaults for UI (core calculations are server-side)
 const RUNNER_LEVELS = {
@@ -5693,13 +5740,10 @@ function generateSplitsTable(flatPace, uphillPace, downhillPace) {
                     surfaceMultiplier = surfaceFactors[segment.surfaceType]?.[segment.terrainType] || 1.0;
                 }
                 
-                // Calculate time for this overlap
-                let basePace;
-                switch (segment.terrainType) {
-                    case 'uphill': basePace = uphillPace; break;
-                    case 'downhill': basePace = downhillPace; break;
-                    default: basePace = flatPace;
-                }
+                // Calculate time for this overlap using gradient-based pace
+                // Use continuous gradient scaling instead of binary uphill/downhill
+                const gradientMultiplier = getGradientPaceMultiplier(segment.grade, flatPace, uphillPace, downhillPace);
+                const basePace = flatPace * gradientMultiplier;
                 
                 unitTime += overlapDistance * basePace * surfaceMultiplier;
             }
@@ -5973,12 +6017,9 @@ function renderLegSummary(flatPace, uphillPace, downhillPace, applySurface, star
                     surfaceMultiplier = surfaceFactors[segment.surfaceType]?.[terrain] || 1.0;
                 }
                 
-                let basePace;
-                switch (segment.terrainType) {
-                    case 'uphill': basePace = uphillPace; break;
-                    case 'downhill': basePace = downhillPace; break;
-                    default: basePace = flatPace;
-                }
+                // Use gradient-based pace calculation
+                const gradientMultiplier = getGradientPaceMultiplier(segment.grade, flatPace, uphillPace, downhillPace);
+                const basePace = flatPace * gradientMultiplier;
                 
                 legTime += overlapDistance * basePace * surfaceMultiplier;
             }
@@ -6455,17 +6496,17 @@ function calculateCheckpointTimes() {
         // Calculate time to reach this station
         for (const segment of segments) {
             if (segment.endDistance <= stationKm) {
-                // Full segment before station - surface multipliers applied by API
+                // Full segment before station - use gradient-based pace
                 const surfaceMultiplier = 1.0;
-                const pace = segment.terrainType === 'uphill' ? uphillPace : 
-                             segment.terrainType === 'downhill' ? downhillPace : flatPace;
+                const gradientMultiplier = getGradientPaceMultiplier(segment.grade, flatPace, uphillPace, downhillPace);
+                const pace = flatPace * gradientMultiplier;
                 timeToStation += segment.distance * pace * surfaceMultiplier * fatigueMultiplier;
             } else if (segment.startDistance < stationKm) {
-                // Partial segment - surface multipliers applied by API
+                // Partial segment - use gradient-based pace
                 const partialDist = stationKm - segment.startDistance;
                 const surfaceMultiplier = 1.0;
-                const pace = segment.terrainType === 'uphill' ? uphillPace : 
-                             segment.terrainType === 'downhill' ? downhillPace : flatPace;
+                const gradientMultiplier = getGradientPaceMultiplier(segment.grade, flatPace, uphillPace, downhillPace);
+                const pace = flatPace * gradientMultiplier;
                 timeToStation += partialDist * pace * surfaceMultiplier * fatigueMultiplier;
                 break;
             }

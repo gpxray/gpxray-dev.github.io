@@ -7,6 +7,7 @@ venv/
 
 # API deployment artifacts
 api/deploy.zip
+deploy.zip
 api/local_server.py
 
 # IDE
