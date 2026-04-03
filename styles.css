@@ -2049,6 +2049,7 @@ h2 {
 .hero-night-widget {
     background: rgba(63, 81, 181, 0.15);
     border: 1px solid rgba(63, 81, 181, 0.3);
+    min-height: 180px;
 }
 
 .hero-night-widget .hero-widget-title {
