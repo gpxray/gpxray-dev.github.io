@@ -6166,10 +6166,11 @@ function generateSplitsTable(flatPace, uphillPace, downhillPace) {
             continue;
         }
         
-        // If >45 min since last fuel and we're in an eat zone, mark it
+        // If >45 min since last fuel and we're in an eat zone with flat/downhill terrain, mark it
         if (timeSinceLastFuel >= fuelIntervalMinutes) {
             const inZone = eatZones.some(zone => km >= zone.start && km <= zone.end);
-            if (inZone) {
+            const isFlatOrDown = isTerrainFlatOrDownhill(km);
+            if (inZone && isFlatOrDown) {
                 recommendedFuelKms.add(km);
                 lastFuelKm = km;
             }
@@ -6786,10 +6787,11 @@ function updateHeroSection(totalTime) {
                 continue;
             }
             
-            // If >45 min since last fuel and we're in an eat zone, mark it
+            // If >45 min since last fuel and we're in an eat zone with flat/downhill terrain, mark it
             if (timeSinceLastFuel >= fuelIntervalMinutes) {
                 const inZone = eatZones.some(zone => km >= zone.start && km <= zone.end);
-                if (inZone) {
+                const isFlatOrDown = isTerrainFlatOrDownhill(km);
+                if (inZone && isFlatOrDown) {
                     recommendedFuelPoints.push({
                         km: km,
                         isAid: false,
@@ -7054,6 +7056,28 @@ function findTopClimbs(count = 3) {
     
     // Sort by gain descending and return top N
     return allClimbs.sort((a, b) => b.gain - a.gain).slice(0, count);
+}
+
+// Check if terrain at a specific KM is flat or downhill (not steep uphill)
+function isTerrainFlatOrDownhill(km) {
+    if (!segments || segments.length === 0) return true; // fallback
+    
+    const kmStart = km - 1;
+    const kmEnd = km;
+    let terrain = { flat: 0, uphill: 0, downhill: 0 };
+    
+    for (const segment of segments) {
+        if (segment.endDistance >= kmStart && segment.startDistance < kmEnd) {
+            const overlapStart = Math.max(segment.startDistance, kmStart);
+            const overlapEnd = Math.min(segment.endDistance, kmEnd);
+            const overlapDistance = overlapEnd - overlapStart;
+            terrain[segment.terrainType] += overlapDistance;
+        }
+    }
+    
+    // Return true if dominant terrain is flat or downhill
+    const dominant = Object.entries(terrain).sort((a, b) => b[1] - a[1])[0];
+    return dominant[0] !== 'uphill';
 }
 
 // Find eat zones - flat/gentle terrain segments where eating is comfortable
