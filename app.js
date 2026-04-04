@@ -6693,10 +6693,32 @@ function updateHeroSection(totalTime) {
         }
     }
     
-    // Update Eat Zones (Fuel Windows)
+    // Update Nutrition Windows (Eat Zones)
     const heroFuelWindows = document.getElementById('heroFuelWindows');
+    const nutritionBox = document.getElementById('heroNutritionBox');
     if (heroFuelWindows && gpxData) {
         const eatZones = findEatZones(0.3, 10); // min 300m, max 10% grade (smoothed)
+        
+        // Store zones globally for expansion
+        window.allEatZones = eatZones;
+        
+        // Estimate time per km (rough average)
+        const totalTimeEl = document.getElementById('totalTime');
+        let avgPacePerKm = 6; // default fallback (min/km)
+        if (totalTimeEl && totalTimeEl.textContent && gpxData.totalDistance > 0) {
+            const timeText = totalTimeEl.textContent;
+            const match = timeText.match(/(\d+):(\d+)/);
+            if (match) {
+                const totalMins = parseInt(match[1]) * 60 + parseInt(match[2]);
+                avgPacePerKm = totalMins / gpxData.totalDistance;
+            }
+        }
+        
+        // Add estimated time to each zone
+        eatZones.forEach(zone => {
+            zone.estTimeMin = Math.round(zone.start * avgPacePerKm);
+        });
+        
         const fuelItems = heroFuelWindows.querySelectorAll('.fuel-window-item');
         
         // Show first 3 zones, sorted by KM
@@ -6711,8 +6733,11 @@ function updateHeroSection(totalTime) {
             if (zonesToShow[index]) {
                 const zone = zonesToShow[index];
                 iconEl.textContent = zone.nearAid ? '🍫🚰' : '🍫';
-                locationEl.textContent = `KM ${zone.start.toFixed(1)}–${zone.end.toFixed(1)}`;
-                timeEl.textContent = zone.nearAid ? 'AID' : `${zone.length.toFixed(1)}km`;
+                locationEl.textContent = `KM ${zone.start.toFixed(0)}–${zone.end.toFixed(0)}`;
+                // Show estimated arrival time
+                const hours = Math.floor(zone.estTimeMin / 60);
+                const mins = zone.estTimeMin % 60;
+                timeEl.textContent = hours > 0 ? `~${hours}h${mins.toString().padStart(2,'0')}` : `~${mins}min`;
                 item.style.display = 'flex';
             } else {
                 locationEl.textContent = '-';
@@ -6721,15 +6746,17 @@ function updateHeroSection(totalTime) {
             }
         });
         
-        // Add "+X more" indicator if there are more zones
+        // Add "+X more" indicator if there are more zones (clickable)
         let moreIndicator = heroFuelWindows.querySelector('.fuel-more');
         if (moreCount > 0) {
             if (!moreIndicator) {
                 moreIndicator = document.createElement('div');
                 moreIndicator.className = 'fuel-more';
+                moreIndicator.style.cursor = 'pointer';
+                moreIndicator.addEventListener('click', showAllEatZones);
                 heroFuelWindows.appendChild(moreIndicator);
             }
-            moreIndicator.textContent = `+ ${moreCount} more zones`;
+            moreIndicator.textContent = `+ ${moreCount} more zones ▼`;
             moreIndicator.style.display = 'block';
         } else if (moreIndicator) {
             moreIndicator.style.display = 'none';
@@ -7029,6 +7056,56 @@ function findEatZones(minLength = 0.3, maxGrade = 10) {
     
     // Sort by start KM (so runner can follow along the course)
     return merged.sort((a, b) => a.start - b.start);
+}
+
+// Show all eat zones in a modal
+function showAllEatZones() {
+    if (!window.allEatZones || window.allEatZones.length === 0) return;
+    
+    // Create modal if doesn't exist
+    let modal = document.getElementById('eatZonesModal');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'eatZonesModal';
+        modal.className = 'eat-zones-modal';
+        modal.innerHTML = `
+            <div class="eat-zones-modal-content">
+                <button class="eat-zones-modal-close">✕</button>
+                <h3>🍫 All Nutrition Windows</h3>
+                <p class="eat-zones-subtitle">Flat/gentle terrain (<10% grade) where eating is comfortable</p>
+                <div class="eat-zones-list"></div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+        
+        // Close handlers
+        modal.querySelector('.eat-zones-modal-close').addEventListener('click', () => {
+            modal.style.display = 'none';
+        });
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) modal.style.display = 'none';
+        });
+    }
+    
+    // Populate list
+    const list = modal.querySelector('.eat-zones-list');
+    list.innerHTML = window.allEatZones.map((zone, idx) => {
+        const hours = Math.floor(zone.estTimeMin / 60);
+        const mins = zone.estTimeMin % 60;
+        const timeStr = hours > 0 ? `~${hours}h${mins.toString().padStart(2,'0')}` : `~${mins}min`;
+        const aidBadge = zone.nearAid ? ' <span class="aid-badge">AID</span>' : '';
+        return `
+            <div class="eat-zone-row">
+                <span class="eat-zone-num">#${idx + 1}</span>
+                <span class="eat-zone-icon">${zone.nearAid ? '🍫🚰' : '🍫'}</span>
+                <span class="eat-zone-km">KM ${zone.start.toFixed(0)}–${zone.end.toFixed(0)}</span>
+                <span class="eat-zone-length">${zone.length.toFixed(1)}km${aidBadge}</span>
+                <span class="eat-zone-time">${timeStr}</span>
+            </div>
+        `;
+    }).join('');
+    
+    modal.style.display = 'flex';
 }
 
 // Update Course Shape - Race Intelligence
