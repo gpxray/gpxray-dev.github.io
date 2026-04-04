@@ -91,6 +91,57 @@ def calculate_segment_time(segment: dict, paces: dict, apply_surface: bool) -> d
     }
 
 
+def calculate_total_time_for_paces(segments: list, paces: dict, apply_surface: bool, 
+                                   fatigue: float, stop_time: float) -> float:
+    """Helper function to calculate total time for given paces"""
+    running_time = 0
+    for segment in segments:
+        result = calculate_segment_time(segment, paces, apply_surface)
+        running_time += result['time']
+    
+    # Apply fatigue and add stop times
+    return running_time * fatigue + stop_time
+
+
+def find_flat_pace_for_target_time(segments: list, target_time: float, 
+                                   uphill_ratio: float, downhill_ratio: float,
+                                   apply_surface: bool, fatigue: float, 
+                                   stop_time: float) -> float:
+    """
+    Binary search to find the flat pace that achieves the target time.
+    Returns flat_pace in min/km.
+    """
+    # Search bounds: 3:00/km (very fast) to 15:00/km (very slow)
+    min_pace = 3.0
+    max_pace = 15.0
+    tolerance = 0.1  # Within 0.1 minutes accuracy
+    
+    # Binary search for the right pace
+    for _ in range(50):  # Max iterations to prevent infinite loop
+        mid_pace = (min_pace + max_pace) / 2
+        paces = {
+            'flat': mid_pace,
+            'uphill': mid_pace * uphill_ratio,
+            'downhill': mid_pace * downhill_ratio
+        }
+        
+        estimated_time = calculate_total_time_for_paces(
+            segments, paces, apply_surface, fatigue, stop_time
+        )
+        
+        if abs(estimated_time - target_time) < tolerance:
+            return mid_pace
+        
+        # If estimated time is too long, need faster pace (lower number)
+        if estimated_time > target_time:
+            max_pace = mid_pace
+        else:
+            min_pace = mid_pace
+    
+    # Return best found pace
+    return (min_pace + max_pace) / 2
+
+
 def calculate_race_plan(data: dict) -> dict:
     """Main calculation function - protected business logic"""
     segments = data.get('segments', [])
@@ -113,11 +164,21 @@ def calculate_race_plan(data: dict) -> dict:
         uphill_pace = manual_paces.get('uphill', flat_pace * preset['uphillRatio'])
         downhill_pace = manual_paces.get('downhill', flat_pace * preset['downhillRatio'])
     elif mode == 'target' and target_time:
-        # Calculate paces from target time (will be implemented)
-        # For now use preset
-        flat_pace = preset['flatPace']
-        uphill_pace = flat_pace * preset['uphillRatio']
-        downhill_pace = flat_pace * preset['downhillRatio']
+        # Get ratios from request (with defaults from preset)
+        uphill_ratio = data.get('uphillRatio', preset['uphillRatio'])
+        downhill_ratio = data.get('downhillRatio', preset['downhillRatio'])
+        
+        # Get fatigue and stop times first (needed for reverse calculation)
+        fatigue = get_fatigue_multiplier(total_distance)
+        total_stop_time = sum(s.get('stopMin', 0) for s in aid_stations)
+        
+        # Find flat pace that achieves target time
+        flat_pace = find_flat_pace_for_target_time(
+            segments, target_time, uphill_ratio, downhill_ratio,
+            apply_surface, fatigue, total_stop_time
+        )
+        uphill_pace = flat_pace * uphill_ratio
+        downhill_pace = flat_pace * downhill_ratio
     elif mode == 'itra' and itra_score:
         # ITRA-based pace calculation (will be implemented)
         flat_pace = preset['flatPace']
