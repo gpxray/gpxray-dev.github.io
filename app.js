@@ -6742,14 +6742,12 @@ function updateHeroSection(totalTime) {
         }
     }
     
-    // Update Nutrition Windows (Eat Zones)
+    // Update Fuel Stops (Smart Recommendations - same logic as splits table)
     const heroFuelWindows = document.getElementById('heroFuelWindows');
     const nutritionBox = document.getElementById('heroNutritionBox');
     if (heroFuelWindows && gpxData) {
         const eatZones = findEatZones(0.3, 10); // min 300m, max 10% grade (smoothed)
-        
-        // Store zones globally for expansion
-        window.allEatZones = eatZones;
+        window.allEatZones = eatZones; // cache for splits table
         
         // Estimate time per km (rough average)
         const totalTimeEl = document.getElementById('totalTime');
@@ -6763,29 +6761,64 @@ function updateHeroSection(totalTime) {
             }
         }
         
-        // Add estimated time to each zone
-        eatZones.forEach(zone => {
-            zone.estTimeMin = Math.round(zone.start * avgPacePerKm);
+        // Calculate smart fuel recommendations (~45 min intervals)
+        const fuelIntervalMinutes = 45;
+        const recommendedFuelPoints = [];
+        
+        // Add AID stations as natural fuel points
+        aidStations.forEach(aid => {
+            recommendedFuelPoints.push({
+                km: Math.round(aid.km),
+                isAid: true,
+                estTimeMin: Math.round(aid.km * avgPacePerKm)
+            });
         });
         
-        const fuelItems = heroFuelWindows.querySelectorAll('.fuel-window-item');
+        // Fill gaps >45 min between fuel points with eat zone recommendations
+        let lastFuelKm = 0;
+        const totalDistKm = gpxData.totalDistance;
+        for (let km = 1; km <= Math.ceil(totalDistKm); km++) {
+            const timeSinceLastFuel = (km - lastFuelKm) * avgPacePerKm;
+            
+            // If this is an AID station, update lastFuelKm
+            if (recommendedFuelPoints.some(p => p.km === km)) {
+                lastFuelKm = km;
+                continue;
+            }
+            
+            // If >45 min since last fuel and we're in an eat zone, mark it
+            if (timeSinceLastFuel >= fuelIntervalMinutes) {
+                const inZone = eatZones.some(zone => km >= zone.start && km <= zone.end);
+                if (inZone) {
+                    recommendedFuelPoints.push({
+                        km: km,
+                        isAid: false,
+                        estTimeMin: Math.round(km * avgPacePerKm)
+                    });
+                    lastFuelKm = km;
+                }
+            }
+        }
         
-        // Show first 3 zones, sorted by KM
-        const zonesToShow = eatZones.slice(0, 3);
-        const moreCount = eatZones.length - 3;
+        // Sort by KM and take first 3 for display
+        recommendedFuelPoints.sort((a, b) => a.km - b.km);
+        const fuelToShow = recommendedFuelPoints.slice(0, 3);
+        const moreCount = recommendedFuelPoints.length - 3;
+        
+        const fuelItems = heroFuelWindows.querySelectorAll('.fuel-window-item');
         
         fuelItems.forEach((item, index) => {
             const iconEl = item.querySelector('.fuel-icon');
             const locationEl = item.querySelector('.fuel-location');
             const timeEl = item.querySelector('.fuel-time');
             
-            if (zonesToShow[index]) {
-                const zone = zonesToShow[index];
-                iconEl.textContent = zone.nearAid ? '🍫🚰' : '🍫';
-                locationEl.textContent = `KM ${zone.start.toFixed(0)}–${zone.end.toFixed(0)}`;
+            if (fuelToShow[index]) {
+                const point = fuelToShow[index];
+                iconEl.textContent = point.isAid ? '🍫🚰' : '🍫';
+                locationEl.textContent = `KM ${point.km}`;
                 // Show estimated arrival time
-                const hours = Math.floor(zone.estTimeMin / 60);
-                const mins = zone.estTimeMin % 60;
+                const hours = Math.floor(point.estTimeMin / 60);
+                const mins = point.estTimeMin % 60;
                 timeEl.textContent = hours > 0 ? `~${hours}h${mins.toString().padStart(2,'0')}` : `~${mins}min`;
                 item.style.display = 'flex';
             } else {
@@ -6795,18 +6828,17 @@ function updateHeroSection(totalTime) {
             }
         });
         
-        // Add "+X more" indicator if there are more zones (clickable)
+        // Show "+X more" as text only (no modal)
         let moreIndicator = heroFuelWindows.querySelector('.fuel-more');
         if (moreCount > 0) {
             if (!moreIndicator) {
                 moreIndicator = document.createElement('div');
                 moreIndicator.className = 'fuel-more';
-                moreIndicator.style.cursor = 'pointer';
-                moreIndicator.addEventListener('click', showAllEatZones);
                 heroFuelWindows.appendChild(moreIndicator);
             }
-            moreIndicator.textContent = `+ ${moreCount} more zones ▼`;
+            moreIndicator.textContent = `+ ${moreCount} more`;
             moreIndicator.style.display = 'block';
+            moreIndicator.style.cursor = 'default';
         } else if (moreIndicator) {
             moreIndicator.style.display = 'none';
         }
@@ -7123,56 +7155,6 @@ function findEatZones(minLength = 0.3, maxGrade = 10) {
     
     // Sort by start KM (so runner can follow along the course)
     return merged.sort((a, b) => a.start - b.start);
-}
-
-// Show all eat zones in a modal
-function showAllEatZones() {
-    if (!window.allEatZones || window.allEatZones.length === 0) return;
-    
-    // Create modal if doesn't exist
-    let modal = document.getElementById('eatZonesModal');
-    if (!modal) {
-        modal = document.createElement('div');
-        modal.id = 'eatZonesModal';
-        modal.className = 'eat-zones-modal';
-        modal.innerHTML = `
-            <div class="eat-zones-modal-content">
-                <button class="eat-zones-modal-close">✕</button>
-                <h3>🍫 All Nutrition Windows</h3>
-                <p class="eat-zones-subtitle">Flat/gentle terrain (<10% grade) where eating is comfortable</p>
-                <div class="eat-zones-list"></div>
-            </div>
-        `;
-        document.body.appendChild(modal);
-        
-        // Close handlers
-        modal.querySelector('.eat-zones-modal-close').addEventListener('click', () => {
-            modal.style.display = 'none';
-        });
-        modal.addEventListener('click', (e) => {
-            if (e.target === modal) modal.style.display = 'none';
-        });
-    }
-    
-    // Populate list
-    const list = modal.querySelector('.eat-zones-list');
-    list.innerHTML = window.allEatZones.map((zone, idx) => {
-        const hours = Math.floor(zone.estTimeMin / 60);
-        const mins = zone.estTimeMin % 60;
-        const timeStr = hours > 0 ? `~${hours}h${mins.toString().padStart(2,'0')}` : `~${mins}min`;
-        const aidBadge = zone.nearAid ? ' <span class="aid-badge">AID</span>' : '';
-        return `
-            <div class="eat-zone-row">
-                <span class="eat-zone-num">#${idx + 1}</span>
-                <span class="eat-zone-icon">${zone.nearAid ? '🍫🚰' : '🍫'}</span>
-                <span class="eat-zone-km">KM ${zone.start.toFixed(0)}–${zone.end.toFixed(0)}</span>
-                <span class="eat-zone-length">${zone.length.toFixed(1)}km${aidBadge}</span>
-                <span class="eat-zone-time">${timeStr}</span>
-            </div>
-        `;
-    }).join('');
-    
-    modal.style.display = 'flex';
 }
 
 // Update Course Shape - Race Intelligence
