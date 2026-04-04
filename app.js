@@ -6445,10 +6445,16 @@ function generateSplitsTable(flatPace, uphillPace, downhillPace) {
                     surfaceMultiplier = surfaceFactors[segment.surfaceType]?.[segment.terrainType] || 1.0;
                 }
                 
-                // Calculate time for this overlap using gradient-based pace
-                // Use continuous gradient scaling instead of binary uphill/downhill
-                const gradientMultiplier = getGradientPaceMultiplier(segment.grade, flatPace, uphillPace, downhillPace);
-                const basePace = flatPace * gradientMultiplier;
+                // Use simple terrain-based pace (matching API calculation)
+                // API uses terrainType to select flat/uphill/downhill pace directly
+                let basePace;
+                if (segment.terrainType === 'uphill') {
+                    basePace = uphillPace;
+                } else if (segment.terrainType === 'downhill') {
+                    basePace = downhillPace;
+                } else {
+                    basePace = flatPace;
+                }
                 
                 unitTime += overlapDistance * basePace * surfaceMultiplier;
             }
