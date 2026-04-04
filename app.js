@@ -6693,6 +6693,31 @@ function updateHeroSection(totalTime) {
         }
     }
     
+    // Update Eat Zones (Fuel Windows)
+    const heroFuelWindows = document.getElementById('heroFuelWindows');
+    if (heroFuelWindows && gpxData) {
+        const eatZones = findEatZones(0.5, 5); // min 500m, max 5% grade
+        const fuelItems = heroFuelWindows.querySelectorAll('.fuel-window-item');
+        
+        fuelItems.forEach((item, index) => {
+            const iconEl = item.querySelector('.fuel-icon');
+            const locationEl = item.querySelector('.fuel-location');
+            const timeEl = item.querySelector('.fuel-time');
+            
+            if (eatZones[index] && eatZones[index].length >= 0.5) {
+                const zone = eatZones[index];
+                iconEl.textContent = zone.nearAid ? '🍫🚰' : '🍫';
+                locationEl.textContent = `KM ${zone.start.toFixed(1)}–${zone.end.toFixed(1)}`;
+                timeEl.textContent = zone.nearAid ? 'AID' : `${zone.length.toFixed(1)}km`;
+                item.style.display = 'flex';
+            } else {
+                locationEl.textContent = '-';
+                timeEl.textContent = '';
+                item.style.display = index === 0 ? 'flex' : 'none';
+            }
+        });
+    }
+    
     // Update Course Shape
     updateCourseShape();
     
@@ -6899,6 +6924,86 @@ function findTopClimbs(count = 3) {
     
     // Sort by gain descending and return top N
     return allClimbs.sort((a, b) => b.gain - a.gain).slice(0, count);
+}
+
+// Find eat zones - flat/gentle terrain segments where eating is comfortable
+function findEatZones(minLength = 0.5, maxGrade = 5) {
+    if (!gpxData || !gpxData.points || gpxData.points.length < 10) return [];
+    
+    const points = gpxData.points;
+    const eatZones = [];
+    
+    let zoneStart = null;
+    let zoneStartKm = 0;
+    
+    for (let i = 1; i < points.length; i++) {
+        const prev = points[i - 1];
+        const curr = points[i];
+        const dist = (curr.distance - prev.distance) * 1000; // meters
+        const elevDiff = Math.abs((curr.elevation || 0) - (prev.elevation || 0));
+        const grade = dist > 0 ? (elevDiff / dist) * 100 : 0;
+        
+        if (grade <= maxGrade) {
+            // Flat/gentle terrain
+            if (zoneStart === null) {
+                zoneStart = i - 1;
+                zoneStartKm = prev.distance;
+            }
+        } else {
+            // Steep terrain - end current zone if exists
+            if (zoneStart !== null) {
+                const length = prev.distance - zoneStartKm;
+                if (length >= minLength) {
+                    eatZones.push({
+                        start: zoneStartKm,
+                        end: prev.distance,
+                        length: length,
+                        type: 'flat'
+                    });
+                }
+                zoneStart = null;
+            }
+        }
+    }
+    
+    // Check final zone
+    if (zoneStart !== null) {
+        const lastPoint = points[points.length - 1];
+        const length = lastPoint.distance - zoneStartKm;
+        if (length >= minLength) {
+            eatZones.push({
+                start: zoneStartKm,
+                end: lastPoint.distance,
+                length: length,
+                type: 'flat'
+            });
+        }
+    }
+    
+    // Merge nearby zones (within 300m) and sort by distance
+    const merged = [];
+    for (const zone of eatZones) {
+        if (merged.length > 0 && zone.start - merged[merged.length - 1].end < 0.3) {
+            // Merge with previous
+            merged[merged.length - 1].end = zone.end;
+            merged[merged.length - 1].length = merged[merged.length - 1].end - merged[merged.length - 1].start;
+        } else {
+            merged.push({ ...zone });
+        }
+    }
+    
+    // Check proximity to AID stations
+    for (const zone of merged) {
+        const zoneMid = (zone.start + zone.end) / 2;
+        zone.nearAid = aidStations.some(aid => Math.abs(aid.km - zoneMid) < 2);
+    }
+    
+    // Sort by length descending (best zones first) but prioritize those near AID
+    return merged.sort((a, b) => {
+        if (a.nearAid && !b.nearAid) return -1;
+        if (!a.nearAid && b.nearAid) return 1;
+        return b.length - a.length;
+    });
 }
 
 // Update Course Shape - Race Intelligence
