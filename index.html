@@ -460,7 +460,15 @@
                                 </div>
                                 <div class="race-date-inputs" id="raceDateInputs">
                                     <input type="date" id="heroRaceDate" class="race-date-input" />
-                                    <input type="time" id="heroRaceTime" class="race-time-input" value="06:00" />
+                                    <div class="time-picker-24h" id="heroTimePicker">
+                                        <button type="button" class="time-picker-display" id="heroTimeDisplay">06:00</button>
+                                        <input type="hidden" id="heroRaceTime" value="06:00" />
+                                        <div class="time-picker-dropdown" id="heroTimeDropdown">
+                                            <select class="time-picker-hours" id="heroTimeHours"></select>
+                                            <span class="time-picker-sep">:</span>
+                                            <select class="time-picker-minutes" id="heroTimeMinutes"></select>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                             
@@ -1009,7 +1017,15 @@
                 <label>🕐 Race Start (optional)</label>
                 <div class="race-datetime-wrapper">
                     <input type="date" id="raceStartDate" title="Race date">
-                    <input type="time" id="raceStartTime" value="06:00" title="Start time">
+                    <div class="time-picker-24h" id="mainTimePicker">
+                        <button type="button" class="time-picker-display" id="mainTimeDisplay">06:00</button>
+                        <input type="hidden" id="raceStartTime" value="06:00" />
+                        <div class="time-picker-dropdown" id="mainTimeDropdown">
+                            <select class="time-picker-hours" id="mainTimeHours"></select>
+                            <span class="time-picker-sep">:</span>
+                            <select class="time-picker-minutes" id="mainTimeMinutes"></select>
+                        </div>
+                    </div>
                 </div>
                 <div class="sun-times" id="sunTimes" style="display: none;">
                     <span class="sun-rise">🌅 <span id="sunriseTime">--:--</span></span>

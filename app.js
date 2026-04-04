@@ -681,8 +681,93 @@ function clearItraOverride() {
     });
 }
 
+// Initialize 24h Time Picker
+function initTimePicker24h(pickerId, displayId, hoursId, minutesId, hiddenInputId, dropdownId) {
+    const picker = document.getElementById(pickerId);
+    const display = document.getElementById(displayId);
+    const hoursSelect = document.getElementById(hoursId);
+    const minutesSelect = document.getElementById(minutesId);
+    const hiddenInput = document.getElementById(hiddenInputId);
+    const dropdown = document.getElementById(dropdownId);
+    
+    if (!picker || !display || !hoursSelect || !minutesSelect) return;
+    
+    // Populate hours (00-23)
+    for (let h = 0; h < 24; h++) {
+        const opt = document.createElement('option');
+        opt.value = h.toString().padStart(2, '0');
+        opt.textContent = h.toString().padStart(2, '0');
+        hoursSelect.appendChild(opt);
+    }
+    
+    // Populate minutes (00-59, step 5)
+    for (let m = 0; m < 60; m += 5) {
+        const opt = document.createElement('option');
+        opt.value = m.toString().padStart(2, '0');
+        opt.textContent = m.toString().padStart(2, '0');
+        minutesSelect.appendChild(opt);
+    }
+    
+    // Set initial value
+    const initialTime = hiddenInput?.value || '06:00';
+    const [initH, initM] = initialTime.split(':');
+    hoursSelect.value = initH;
+    // Round to nearest 5 minutes
+    const roundedM = Math.round(parseInt(initM) / 5) * 5;
+    minutesSelect.value = roundedM.toString().padStart(2, '0');
+    
+    // Toggle dropdown
+    display.addEventListener('click', (e) => {
+        e.stopPropagation();
+        // Close other dropdowns first
+        document.querySelectorAll('.time-picker-dropdown.show').forEach(d => {
+            if (d !== dropdown) d.classList.remove('show');
+        });
+        dropdown.classList.toggle('show');
+    });
+    
+    // Update on select change
+    const updateTime = () => {
+        const time = `${hoursSelect.value}:${minutesSelect.value}`;
+        display.textContent = time;
+        if (hiddenInput) hiddenInput.value = time;
+        // Dispatch change event for compatibility
+        hiddenInput?.dispatchEvent(new Event('change', { bubbles: true }));
+    };
+    
+    hoursSelect.addEventListener('change', updateTime);
+    minutesSelect.addEventListener('change', updateTime);
+    
+    // Close dropdown when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!picker.contains(e.target)) {
+            dropdown.classList.remove('show');
+        }
+    });
+    
+    // Return update function for external use
+    return {
+        setValue: (time) => {
+            const [h, m] = time.split(':');
+            hoursSelect.value = h.padStart(2, '0');
+            const roundedM = Math.round(parseInt(m) / 5) * 5;
+            minutesSelect.value = roundedM.toString().padStart(2, '0');
+            display.textContent = `${hoursSelect.value}:${minutesSelect.value}`;
+            if (hiddenInput) hiddenInput.value = `${hoursSelect.value}:${minutesSelect.value}`;
+        }
+    };
+}
+
+// Store time picker instances
+let heroTimePicker24h = null;
+let mainTimePicker24h = null;
+
 // Date Presets for Race Strategy Box
 function setupDatePresets() {
+    // Initialize 24h time pickers
+    heroTimePicker24h = initTimePicker24h('heroTimePicker', 'heroTimeDisplay', 'heroTimeHours', 'heroTimeMinutes', 'heroRaceTime', 'heroTimeDropdown');
+    mainTimePicker24h = initTimePicker24h('mainTimePicker', 'mainTimeDisplay', 'mainTimeHours', 'mainTimeMinutes', 'raceStartTime', 'mainTimeDropdown');
+    
     const presetBtns = document.querySelectorAll('.race-date-preset');
     const dateInput = document.getElementById('heroRaceDate');
     const timeInput = document.getElementById('heroRaceTime');
@@ -908,6 +993,11 @@ function setDateFromPreset(preset, dateInput, timeInput) {
     
     dateInput.value = formatDateForInput(targetDate);
     timeInput.value = targetTime;
+    
+    // Update 24h time picker display if available
+    if (heroTimePicker24h && timeInput.id === 'heroRaceTime') {
+        heroTimePicker24h.setValue(targetTime);
+    }
 }
 
 // Fetch weather for custom GPX uploads
@@ -4016,6 +4106,7 @@ function loadPlan() {
         // Restore values
         const setVal = (id, val) => { const el = document.getElementById(id); if (el) el.value = val; };
         setVal('raceStartTime', plan.startTime);
+        if (mainTimePicker24h && plan.startTime) mainTimePicker24h.setValue(plan.startTime);
         setVal('flatPaceMin', plan.flatPaceMin);
         setVal('flatPaceSec', plan.flatPaceSec);
         setVal('uphillPaceMin', plan.uphillPaceMin);
@@ -4312,6 +4403,7 @@ function loadFromHistory(id) {
     // Restore values
     const setVal = (id, val) => { const el = document.getElementById(id); if (el && val !== undefined) el.value = val; };
     setVal('raceStartTime', plan.startTime);
+    if (mainTimePicker24h && plan.startTime) mainTimePicker24h.setValue(plan.startTime);
     setVal('flatPaceMin', plan.flatPaceMin);
     setVal('flatPaceSec', plan.flatPaceSec);
     setVal('uphillPaceMin', plan.uphillPaceMin);
