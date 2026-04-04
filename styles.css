@@ -3512,6 +3512,24 @@ h2 {
     font-size: 1.1rem;
 }
 
+/* Smart time input */
+.smart-time-input {
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.smart-time-field {
+    width: 120px !important;
+    font-size: 1.5rem !important;
+    font-weight: 600;
+}
+
+.time-hint {
+    font-size: 0.85rem !important;
+    color: #666 !important;
+    margin: 0 5px;
+}
+
 .pace-ratios {
     background: rgba(0, 0, 0, 0.3);
     padding: 20px;

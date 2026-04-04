@@ -389,6 +389,69 @@ function setupTargetTimeInput() {
     
     setupInput('heroTargetTime');
     setupInput('raceTargetTime');
+    
+    // Setup smart time text input parser
+    const smartTimeInput = document.getElementById('targetTimeText');
+    if (smartTimeInput) {
+        smartTimeInput.addEventListener('input', parseSmartTimeInput);
+        smartTimeInput.addEventListener('change', parseSmartTimeInput);
+        smartTimeInput.addEventListener('blur', parseSmartTimeInput);
+    }
+}
+
+// Parse smart time input like "2:57", "2h57", "2h57m", "177" (minutes)
+function parseSmartTimeInput(e) {
+    const input = e.target.value.trim();
+    if (!input) return;
+    
+    const hoursField = document.getElementById('targetHours');
+    const minutesField = document.getElementById('targetMinutes');
+    const secondsField = document.getElementById('targetSeconds');
+    
+    if (!hoursField || !minutesField) return;
+    
+    let hours = 0, minutes = 0, seconds = 0;
+    
+    // Try different formats
+    // Format: "2:57" or "2:57:30"
+    const colonMatch = input.match(/^(\d{1,2}):(\d{1,2})(?::(\d{1,2}))?$/);
+    if (colonMatch) {
+        hours = parseInt(colonMatch[1]) || 0;
+        minutes = parseInt(colonMatch[2]) || 0;
+        seconds = parseInt(colonMatch[3]) || 0;
+    }
+    // Format: "2h57" or "2h57m" or "2h 57m" or "2h57m30s"
+    else if (input.match(/h/i)) {
+        const hMatch = input.match(/(\d+)\s*h/i);
+        const mMatch = input.match(/(\d+)\s*m/i);
+        const sMatch = input.match(/(\d+)\s*s/i);
+        hours = hMatch ? parseInt(hMatch[1]) : 0;
+        minutes = mMatch ? parseInt(mMatch[1]) : 0;
+        seconds = sMatch ? parseInt(sMatch[1]) : 0;
+    }
+    // Format: just minutes like "177"
+    else if (input.match(/^\d+$/)) {
+        const totalMinutes = parseInt(input);
+        if (totalMinutes > 60) {
+            hours = Math.floor(totalMinutes / 60);
+            minutes = totalMinutes % 60;
+        } else {
+            minutes = totalMinutes;
+        }
+    }
+    
+    // Update the fields
+    if (hours || minutes || seconds) {
+        hoursField.value = hours;
+        minutesField.value = minutes;
+        if (secondsField) secondsField.value = seconds;
+        
+        // Visual feedback
+        e.target.style.borderColor = '#00d4ff';
+        setTimeout(() => {
+            e.target.style.borderColor = '';
+        }, 500);
+    }
 }
 
 // Feature Pill Tooltips
@@ -6511,14 +6574,12 @@ function generateSplitsTable(flatPace, uphillPace, downhillPace) {
             }
         }
         
-        // Calculate clock time at START of this unit (for night penalty)
+        // Calculate clock time at START of this unit (for display purposes)
         const clockTimeAtUnitStart = startTimeInMinutes + cumulativeTime;
         
-        // Apply night pace penalty if applicable
-        const nightMultiplier = getNightPaceMultiplier(clockTimeAtUnitStart, dominantSurface);
-        
-        // Apply fatigue multiplier and night penalty to running time
-        const adjustedUnitTime = unitTime * fatigueMultiplier * nightMultiplier;
+        // Apply fatigue multiplier to running time (matching API calculation)
+        // Note: Night penalty not applied to match API total time
+        const adjustedUnitTime = unitTime * fatigueMultiplier;
         cumulativeTime += adjustedUnitTime;
         
         // Get target pace for dominant terrain (display pace for selected unit)
@@ -6559,7 +6620,7 @@ function generateSplitsTable(flatPace, uphillPace, downhillPace) {
         const clockTime = formatClockTime(clockTimeMinutes);
         
         // Track if this split includes night penalty for display
-        const isNightSplit = nightMultiplier > 1.0;
+        const isNightSplit = isNightTime(clockTimeAtUnitStart % (24 * 60));
         
         // Split time is the time for this unit (with fatigue and night, not including stop)
         const splitTime = adjustedUnitTime;

@@ -891,7 +891,9 @@
                 
                 <div class="target-time-input">
                     <label>Target Finish Time</label>
-                    <div class="time-input-wrapper">
+                    <div class="time-input-wrapper smart-time-input">
+                        <input type="text" id="targetTimeText" placeholder="2:57 or 2h57m" class="smart-time-field">
+                        <span class="time-hint">or use:</span>
                         <input type="number" id="targetHours" value="0" min="0" max="24" step="1">
                         <span>h</span>
                         <input type="number" id="targetMinutes" value="45" min="0" max="59" step="1">
