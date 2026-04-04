@@ -2693,6 +2693,14 @@ h2 {
     align-items: center;
     gap: 6px;
     font-size: 0.85rem;
+    cursor: help;
+    padding: 2px 4px;
+    border-radius: 4px;
+    transition: background 0.2s;
+}
+
+.fuel-window-item:hover {
+    background: rgba(255, 255, 255, 0.05);
 }
 
 .fuel-icon {
@@ -4280,6 +4288,10 @@ h2 {
 .fuel-cell {
     text-align: center;
     font-size: 1rem;
+}
+
+.fuel-cell[title] {
+    cursor: help;
 }
 
 /* Editable stop time cells */

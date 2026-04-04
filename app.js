@@ -6350,6 +6350,9 @@ function generateSplitsTable(flatPace, uphillPace, downhillPace) {
         const unitKm = useMetric ? unit : Math.round(unit * MILES_TO_KM);
         const isRecommendedFuel = recommendedFuelKms.has(unitKm);
         const fuelIcon = isRecommendedFuel ? (hasAidStation ? '🍫🚰' : '🍫') : '';
+        const fuelTooltip = isRecommendedFuel 
+            ? (hasAidStation ? `${aidStation.name || 'AID'} — planned refuel stop` : 'Flat/downhill terrain — good eating opportunity')
+            : '';
         
         // Calculate clock time (after adding stop time)
         const clockTimeMinutes = startTimeInMinutes + cumulativeTime;
@@ -6384,7 +6387,7 @@ function generateSplitsTable(flatPace, uphillPace, downhillPace) {
             <td class="${surfaceClass}">${surfaceDisplay}</td>
             <td class="${hasAidStation ? 'aid-station-cell' : ''}">${aidStationText}</td>
             <td class="stop-time${hasAidStation ? ' editable-stop' : ''}"${hasAidStation ? ` data-station-index="${aidStations.findIndex(s => s.km === aidStation.km)}" data-station-km="${aidStation.km}"` : ''}>${stopTime > 0 ? '+' + stopTime + ' min' : '-'}</td>
-            <td class="fuel-cell">${fuelIcon}</td>
+            <td class="fuel-cell"${fuelTooltip ? ` title="${fuelTooltip}"` : ''}>${fuelIcon}</td>
             <td>${formatPace(actualPace)} /${unitLabel}</td>
             <td>${formatTime(splitTime)}</td>
             <td>${formatTime(cumulativeTime)}</td>
@@ -6771,6 +6774,7 @@ function updateHeroSection(totalTime) {
             recommendedFuelPoints.push({
                 km: Math.round(aid.km),
                 isAid: true,
+                aidName: aid.name || 'AID Station',
                 estTimeMin: Math.round(aid.km * avgPacePerKm)
             });
         });
@@ -6823,10 +6827,17 @@ function updateHeroSection(totalTime) {
                 const mins = point.estTimeMin % 60;
                 timeEl.textContent = hours > 0 ? `~${hours}h${mins.toString().padStart(2,'0')}` : `~${mins}min`;
                 item.style.display = 'flex';
+                // Add hover tooltip explaining why this spot
+                if (point.isAid) {
+                    item.title = `${point.aidName} — planned refuel stop`;
+                } else {
+                    item.title = 'Flat/downhill terrain — good eating opportunity';
+                }
             } else {
                 locationEl.textContent = '-';
                 timeEl.textContent = '';
                 item.style.display = index === 0 ? 'flex' : 'none';
+                item.title = '';
             }
         });
         
@@ -7220,11 +7231,12 @@ function showAllFuelStops() {
         const hours = Math.floor(point.estTimeMin / 60);
         const mins = point.estTimeMin % 60;
         const timeStr = hours > 0 ? `~${hours}h${mins.toString().padStart(2,'0')}` : `~${mins}min`;
+        const typeText = point.isAid ? (point.aidName || 'AID') : 'Flat terrain';
         return `
-            <div class="fuel-stop-row">
+            <div class="fuel-stop-row" title="${point.isAid ? (point.aidName || 'AID') + ' — planned refuel stop' : 'Flat/downhill terrain — good eating opportunity'}">
                 <span class="fuel-stop-icon">${point.isAid ? '🍫🚰' : '🍫'}</span>
                 <span class="fuel-stop-km">KM ${point.km}</span>
-                <span class="fuel-stop-type">${point.isAid ? 'AID' : 'Terrain'}</span>
+                <span class="fuel-stop-type">${typeText}</span>
                 <span class="fuel-stop-time">${timeStr}</span>
             </div>
         `;
