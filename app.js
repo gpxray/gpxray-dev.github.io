@@ -6696,16 +6696,20 @@ function updateHeroSection(totalTime) {
     // Update Eat Zones (Fuel Windows)
     const heroFuelWindows = document.getElementById('heroFuelWindows');
     if (heroFuelWindows && gpxData) {
-        const eatZones = findEatZones(0.5, 5); // min 500m, max 5% grade
+        const eatZones = findEatZones(0.3, 10); // min 300m, max 10% grade (smoothed)
         const fuelItems = heroFuelWindows.querySelectorAll('.fuel-window-item');
+        
+        // Show first 3 zones, sorted by KM
+        const zonesToShow = eatZones.slice(0, 3);
+        const moreCount = eatZones.length - 3;
         
         fuelItems.forEach((item, index) => {
             const iconEl = item.querySelector('.fuel-icon');
             const locationEl = item.querySelector('.fuel-location');
             const timeEl = item.querySelector('.fuel-time');
             
-            if (eatZones[index] && eatZones[index].length >= 0.5) {
-                const zone = eatZones[index];
+            if (zonesToShow[index]) {
+                const zone = zonesToShow[index];
                 iconEl.textContent = zone.nearAid ? '🍫🚰' : '🍫';
                 locationEl.textContent = `KM ${zone.start.toFixed(1)}–${zone.end.toFixed(1)}`;
                 timeEl.textContent = zone.nearAid ? 'AID' : `${zone.length.toFixed(1)}km`;
@@ -6716,6 +6720,20 @@ function updateHeroSection(totalTime) {
                 item.style.display = index === 0 ? 'flex' : 'none';
             }
         });
+        
+        // Add "+X more" indicator if there are more zones
+        let moreIndicator = heroFuelWindows.querySelector('.fuel-more');
+        if (moreCount > 0) {
+            if (!moreIndicator) {
+                moreIndicator = document.createElement('div');
+                moreIndicator.className = 'fuel-more';
+                heroFuelWindows.appendChild(moreIndicator);
+            }
+            moreIndicator.textContent = `+ ${moreCount} more zones`;
+            moreIndicator.style.display = 'block';
+        } else if (moreIndicator) {
+            moreIndicator.style.display = 'none';
+        }
     }
     
     // Update Course Shape
@@ -6927,36 +6945,47 @@ function findTopClimbs(count = 3) {
 }
 
 // Find eat zones - flat/gentle terrain segments where eating is comfortable
-function findEatZones(minLength = 0.5, maxGrade = 5) {
+function findEatZones(minLength = 0.3, maxGrade = 10) {
     if (!gpxData || !gpxData.points || gpxData.points.length < 10) return [];
     
     const points = gpxData.points;
     const eatZones = [];
     
+    // Use 200m rolling window for smoothed grade calculation
+    const windowSize = 0.2; // km
+    
     let zoneStart = null;
     let zoneStartKm = 0;
     
-    for (let i = 1; i < points.length; i++) {
-        const prev = points[i - 1];
+    for (let i = 0; i < points.length; i++) {
         const curr = points[i];
-        const dist = (curr.distance - prev.distance) * 1000; // meters
-        const elevDiff = Math.abs((curr.elevation || 0) - (prev.elevation || 0));
-        const grade = dist > 0 ? (elevDiff / dist) * 100 : 0;
+        const currDist = curr.distance;
         
-        if (grade <= maxGrade) {
+        // Find point ~200m back for smoothed grade
+        let backIdx = i;
+        while (backIdx > 0 && currDist - points[backIdx].distance < windowSize) {
+            backIdx--;
+        }
+        
+        const backPoint = points[backIdx];
+        const dist = (currDist - backPoint.distance) * 1000; // meters
+        const elevDiff = Math.abs((curr.elevation || 0) - (backPoint.elevation || 0));
+        const smoothedGrade = dist > 50 ? (elevDiff / dist) * 100 : 0;
+        
+        if (smoothedGrade <= maxGrade) {
             // Flat/gentle terrain
             if (zoneStart === null) {
-                zoneStart = i - 1;
-                zoneStartKm = prev.distance;
+                zoneStart = i;
+                zoneStartKm = currDist;
             }
         } else {
             // Steep terrain - end current zone if exists
             if (zoneStart !== null) {
-                const length = prev.distance - zoneStartKm;
+                const length = currDist - zoneStartKm;
                 if (length >= minLength) {
                     eatZones.push({
                         start: zoneStartKm,
-                        end: prev.distance,
+                        end: currDist,
                         length: length,
                         type: 'flat'
                     });
@@ -6980,10 +7009,10 @@ function findEatZones(minLength = 0.5, maxGrade = 5) {
         }
     }
     
-    // Merge nearby zones (within 300m) and sort by distance
+    // Merge nearby zones (within 500m) 
     const merged = [];
     for (const zone of eatZones) {
-        if (merged.length > 0 && zone.start - merged[merged.length - 1].end < 0.3) {
+        if (merged.length > 0 && zone.start - merged[merged.length - 1].end < 0.5) {
             // Merge with previous
             merged[merged.length - 1].end = zone.end;
             merged[merged.length - 1].length = merged[merged.length - 1].end - merged[merged.length - 1].start;
@@ -6998,12 +7027,8 @@ function findEatZones(minLength = 0.5, maxGrade = 5) {
         zone.nearAid = aidStations.some(aid => Math.abs(aid.km - zoneMid) < 2);
     }
     
-    // Sort by length descending (best zones first) but prioritize those near AID
-    return merged.sort((a, b) => {
-        if (a.nearAid && !b.nearAid) return -1;
-        if (!a.nearAid && b.nearAid) return 1;
-        return b.length - a.length;
-    });
+    // Sort by start KM (so runner can follow along the course)
+    return merged.sort((a, b) => a.start - b.start);
 }
 
 // Update Course Shape - Race Intelligence
