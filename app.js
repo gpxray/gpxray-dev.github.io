@@ -135,20 +135,21 @@ function getGradientPaceMultiplier(gradePercent, flatPace, uphillPace, downhillP
         let baseMultiplier;
         
         if (absGrade <= 5) {
-            // -2 to -5%: 1.0 to 0.95 (easy descent, slightly faster)
+            // -2 to -5%: 0.95 to 0.88 (easy descent, noticeably faster)
             const t = (absGrade - GRADE_THRESHOLD) / (5 - GRADE_THRESHOLD);
-            baseMultiplier = 1.0 - t * 0.05;
+            baseMultiplier = 0.95 - t * 0.07;
         } else if (absGrade <= 10) {
-            // -5 to -10%: 0.95 to 1.0 (moderate descent, back to flat speed)
+            // -5 to -10%: 0.88 to 0.82 (moderate descent, even faster)
             const t = (absGrade - 5) / 5;
-            baseMultiplier = 0.95 + t * 0.05;
+            baseMultiplier = 0.88 - t * 0.06;
         } else if (absGrade <= 15) {
-            // -10 to -15%: 1.0 to 1.1 (steep descent, technical braking)
+            // -10 to -15%: 0.82 to 0.80 (steep descent, near max speed)
             const t = (absGrade - 10) / 5;
-            baseMultiplier = 1.0 + t * 0.1;
+            baseMultiplier = 0.82 - t * 0.02;
         } else {
-            // <-15%: 1.1+ very technical, 2% slower per additional grade point
-            baseMultiplier = 1.1 + (absGrade - 15) * 0.02;
+            // <-15%: starts slowing due to technical terrain
+            // 0.80 at -15%, then +2% per grade point
+            baseMultiplier = 0.80 + (absGrade - 15) * 0.02;
         }
         
         // Scale by runner efficiency (elite descends faster)
