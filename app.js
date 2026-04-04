@@ -6392,8 +6392,8 @@ function generateSplitsTable(flatPace, uphillPace, downhillPace, apiTotalTime) {
             const surfaceFactors = {
                 'road': { flat: 1.0, uphill: 1.0, downhill: 1.0 },
                 'trail': { flat: 1.05, uphill: 1.08, downhill: 1.10 },
-                'technical': { flat: 1.12, uphill: 1.15, downhill: 1.20 },
-                'rocky': { flat: 1.15, uphill: 1.18, downhill: 1.25 },
+                'technical': { flat: 1.12, uphill: 1.15, downhill: 1.30 },
+                'rocky': { flat: 1.15, uphill: 1.18, downhill: 1.40 },
                 'sand': { flat: 1.25, uphill: 1.30, downhill: 1.15 }
             };
             surfaceMultiplier = surfaceFactors[segment.surfaceType]?.[segment.terrainType] || 1.0;
@@ -6551,8 +6551,8 @@ function generateSplitsTable(flatPace, uphillPace, downhillPace, apiTotalTime) {
                     const surfaceFactors = {
                         'road': { flat: 1.0, uphill: 1.0, downhill: 1.0 },
                         'trail': { flat: 1.05, uphill: 1.08, downhill: 1.10 },
-                        'technical': { flat: 1.12, uphill: 1.15, downhill: 1.20 },
-                        'rocky': { flat: 1.15, uphill: 1.18, downhill: 1.25 },
+                        'technical': { flat: 1.12, uphill: 1.15, downhill: 1.30 },
+                        'rocky': { flat: 1.15, uphill: 1.18, downhill: 1.40 },
                         'sand': { flat: 1.25, uphill: 1.30, downhill: 1.15 }
                     };
                     surfaceMultiplier = surfaceFactors[segment.surfaceType]?.[segment.terrainType] || 1.0;
@@ -6843,8 +6843,8 @@ function renderLegSummary(flatPace, uphillPace, downhillPace, applySurface, star
                     const surfaceFactors = {
                         'road': { flat: 1.0, uphill: 1.0, downhill: 1.0 },
                         'trail': { flat: 1.05, uphill: 1.08, downhill: 1.10 },
-                        'technical': { flat: 1.12, uphill: 1.15, downhill: 1.20 },
-                        'rocky': { flat: 1.15, uphill: 1.18, downhill: 1.25 },
+                        'technical': { flat: 1.12, uphill: 1.15, downhill: 1.30 },
+                        'rocky': { flat: 1.15, uphill: 1.18, downhill: 1.40 },
                         'sand': { flat: 1.25, uphill: 1.30, downhill: 1.15 }
                     };
                     const terrain = segment.terrainType || 'flat';
