@@ -6278,8 +6278,8 @@ function displayApiResults(result) {
         }
     }
     
-    // Generate splits table using returned paces
-    generateSplitsTable(paces.flat, paces.uphill, paces.downhill);
+    // Generate splits table using returned paces and total time
+    generateSplitsTable(paces.flat, paces.uphill, paces.downhill, totalTimeMinutes);
     
     // Update Hero section
     updateHeroSection(totalTimeMinutes);
@@ -6337,7 +6337,7 @@ function calculateRacePlanLocal() {
 }
 
 // Generate kilometer splits table
-function generateSplitsTable(flatPace, uphillPace, downhillPace) {
+function generateSplitsTable(flatPace, uphillPace, downhillPace, apiTotalTime) {
     // Use stored paces if not provided
     if (flatPace === undefined || uphillPace === undefined || downhillPace === undefined) {
         if (lastCalculatedPaces) {
@@ -6402,20 +6402,34 @@ function generateSplitsTable(flatPace, uphillPace, downhillPace) {
     }
     rawTotalTime *= fatigueMultiplier;
     
-    // Get the API total time (what's shown in hero)
-    const heroTimeEl = document.getElementById('heroTime');
-    let apiTotalMinutes = rawTotalTime; // fallback
-    if (heroTimeEl && heroTimeEl.textContent) {
-        const match = heroTimeEl.textContent.match(/(\d+):(\d+):(\d+)/);
-        if (match) {
-            apiTotalMinutes = parseInt(match[1]) * 60 + parseInt(match[2]) + parseInt(match[3]) / 60;
+    // Use the API total time (passed from displayApiResults) or fallback to hero element
+    let apiTotalMinutes = apiTotalTime;
+    if (!apiTotalMinutes) {
+        const heroTimeEl = document.getElementById('heroFinishTime');
+        if (heroTimeEl && heroTimeEl.textContent && heroTimeEl.textContent !== '-') {
+            const match = heroTimeEl.textContent.match(/(\d+):(\d+):(\d+)/);
+            if (match) {
+                apiTotalMinutes = parseInt(match[1]) * 60 + parseInt(match[2]) + parseInt(match[3]) / 60;
+            }
         }
+    }
+    // Final fallback to raw calculation
+    if (!apiTotalMinutes) {
+        apiTotalMinutes = rawTotalTime;
     }
     
     // Calculate normalization factor so splits sum matches hero time
     const totalStopTime = aidStations.reduce((sum, s) => sum + (s.stopMin || 0), 0);
     const apiRunningTime = apiTotalMinutes - totalStopTime;
     const normalizationFactor = apiRunningTime > 0 && rawTotalTime > 0 ? apiRunningTime / rawTotalTime : 1.0;
+    
+    console.log('Splits normalization:', {
+        rawTotalTime: rawTotalTime.toFixed(1),
+        apiTotalMinutes: apiTotalMinutes.toFixed(1),
+        totalStopTime,
+        apiRunningTime: apiRunningTime.toFixed(1),
+        normalizationFactor: normalizationFactor.toFixed(3)
+    });
     
     let cumulativeTime = 0;
     
