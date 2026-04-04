@@ -5806,6 +5806,59 @@ function calculateTerrainDistances() {
     return { flatDistance, uphillDistance, downhillDistance };
 }
 
+// Estimate total time given paces (client-side calculation)
+function estimateTotalTimeFromPaces(flatPace, uphillRatio, downhillRatio) {
+    const { flatDistance, uphillDistance, downhillDistance } = calculateTerrainDistances();
+    
+    const flatTime = flatDistance * flatPace;
+    const uphillTime = uphillDistance * flatPace * uphillRatio;
+    const downhillTime = downhillDistance * flatPace * downhillRatio;
+    
+    let runningTime = flatTime + uphillTime + downhillTime;
+    
+    // Apply fatigue multiplier based on total distance
+    const totalDist = gpxData?.totalDistance || 0;
+    let fatigue = 1.0;
+    if (totalDist > 130) fatigue = 1.50;
+    else if (totalDist > 100) fatigue = 1.32;
+    else if (totalDist > 80) fatigue = 1.25;
+    else if (totalDist > 65) fatigue = 1.18;
+    else if (totalDist > 50) fatigue = 1.12;
+    else if (totalDist > 42) fatigue = 1.05;
+    else if (totalDist > 21) fatigue = 1.02;
+    
+    runningTime *= fatigue;
+    
+    // Add AID station stop times
+    const totalStopTime = aidStations.reduce((sum, s) => sum + (s.stopMin || 0), 0);
+    
+    return runningTime + totalStopTime;
+}
+
+// Find flat pace that achieves target time (binary search)
+function findFlatPaceForTargetTime(targetTimeMinutes, uphillRatio, downhillRatio) {
+    let minPace = 3.0;  // 3:00/km (very fast)
+    let maxPace = 15.0; // 15:00/km (very slow)
+    const tolerance = 0.5; // Within 0.5 minutes accuracy
+    
+    for (let i = 0; i < 50; i++) {
+        const midPace = (minPace + maxPace) / 2;
+        const estimatedTime = estimateTotalTimeFromPaces(midPace, uphillRatio, downhillRatio);
+        
+        if (Math.abs(estimatedTime - targetTimeMinutes) < tolerance) {
+            return midPace;
+        }
+        
+        if (estimatedTime > targetTimeMinutes) {
+            maxPace = midPace; // Need faster pace
+        } else {
+            minPace = midPace; // Need slower pace
+        }
+    }
+    
+    return (minPace + maxPace) / 2;
+}
+
 // Pace calculation - uses cached values from API
 function calculatePacesFromTargetTime() {
     // Return cached paces if available (set by API)
@@ -5884,12 +5937,29 @@ async function calculateRacePlanFromAPI() {
             )
         };
     } else if (currentMode === 'target') {
+        // Calculate flat pace from target time client-side, then send as manual mode
         const targetHours = parseInt(document.getElementById('targetHours')?.value) || 0;
         const targetMinutes = parseInt(document.getElementById('targetMinutes')?.value) || 0;
         const targetSeconds = parseInt(document.getElementById('targetSeconds')?.value) || 0;
-        payload.targetTime = targetHours * 60 + targetMinutes + targetSeconds / 60;
-        payload.uphillRatio = parseFloat(document.getElementById('uphillRatio')?.value) || 1.2;
-        payload.downhillRatio = parseFloat(document.getElementById('downhillRatio')?.value) || 0.9;
+        const targetTimeMinutes = targetHours * 60 + targetMinutes + targetSeconds / 60;
+        
+        const uphillRatio = parseFloat(document.getElementById('uphillRatio')?.value) || 1.2;
+        const downhillRatio = parseFloat(document.getElementById('downhillRatio')?.value) || 0.9;
+        
+        // Find flat pace that achieves target time
+        const flatPace = findFlatPaceForTargetTime(targetTimeMinutes, uphillRatio, downhillRatio);
+        const uphillPace = flatPace * uphillRatio;
+        const downhillPace = flatPace * downhillRatio;
+        
+        console.log(`Target time: ${targetTimeMinutes} min → Calculated flat pace: ${flatPace.toFixed(2)} min/km`);
+        
+        // Send as manual mode with calculated paces
+        payload.mode = 'manual';
+        payload.manualPaces = {
+            flat: flatPace,
+            uphill: uphillPace,
+            downhill: downhillPace
+        };
     } else if (currentMode === 'itra') {
         payload.itraScore = parseInt(document.getElementById('itraScore')?.value) || 550;
         payload.uphillRatio = parseFloat(document.getElementById('itraUphillRatio')?.value) || 1.3;
