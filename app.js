@@ -63,6 +63,10 @@ function setupDevIndicator() {
         devBadge.textContent = 'DEV';
         logoText.appendChild(devBadge);
     }
+    
+    // Show dev-only features
+    const nutritionBox = document.getElementById('heroNutritionBox');
+    if (nutritionBox) nutritionBox.style.display = '';
 }
 
 // Helper to resolve GPX URLs (uses blob storage if available)

@@ -570,6 +570,29 @@
                             <span class="hero-metric-value" id="heroClimbLoad">-</span>
                         </div>
                     </div>
+                    <div class="hero-metric hero-metric-nutrition" id="heroNutritionBox" style="display: none;">
+                        <span class="hero-metric-icon">🍫</span>
+                        <div class="hero-metric-content">
+                            <span class="hero-metric-label">
+                                <span data-i18n="hero.nutritionWindow">Fuel Windows</span>
+                                <span class="info-tooltip" tabindex="0">
+                                    ⓘ
+                                    <span class="info-tooltip-content">
+                                        <strong data-i18n="nutrition.title">Optimal Fuel Windows</strong><br>
+                                        <span data-i18n="nutrition.description">Best moments to eat/drink based on terrain and timing.</span><br><br>
+                                        <em data-i18n="nutrition.logic">Avoids steep grades (&gt;8%) where digestion is harder.</em><br><br>
+                                        💧 = Drink window<br>
+                                        🍫 = Eat window (flatter terrain)
+                                    </span>
+                                </span>
+                            </span>
+                            <div class="fuel-windows-list" id="heroFuelWindows">
+                                <div class="fuel-window-item"><span class="fuel-icon">🍫</span> <span class="fuel-location">-</span> <span class="fuel-time"></span></div>
+                                <div class="fuel-window-item"><span class="fuel-icon">💧</span> <span class="fuel-location">-</span> <span class="fuel-time"></span></div>
+                                <div class="fuel-window-item"><span class="fuel-icon">🍫</span> <span class="fuel-location">-</span> <span class="fuel-time"></span></div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 
                 <!-- DDL Explainer Modal -->

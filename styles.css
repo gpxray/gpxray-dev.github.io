@@ -2680,6 +2680,42 @@ h2 {
     margin-left: auto;
 }
 
+/* Fuel Windows (Nutrition) */
+.fuel-windows-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-top: 4px;
+}
+
+.fuel-window-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.85rem;
+}
+
+.fuel-icon {
+    font-size: 0.9rem;
+    min-width: 18px;
+}
+
+.fuel-location {
+    color: #fff;
+    font-weight: 500;
+}
+
+.fuel-time {
+    color: #4ade80;
+    font-weight: 600;
+    margin-left: auto;
+    font-size: 0.8rem;
+}
+
+.hero-metric-nutrition {
+    min-width: 180px;
+}
+
 .hero-metric-insight {
     display: block;
     font-size: 0.75rem;
