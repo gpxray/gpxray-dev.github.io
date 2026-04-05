@@ -455,11 +455,21 @@ def calculate_race_plan(data: dict) -> dict:
     total_mins = int(total_time % 60)
     total_secs = int((total_time % 1) * 60)
     
-    # Calculate km splits
-    km_splits = calculate_km_splits(
-        segments, paces, apply_surface, fatigue, 
-        aid_stations, start_minutes, total_distance
-    )
+    # Calculate km splits with error handling
+    km_splits_error = None
+    try:
+        km_splits = calculate_km_splits(
+            segments, paces, apply_surface, fatigue, 
+            aid_stations, start_minutes, total_distance
+        )
+        import logging
+        logging.info(f"km_splits generated: {len(km_splits)} splits")
+    except Exception as e:
+        import logging
+        import traceback
+        km_splits_error = f"{str(e)} - {traceback.format_exc()}"
+        logging.error(f"km_splits FAILED: {km_splits_error}")
+        km_splits = []
     
     return {
         'totalTimeMinutes': total_time,
@@ -483,7 +493,8 @@ def calculate_race_plan(data: dict) -> dict:
         'stopTimeMinutes': total_stop_time,
         'runnerLevel': runner_level,
         'preset': preset,
-        'kmSplits': km_splits
+        'kmSplits': km_splits,
+        'kmSplitsError': km_splits_error
     }
 
 

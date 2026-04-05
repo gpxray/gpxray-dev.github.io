@@ -6287,12 +6287,15 @@ async function calculateRacePlanForTargetTime() {
 
 // Display results from API response
 function displayApiResults(result) {
-    const { paces, terrain, totalTimeMinutes, fatigueMultiplier, checkpoints, stopTimeMinutes, ddl, finishClockTime, kmSplits } = result;
+    const { paces, terrain, totalTimeMinutes, fatigueMultiplier, checkpoints, stopTimeMinutes, ddl, finishClockTime, kmSplits, kmSplitsError } = result;
     
     // Debug: log API response
     console.log('%c📥 API RESPONSE', 'background: #9b59b6; color: white; padding: 2px 8px; font-weight: bold;');
     console.log('  paces:', paces);
     console.log('  kmSplits:', kmSplits?.length || 0, 'splits');
+    if (kmSplitsError) {
+        console.log('%c❌ kmSplits ERROR', 'background: #e74c3c; color: white; padding: 2px 8px;', kmSplitsError);
+    }
     if (kmSplits && kmSplits.length > 0) {
         const downhillSplit = kmSplits.find(s => s.elevation < -30);
         if (downhillSplit) {
