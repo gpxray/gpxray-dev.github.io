@@ -6076,7 +6076,12 @@ async function calculateRacePlanFromAPI() {
         startTime: startTime,
         totalDistance: gpxData.totalDistance,
         elevationGain: gpxData.elevationGain || 0,
-        mode: currentMode
+        mode: currentMode,
+        // Always include terrain style ratios from sliders (hero or original)
+        uphillRatio: parseFloat(document.getElementById('uphillRatio')?.value) || 
+                     parseFloat(document.getElementById('heroUphillSlider')?.value) || 1.4,
+        downhillRatio: parseFloat(document.getElementById('downhillRatio')?.value) || 
+                       parseFloat(document.getElementById('heroDownhillSlider')?.value) || 0.85
     };
     
     // Add mode-specific data
@@ -6159,8 +6164,11 @@ async function calculateRacePlanForTargetTime() {
     const targetSeconds = parseInt(document.getElementById('targetSeconds')?.value) || 0;
     const targetTimeMinutes = targetHours * 60 + targetMinutes + targetSeconds / 60;
     
-    const uphillRatio = parseFloat(document.getElementById('uphillRatio')?.value) || 1.2;
-    const downhillRatio = parseFloat(document.getElementById('downhillRatio')?.value) || 0.9;
+    // Get terrain style ratios from slider or hero slider
+    const uphillRatio = parseFloat(document.getElementById('uphillRatio')?.value) || 
+                        parseFloat(document.getElementById('heroUphillSlider')?.value) || 1.4;
+    const downhillRatio = parseFloat(document.getElementById('downhillRatio')?.value) || 
+                          parseFloat(document.getElementById('heroDownhillSlider')?.value) || 0.85;
     
     // Build base payload
     const surfaceToggle = document.getElementById('surfaceEnabled');
@@ -6207,6 +6215,8 @@ async function calculateRacePlanForTargetTime() {
             totalDistance: gpxData.totalDistance,
             elevationGain: gpxData.elevationGain || 0,
             mode: 'manual',
+            uphillRatio: uphillRatio,
+            downhillRatio: downhillRatio,
             manualPaces: {
                 flat: testPace,
                 uphill: testPace * uphillRatio,

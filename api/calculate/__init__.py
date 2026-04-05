@@ -321,16 +321,16 @@ def calculate_race_plan(data: dict) -> dict:
     # Get runner preset
     preset = RUNNER_LEVELS.get(runner_level, RUNNER_LEVELS['intermediate'])
     
+    # Get user-specified ratios (terrain style sliders) or fall back to preset
+    uphill_ratio = float(data.get('uphillRatio', preset['uphillRatio']))
+    downhill_ratio = float(data.get('downhillRatio', preset['downhillRatio']))
+    
     # Calculate paces based on mode
     if mode == 'manual' and manual_paces:
         flat_pace = manual_paces.get('flat', preset['flatPace'])
-        uphill_pace = manual_paces.get('uphill', flat_pace * preset['uphillRatio'])
-        downhill_pace = manual_paces.get('downhill', flat_pace * preset['downhillRatio'])
+        uphill_pace = manual_paces.get('uphill', flat_pace * uphill_ratio)
+        downhill_pace = manual_paces.get('downhill', flat_pace * downhill_ratio)
     elif mode == 'target' and target_time:
-        # Get ratios from request (with defaults from preset)
-        uphill_ratio = data.get('uphillRatio', preset['uphillRatio'])
-        downhill_ratio = data.get('downhillRatio', preset['downhillRatio'])
-        
         # Get fatigue and stop times first (needed for reverse calculation)
         fatigue = get_fatigue_multiplier(total_distance)
         total_stop_time = sum(s.get('stopMin', 0) for s in aid_stations)
@@ -345,13 +345,13 @@ def calculate_race_plan(data: dict) -> dict:
     elif mode == 'itra' and itra_score:
         # ITRA-based pace calculation (will be implemented)
         flat_pace = preset['flatPace']
-        uphill_pace = flat_pace * preset['uphillRatio']
-        downhill_pace = flat_pace * preset['downhillRatio']
+        uphill_pace = flat_pace * uphill_ratio
+        downhill_pace = flat_pace * downhill_ratio
     else:
-        # Default: Use runner level preset
+        # Default: Use runner level flat pace with user's terrain style ratios
         flat_pace = preset['flatPace']
-        uphill_pace = flat_pace * preset['uphillRatio']
-        downhill_pace = flat_pace * preset['downhillRatio']
+        uphill_pace = flat_pace * uphill_ratio
+        downhill_pace = flat_pace * downhill_ratio
     
     paces = {
         'flat': flat_pace,
