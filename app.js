@@ -6488,11 +6488,14 @@ function renderApiKmSplits(kmSplits, splitsBody) {
         const clockMinutes = startTimeInMinutes + cumulativeTime;
         const isNightSplit = isNightTime(clockMinutes % (24 * 60));
         
-        // Fuel recommendation
-        const hasFuel = recommendedFuelKms.has(km) && !aidAtKm;
-        const fuelHtml = hasFuel 
-            ? `<span class="fuel-icon" title="Recommended fuel point (~${Math.round(cumulativeTime)} min in)">🍫</span>`
-            : '-';
+        // Fuel recommendation - AID stations are natural refuel points
+        const isRecommendedFuel = recommendedFuelKms.has(km);
+        let fuelHtml = '-';
+        if (aidAtKm) {
+            fuelHtml = `<span class="fuel-icon" title="${aidAtKm.name || 'AID'} — planned refuel stop (~${Math.round(cumulativeTime)} min in)">🍫🚰</span>`;
+        } else if (isRecommendedFuel) {
+            fuelHtml = `<span class="fuel-icon" title="Recommended fuel point (~${Math.round(cumulativeTime)} min in)">🍫</span>`;
+        }
         
         // Format times
         const splitFormatted = formatTime(splitTime);
@@ -6805,7 +6808,7 @@ function generateSplitsTable(flatPace, uphillPace, downhillPace, apiTotalTime) {
                 <td>-</td>
                 <td class="aid-station-cell">${station.name}</td>
                 <td class="stop-time editable-stop" data-station-index="${stationIndex}" data-station-km="${station.km}">${stopTime > 0 ? '+' + stopTime + ' min' : '-'}</td>
-                <td>-</td>
+                <td><span class="fuel-icon" title="${station.name || 'AID'} — planned refuel stop">🍫🚰</span></td>
                 <td>-</td>
                 <td>${formatTime(timeToStation)}</td>
                 <td>${clockTime}</td>
@@ -6860,10 +6863,11 @@ function generateSplitsTable(flatPace, uphillPace, downhillPace, apiTotalTime) {
         // Check if this km is a recommended fuel point
         const unitKm = useMetric ? unit : Math.round(unit * MILES_TO_KM);
         const isRecommendedFuel = recommendedFuelKms.has(unitKm);
-        const fuelIcon = isRecommendedFuel ? (hasAidStation ? '🍫🚰' : '🍫') : '';
-        const fuelTooltip = isRecommendedFuel 
-            ? (hasAidStation ? `${aidStation.name || 'AID'} — planned refuel stop` : 'Flat/downhill terrain — good eating opportunity')
-            : '';
+        // AID stations always show fuel icon since they're natural refuel points
+        const fuelIcon = hasAidStation ? '🍫🚰' : (isRecommendedFuel ? '🍫' : '');
+        const fuelTooltip = hasAidStation
+            ? `${aidStation.name || 'AID'} — planned refuel stop`
+            : (isRecommendedFuel ? 'Flat/downhill terrain — good eating opportunity' : '');
         
         // Calculate clock time (after adding stop time)
         const clockTimeMinutes = startTimeInMinutes + cumulativeTime;
