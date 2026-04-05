@@ -7190,10 +7190,10 @@ function updateHeroSection(totalTime) {
         heroClimbLoad.textContent = `+${Math.round(gpxData.elevationGain)}m`;
     }
     
-    // Update Top Climbs (3 biggest continuous ascents)
+    // Update Top Climbs (5 biggest continuous ascents)
     const heroTopClimbs = document.getElementById('heroTopClimbs');
     if (heroTopClimbs && gpxData) {
-        const topClimbs = findTopClimbs(3);
+        const topClimbs = findTopClimbs(5);
         const climbItems = heroTopClimbs.querySelectorAll('.top-climb-item');
         
         climbItems.forEach((item, index) => {
@@ -8589,7 +8589,7 @@ async function exportShareCard() {
         }
 
         // Gather Key Challenges info for lockscreen
-        const topClimbs = findTopClimbs(3);
+        const topClimbs = findTopClimbs(5);
         let challengesHtml = '';
         
         // Sort climbs by start km (race sequence order)
