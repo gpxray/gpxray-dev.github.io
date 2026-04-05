@@ -6074,12 +6074,11 @@ async function calculateRacePlanFromAPI() {
     const heroDownhillEl = document.getElementById('heroDownhillSlider');
     
     // Debug: log all slider values
-    console.log('Terrain Style Debug:', {
-        uphillRatio: uphillRatioEl?.value,
-        downhillRatio: downhillRatioEl?.value,
-        heroUphill: heroUphillEl?.value,
-        heroDownhill: heroDownhillEl?.value
-    });
+    console.log('%c🎿 TERRAIN SLIDER DEBUG', 'background: #ff6b6b; color: white; padding: 2px 8px; font-weight: bold;');
+    console.log('  uphillRatio input:', uphillRatioEl?.value);
+    console.log('  downhillRatio input:', downhillRatioEl?.value);
+    console.log('  heroUphill slider:', heroUphillEl?.value);
+    console.log('  heroDownhill slider:', heroDownhillEl?.value);
     
     // Get ratios - prefer hero sliders if they exist and have been touched
     const uphillRatioValue = parseFloat(heroUphillEl?.value) || 
@@ -6087,7 +6086,9 @@ async function calculateRacePlanFromAPI() {
     const downhillRatioValue = parseFloat(heroDownhillEl?.value) || 
                                parseFloat(downhillRatioEl?.value) || 0.85;
     
-    console.log('Using ratios:', { uphill: uphillRatioValue, downhill: downhillRatioValue });
+    console.log('%c📤 SENDING TO API', 'background: #4ecdc4; color: white; padding: 2px 8px; font-weight: bold;');
+    console.log('  uphillRatio:', uphillRatioValue);
+    console.log('  downhillRatio:', downhillRatioValue);
     
     const payload = {
         segments: apiSegments,
@@ -6287,9 +6288,15 @@ function displayApiResults(result) {
     const { paces, terrain, totalTimeMinutes, fatigueMultiplier, checkpoints, stopTimeMinutes, ddl, finishClockTime, kmSplits } = result;
     
     // Debug: log API response
-    console.log('API returned checkpoints:', checkpoints);
-    console.log('API returned kmSplits:', kmSplits?.length || 0, 'splits');
-    console.log('Current aidStations:', aidStations);
+    console.log('%c📥 API RESPONSE', 'background: #9b59b6; color: white; padding: 2px 8px; font-weight: bold;');
+    console.log('  paces:', paces);
+    console.log('  kmSplits:', kmSplits?.length || 0, 'splits');
+    if (kmSplits && kmSplits.length > 0) {
+        const downhillSplit = kmSplits.find(s => s.elevation < -30);
+        if (downhillSplit) {
+            console.log('  Sample downhill split:', downhillSplit);
+        }
+    }
     
     // Cache API results for use in other functions
     lastCachedCheckpoints = checkpoints;
@@ -6597,7 +6604,8 @@ function generateSplitsTable(flatPace, uphillPace, downhillPace, apiTotalTime) {
     
     // If API provided km splits, use them directly (much cleaner!)
     if (lastCachedKmSplits && lastCachedKmSplits.length > 0) {
-        console.log('Using API-provided km splits:', lastCachedKmSplits.length);
+        console.log('%c✅ USING API KM SPLITS', 'background: #2ecc71; color: white; padding: 2px 8px; font-weight: bold;', lastCachedKmSplits.length, 'splits');
+        console.log('  First 3 splits:', lastCachedKmSplits.slice(0, 3));
         renderApiKmSplits(lastCachedKmSplits, splitsBody);
         return;
     }
