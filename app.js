@@ -3364,24 +3364,11 @@ function updateHeroAidWidget() {
     const widget = document.getElementById('heroAidWidget');
     const listContainer = document.getElementById('heroAidWidgetList');
     
-    console.log('updateHeroAidWidget CALLED:', { 
-        widgetExists: !!widget,
-        listExists: !!listContainer,
-        lastCachedCheckpoints: lastCachedCheckpoints?.length || 0,
-        aidStationsCount: aidStations?.length || 0
-    });
-    
-    if (!widget || !listContainer) {
-        console.log('updateHeroAidWidget: Missing elements');
-        return;
-    }
+    if (!widget || !listContainer) return;
     
     // Check if we have AID stations and checkpoint times
     if (lastCachedCheckpoints && Array.isArray(lastCachedCheckpoints) && lastCachedCheckpoints.length > 0) {
         // Use API-calculated checkpoint times
-        console.log('updateHeroAidWidget: Using', lastCachedCheckpoints.length, 'checkpoints');
-        console.log('Branch 1: Using lastCachedCheckpoints');
-        console.log('Checkpoint data:', lastCachedCheckpoints);
         const html = lastCachedCheckpoints.map(cp => `
             <div class="hero-aid-item">
                 <span class="hero-aid-name">${cp.name}</span>
@@ -3392,16 +3379,10 @@ function updateHeroAidWidget() {
             </div>
         `).join('');
         
-        console.log('Generated HTML:', html);
         listContainer.innerHTML = html;
         widget.style.display = 'flex';
-        widget.style.border = '3px solid red'; // DEBUG: Make widget visible
-        console.log('heroAidWidget display set to flex, computed:', window.getComputedStyle(widget).display);
-        console.log('listContainer innerHTML length:', listContainer.innerHTML.length);
-        console.log('listContainer children:', listContainer.children.length);
     } else if (typeof aidStations !== 'undefined' && aidStations && Array.isArray(aidStations) && aidStations.length > 0) {
         // Fallback: show AID stations without times (they'll get times after recalculation)
-        console.log('Branch 2: Using aidStations fallback');
         const html = aidStations.map(aid => `
             <div class="hero-aid-item">
                 <span class="hero-aid-name">${aid.name}</span>
@@ -3416,7 +3397,6 @@ function updateHeroAidWidget() {
         widget.style.display = 'flex';
     } else {
         // No AID stations - hide widget completely
-        console.log('Branch 3: Hiding widget - no data');
         listContainer.innerHTML = '';
         widget.style.display = 'none';
     }
