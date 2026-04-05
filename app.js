@@ -3381,6 +3381,7 @@ function updateHeroAidWidget() {
         // Use API-calculated checkpoint times
         console.log('updateHeroAidWidget: Using', lastCachedCheckpoints.length, 'checkpoints');
         console.log('Branch 1: Using lastCachedCheckpoints');
+        console.log('Checkpoint data:', lastCachedCheckpoints);
         const html = lastCachedCheckpoints.map(cp => `
             <div class="hero-aid-item">
                 <span class="hero-aid-name">${cp.name}</span>
@@ -3391,9 +3392,12 @@ function updateHeroAidWidget() {
             </div>
         `).join('');
         
+        console.log('Generated HTML:', html);
         listContainer.innerHTML = html;
         widget.style.display = 'flex';
         console.log('heroAidWidget display set to flex, computed:', window.getComputedStyle(widget).display);
+        console.log('listContainer innerHTML length:', listContainer.innerHTML.length);
+        console.log('listContainer children:', listContainer.children.length);
     } else if (typeof aidStations !== 'undefined' && aidStations && Array.isArray(aidStations) && aidStations.length > 0) {
         // Fallback: show AID stations without times (they'll get times after recalculation)
         console.log('Branch 2: Using aidStations fallback');
