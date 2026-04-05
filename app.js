@@ -6063,6 +6063,7 @@ async function calculateRacePlanFromAPI() {
         name: station.name || 'VP',
         stopMin: station.stopMin || 0
     }));
+    console.log('calculateRacePlan: aidStations for API:', apiAidStations.length, apiAidStations);
     
     // Build request based on current mode
     const uphillRatioEl = document.getElementById('uphillRatio');
@@ -6272,6 +6273,8 @@ async function calculateRacePlanForTargetTime() {
 // Display results from API response
 function displayApiResults(result) {
     const { paces, terrain, totalTimeMinutes, fatigueMultiplier, checkpoints, stopTimeMinutes, ddl, finishClockTime, kmSplits } = result;
+    
+    console.log('displayApiResults: checkpoints received:', checkpoints?.length, checkpoints);
     
     // Cache API results for use in other functions
     lastCachedCheckpoints = checkpoints;
