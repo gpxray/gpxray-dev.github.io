@@ -3395,6 +3395,7 @@ function updateHeroAidWidget() {
         console.log('Generated HTML:', html);
         listContainer.innerHTML = html;
         widget.style.display = 'flex';
+        widget.style.border = '3px solid red'; // DEBUG: Make widget visible
         console.log('heroAidWidget display set to flex, computed:', window.getComputedStyle(widget).display);
         console.log('listContainer innerHTML length:', listContainer.innerHTML.length);
         console.log('listContainer children:', listContainer.children.length);
