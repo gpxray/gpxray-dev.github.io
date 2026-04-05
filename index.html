@@ -430,7 +430,40 @@
                                 <label class="race-setup-label-inline" data-i18n="race.targetTime">Target time:</label>
                                 <input type="text" id="heroTargetTime" class="target-time-input" placeholder="HH:MM" pattern="[0-9]{1,2}:[0-9]{2}" />
                                 <span class="target-time-hint" data-i18n="race.targetOptional">(optional)</span>
-                            </div><!-- ITRA Score Optional -->
+                            </div>
+                            
+                            <!-- Terrain Style Section (collapsible) -->
+                            <div class="hero-terrain-section">
+                                <button type="button" class="hero-terrain-toggle" id="heroTerrainToggle">
+                                    <span>⛰️ <span>Terrain Style</span></span>
+                                    <span class="hero-terrain-arrow">▼</span>
+                                </button>
+                                <div class="hero-terrain-content" id="heroTerrainContent" style="display: none;">
+                                    <p class="terrain-style-hint">How do you handle terrain? This personalizes your pace predictions.</p>
+                                    <div class="hero-terrain-sliders">
+                                        <div class="hero-terrain-slider-group">
+                                            <label>⬆️ Uphill</label>
+                                            <div class="hero-slider-row">
+                                                <span class="slider-emoji">�</span>
+                                                <input type="range" id="heroUphillSlider" min="1.2" max="1.6" step="0.05" value="1.4">
+                                                <span class="slider-emoji">😓</span>
+                                            </div>
+                                            <span class="hero-terrain-hint" id="heroUphillHint">Balanced climber</span>
+                                        </div>
+                                        <div class="hero-terrain-slider-group">
+                                            <label>⬇️ Downhill</label>
+                                            <div class="hero-slider-row">
+                                                <span class="slider-emoji">🏃</span>
+                                                <input type="range" id="heroDownhillSlider" min="0.80" max="0.95" step="0.01" value="0.85">
+                                                <span class="slider-emoji">🚶</span>
+                                            </div>
+                                            <span class="hero-terrain-hint" id="heroDownhillHint">Balanced descender</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- ITRA Score Optional -->
                             <div class="itra-score-section">
                                 <div class="itra-label-row">
                                     <label class="itra-label" data-i18n="race.itraOptional">Know your ITRA score?</label>
