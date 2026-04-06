@@ -3745,11 +3745,17 @@ function displayElevationChart() {
         options: {
             responsive: true,
             maintainAspectRatio: false,
+            interaction: {
+                mode: 'index',
+                intersect: false
+            },
             plugins: {
                 legend: {
                     display: false
                 },
                 tooltip: {
+                    mode: 'index',
+                    intersect: false,
                     callbacks: {
                         title: function(context) {
                             return `Distance: ${context[0].label} km`;
@@ -3817,29 +3823,41 @@ function displayElevationChart() {
 }
 
 // Update hover marker position on map (sync with elevation profile)
+// Throttle helper for smooth hover
+let lastHoverUpdate = 0;
+const HOVER_THROTTLE_MS = 16; // ~60fps
+
 function updateHoverMarker(lat, lon, distance, elevation) {
     if (!map) return;
     
-    // Create custom icon for hover marker
-    const hoverIcon = L.divIcon({
-        className: 'hover-marker',
-        html: `<div class="hover-marker-dot"></div>
-               <div class="hover-marker-tooltip">
-                   <span class="hover-km">${distance.toFixed(1)} km</span>
-                   <span class="hover-elev">${elevation?.toFixed(0) || '?'} m</span>
-               </div>`,
-        iconSize: [20, 20],
-        iconAnchor: [10, 10]
-    });
+    // Throttle updates for smooth performance
+    const now = Date.now();
+    if (now - lastHoverUpdate < HOVER_THROTTLE_MS) return;
+    lastHoverUpdate = now;
     
     if (hoverMarker) {
+        // Just move existing marker (fast)
         hoverMarker.setLatLng([lat, lon]);
-        hoverMarker.setIcon(hoverIcon);
+        // Update tooltip content
+        hoverMarker.setTooltipContent(`${distance.toFixed(1)} km · ${elevation?.toFixed(0) || '?'} m`);
     } else {
-        hoverMarker = L.marker([lat, lon], { 
-            icon: hoverIcon,
-            zIndexOffset: 1000 
+        // Create marker once with simple circle style
+        hoverMarker = L.circleMarker([lat, lon], {
+            radius: 8,
+            fillColor: '#00d4ff',
+            fillOpacity: 1,
+            color: '#fff',
+            weight: 3,
+            className: 'hover-marker-circle'
         }).addTo(map);
+        
+        // Bind permanent tooltip
+        hoverMarker.bindTooltip(`${distance.toFixed(1)} km · ${elevation?.toFixed(0) || '?'} m`, {
+            permanent: true,
+            direction: 'top',
+            offset: [0, -10],
+            className: 'hover-marker-tooltip-leaflet'
+        });
     }
 }
 
