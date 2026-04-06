@@ -5460,6 +5460,25 @@ h2 {
     .early-access-divider {
         margin: 15px 0;
     }
+    
+    /* Chart header - mobile: keep layout but ensure contained */
+    .chart-header {
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+    
+    .chart-selector {
+        padding: 6px 12px;
+        font-size: 0.85rem;
+    }
+    
+    .elevation-section {
+        padding: 15px;
+    }
+    
+    .chart-container {
+        padding: 10px;
+    }
 }
 
 /* ========================================
