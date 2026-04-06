@@ -3756,12 +3756,27 @@ function displayElevationChart() {
                 tooltip: {
                     mode: 'index',
                     intersect: false,
+                    backgroundColor: 'rgba(0, 0, 0, 0.9)',
+                    titleColor: '#00d4ff',
+                    titleFont: {
+                        size: 14,
+                        weight: 'bold'
+                    },
+                    bodyColor: '#fff',
+                    bodyFont: {
+                        size: 13
+                    },
+                    borderColor: '#00d4ff',
+                    borderWidth: 2,
+                    padding: 12,
+                    cornerRadius: 8,
+                    displayColors: false,
                     callbacks: {
                         title: function(context) {
-                            return `Distance: ${context[0].label} km`;
+                            return `📍 ${context[0].label} km`;
                         },
                         label: function(context) {
-                            return `Elevation: ${context.raw.toFixed(0)} m`;
+                            return `⛰️ ${context.raw.toFixed(0)} m`;
                         }
                     }
                 },
