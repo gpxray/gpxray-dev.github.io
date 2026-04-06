@@ -2572,7 +2572,7 @@ function parseGPX(gpxContent) {
         setTimeout(() => {
             const strategyBox = document.getElementById('heroRunnerLevel');
             if (strategyBox) {
-                strategyBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                strategyBox.scrollIntoView({ behavior: 'smooth', block: 'start' });
             }
         }, 100);
     }
