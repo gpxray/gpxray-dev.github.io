@@ -5814,9 +5814,22 @@ function formatTime(totalMinutes) {
     const seconds = Math.round((totalMinutes % 1) * 60);
     
     if (hours > 0) {
-        return `${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        // Always pad hours to 2 digits for consistency in exports
+        return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
     }
     return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+}
+
+// Extract HH:MM from time string (handles both "7:00:02" and "07:00:02")
+function extractHHMM(timeStr) {
+    if (!timeStr) return '';
+    const parts = timeStr.split(':');
+    if (parts.length >= 2) {
+        const hours = parts[0].padStart(2, '0');
+        const minutes = parts[1].padStart(2, '0');
+        return `${hours}:${minutes}`;
+    }
+    return timeStr;
 }
 
 function formatPace(paceMinutes) {
@@ -9603,8 +9616,8 @@ async function exportCrewCard() {
             }
             
             // Show arrival time, and time range if there's a stop
-            const arrivalTime = station.clockTime.substring(0, 5); // HH:MM
-            const departureTime = station.departureTime ? station.departureTime.substring(0, 5) : arrivalTime;
+            const arrivalTime = extractHHMM(station.clockTime);
+            const departureTime = station.departureTime ? extractHHMM(station.departureTime) : arrivalTime;
             const hasStop = station.stopMin > 0 && arrivalTime !== departureTime;
             const timeDisplay = hasStop ? `${arrivalTime} - ${departureTime}` : arrivalTime;
             const timeFontSize = hasStop ? (stationCount <= 4 ? '20px' : (stationCount <= 6 ? '17px' : (stationCount <= 8 ? '15px' : '14px'))) : timeSize;
@@ -9640,7 +9653,7 @@ async function exportCrewCard() {
         }).join('');
 
         // Add finish row
-        const finishTimeDisplay = finishClockTime ? finishClockTime.substring(0, 5) : finishClockTime;
+        const finishTimeDisplay = extractHHMM(finishClockTime);
         const totalElevGain = Math.round(gpxData.elevationGain);
         const finishIconMargin = stationCount <= 6 ? '10px' : (stationCount <= 8 ? '8px' : '6px');
         
@@ -10033,12 +10046,12 @@ async function exportCrewPdf() {
             
             // Arrival time
             doc.setFont('helvetica', 'bold');
-            doc.text(station.clockTime.substring(0, 5), colX.arrival, y);
+            doc.text(extractHHMM(station.clockTime), colX.arrival, y);
             doc.setFont('helvetica', 'normal');
             
             // Departure time
             if (station.stopMin > 0 && station.departureTime) {
-                doc.text(station.departureTime.substring(0, 5), colX.departure, y);
+                doc.text(extractHHMM(station.departureTime), colX.departure, y);
             } else {
                 doc.text('-', colX.departure, y);
             }
@@ -10073,7 +10086,7 @@ async function exportCrewPdf() {
         doc.text(`${distance.toFixed(1)} ${unitLabel} (100%)`, colX.dist, y);
         doc.text('-', colX.elev, y);
         doc.setFont('helvetica', 'bold');
-        doc.text(finishClockTime.substring(0, 5), colX.arrival, y);
+        doc.text(extractHHMM(finishClockTime), colX.arrival, y);
         
         y += 20;
 
