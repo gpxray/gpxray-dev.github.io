@@ -2887,7 +2887,10 @@ async function fetchSurfaceData() {
         const ways = processOSMWays(data);
         
         if (ways.length === 0) {
-            updateSurfaceStatus('No OSM data found for this area. Using default surfaces.');
+            console.log('No OSM data found for this area. Using default surfaces.');
+            isSurfaceLoading = false;
+            displaySurfaceStats();
+            displayMap();
             return;
         }
         
@@ -3256,12 +3259,19 @@ function updateHeroSurfaceWidget() {
     
     const surfaceDistances = { road: 0, trail: 0, technical: 0 };
     let totalDistance = 0;
+    let hasKnownSurface = false;
     
     for (const segment of segments) {
         if (segment.surfaceType !== 'unknown') {
             surfaceDistances[segment.surfaceType] = (surfaceDistances[segment.surfaceType] || 0) + segment.distance;
+            hasKnownSurface = true;
         }
         totalDistance += segment.distance;
+    }
+    
+    // If no known surfaces, default to 100% trail
+    if (!hasKnownSurface && totalDistance > 0) {
+        surfaceDistances.trail = totalDistance;
     }
     
     if (totalDistance === 0) {
