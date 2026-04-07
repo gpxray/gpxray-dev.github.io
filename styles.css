@@ -5610,8 +5610,8 @@ h2 {
 }
 
 .race-logo img {
-    max-height: 120px;
-    max-width: 300px;
+    max-height: 90px;
+    max-width: 220px;
     object-fit: contain;
 }
 
