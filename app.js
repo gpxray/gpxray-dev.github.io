@@ -7235,12 +7235,12 @@ function renderLegSummary(flatPace, uphillPace, downhillPace, applySurface, star
             }
         }
         
-        // Apply night penalty if running at night
+        // Check if running at night (for display indicator only)
         const nightMultiplier = getNightPaceMultiplier(clockTimeAtLegStart, dominantSurface);
         const isNightLeg = nightMultiplier > 1.0;
         
-        // Apply fatigue multiplier, night penalty, AND normalization factor to match splits table
-        const adjustedLegTime = legTime * fatigueMultiplier * nightMultiplier * normalizationFactor;
+        // Apply fatigue and normalization factor only - night penalty is already in API time
+        const adjustedLegTime = legTime * fatigueMultiplier * normalizationFactor;
         
         // Add previous stop time to cumulative
         cumulativeTime += leg.stopMin;
