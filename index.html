@@ -276,6 +276,31 @@
                     <label for="feedbackBugs" data-i18n="feedback.bugs">Any bugs or issues?</label>
                     <textarea id="feedbackBugs" name="bugs" rows="2" data-i18n-placeholder="feedback.bugsPlaceholder" placeholder="I noticed that..."></textarea>
                 </div>
+                <div class="feedback-field feedback-pricing">
+                    <label data-i18n="feedback.pricing">What would you pay for race strategy?</label>
+                    <div class="pricing-options">
+                        <div class="pricing-row">
+                            <span class="pricing-label" data-i18n="feedback.perRace">Per race:</span>
+                            <div class="pricing-buttons" id="pricingPerRace">
+                                <button type="button" class="pricing-btn" data-value="free">Free</button>
+                                <button type="button" class="pricing-btn" data-value="1-2">€1-2</button>
+                                <button type="button" class="pricing-btn" data-value="3-5">€3-5</button>
+                                <button type="button" class="pricing-btn" data-value="5-10">€5-10</button>
+                            </div>
+                        </div>
+                        <div class="pricing-row">
+                            <span class="pricing-label" data-i18n="feedback.perYear">Per year:</span>
+                            <div class="pricing-buttons" id="pricingPerYear">
+                                <button type="button" class="pricing-btn" data-value="free">Free</button>
+                                <button type="button" class="pricing-btn" data-value="10-20">€10-20</button>
+                                <button type="button" class="pricing-btn" data-value="20-50">€20-50</button>
+                                <button type="button" class="pricing-btn" data-value="50+">€50+</button>
+                            </div>
+                        </div>
+                    </div>
+                    <input type="hidden" id="feedbackPricingPerRace" name="pricingPerRace">
+                    <input type="hidden" id="feedbackPricingPerYear" name="pricingPerYear">
+                </div>
                 <div class="feedback-field">
                     <label for="feedbackEmail" data-i18n="feedback.email">Email (optional, for follow-up)</label>
                     <input type="email" id="feedbackEmail" name="email" placeholder="your@email.com">

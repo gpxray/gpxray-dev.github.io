@@ -4451,6 +4451,27 @@ function setupFeedback() {
     
     if (!feedbackBtn || !feedbackPanel) return;
     
+    // Setup pricing button selection
+    const setupPricingButtons = (containerId, hiddenInputId) => {
+        const container = document.getElementById(containerId);
+        const hiddenInput = document.getElementById(hiddenInputId);
+        if (!container || !hiddenInput) return;
+        
+        container.querySelectorAll('.pricing-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                // Deselect all in this group
+                container.querySelectorAll('.pricing-btn').forEach(b => b.classList.remove('selected'));
+                // Select clicked
+                btn.classList.add('selected');
+                hiddenInput.value = btn.dataset.value;
+            });
+        });
+    };
+    
+    setupPricingButtons('pricingPerRace', 'feedbackPricingPerRace');
+    setupPricingButtons('pricingPerYear', 'feedbackPricingPerYear');
+    
     // Open panel
     feedbackBtn.addEventListener('click', () => {
         feedbackPanel.classList.add('active');
@@ -4459,6 +4480,8 @@ function setupFeedback() {
         feedbackForm.style.display = 'flex';
         feedbackSuccess.style.display = 'none';
         feedbackForm.reset();
+        // Reset pricing buttons
+        document.querySelectorAll('.pricing-btn').forEach(btn => btn.classList.remove('selected'));
     });
     
     // Close panel
@@ -4479,6 +4502,8 @@ function setupFeedback() {
             like: formData.get('like'),
             missing: formData.get('missing'),
             bugs: formData.get('bugs'),
+            pricingPerRace: formData.get('pricingPerRace') || 'not selected',
+            pricingPerYear: formData.get('pricingPerYear') || 'not selected',
             email: formData.get('email'),
             url: window.location.href,
             timestamp: new Date().toISOString()
@@ -4511,6 +4536,8 @@ function setupFeedback() {
                 `What I like:\n${data.like || 'N/A'}\n\n` +
                 `Missing features:\n${data.missing || 'N/A'}\n\n` +
                 `Bugs/Issues:\n${data.bugs || 'N/A'}\n\n` +
+                `Pricing per race: ${data.pricingPerRace}\n` +
+                `Pricing per year: ${data.pricingPerYear}\n\n` +
                 `Email: ${data.email || 'N/A'}`
             );
             window.open(`mailto:gpxrayrun@gmail.com?subject=${subject}&body=${body}`, '_blank');
