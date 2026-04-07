@@ -9440,8 +9440,9 @@ async function exportCrewCard() {
                             crewInsight = `🏃 ${t('crew.longLeg').replace('{0}', legDist.toFixed(0))}`;
                         }
                         
+                        // Add night indicator (just emoji, no text)
                         if (isNight) {
-                            crewInsight = crewInsight ? `${crewInsight} • 🌙 ${t('crew.night')}` : `🌙 ${t('crew.nightArrival')}`;
+                            crewInsight = crewInsight ? `${crewInsight} • 🌙` : `🌙`;
                         }
                         
                         // NEW: Calculate additional crew info
@@ -9576,8 +9577,8 @@ async function exportCrewCard() {
         // Use 9:16 aspect ratio (social media friendly) with width of 540px
         const cardWidth = 540;
         const targetHeight = 960; // 540 * 16/9 = 960 for 9:16 ratio
-        // Compact row heights
-        const rowHeightEstimate = stationCount <= 4 ? 90 : (stationCount <= 6 ? 80 : (stationCount <= 8 ? 70 : 60));
+        // Compact row heights (reduced since we removed one detail line)
+        const rowHeightEstimate = stationCount <= 4 ? 80 : (stationCount <= 6 ? 70 : (stationCount <= 8 ? 60 : 52));
         const headerHeight = stationCount <= 4 ? 120 : (stationCount <= 6 ? 100 : (stationCount <= 8 ? 85 : 70));
         const footerHeight = 60;
         const contentHeight = headerHeight + (stationData.length + 1) * rowHeightEstimate + footerHeight + 40;
@@ -9630,10 +9631,9 @@ async function exportCrewCard() {
             const timeDisplay = hasStop ? `${arrivalTime} - ${departureTime}` : arrivalTime;
             const timeFontSize = hasStop ? (stationCount <= 4 ? '20px' : (stationCount <= 6 ? '17px' : (stationCount <= 8 ? '15px' : '14px'))) : timeSize;
             
-            // Build detail lines with new info (translated)
+            // Build detail lines - simplified format
             const breakText = station.stopMin > 0 ? ` · ${station.stopMin}${t('crew.minBreak')}` : '';
             const detailLine1 = `${station.dist} ${unitLabel} · ${station.percentComplete}%${breakText}`;
-            const detailLine2 = `📍 ${station.stationElevation}m · D+ ${station.cumulativeGain}m`;
             const timeToNextText = station.timeToNext ? ` · ~${station.timeToNext} ${t('crew.toNext')}` : '';
             const nextLegLine = station.nextLeg + timeToNextText;
             
@@ -9648,7 +9648,6 @@ async function exportCrewCard() {
                     <div style="flex: 1; min-width: 0;">
                         <div style="font-size: ${nameSize}; font-weight: 700; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${stationName}</div>
                         <div style="font-size: ${detailSize}; opacity: 0.8;">${detailLine1}</div>
-                        <div style="font-size: ${detailSize}; opacity: 0.7;">${detailLine2}</div>
                         ${station.crewInsight ? `<div style="font-size: ${detailSize}; font-weight: 600; color: #ffd700;">${station.crewInsight}</div>` : ''}
                         <div style="font-size: ${detailSize}; opacity: 0.8; color: #90EE90;">${nextLegLine}</div>
                     </div>
@@ -9684,8 +9683,8 @@ async function exportCrewCard() {
                 <div style="font-size: ${iconSize}; margin-right: ${finishIconMargin};">🏁</div>
                 <div style="flex: 1; min-width: 0;">
                     <div style="font-size: ${nameSize}; font-weight: 700; margin-bottom: 2px;">${t('crew.finish')}</div>
-                    <div style="font-size: ${detailSize}; opacity: 0.8;">${distance.toFixed(1)} ${unitLabel} · 100%</div>
-                    <div style="font-size: ${detailSize}; opacity: 0.7;">D+ ${totalElevGain}m · ${totalTime.split('(')[0].trim()}</div>
+                    <div style="font-size: ${detailSize}; opacity: 0.8;">${distance.toFixed(1)} ${unitLabel} · 100% · D+ ${totalElevGain}m</div>
+                    <div style="font-size: ${detailSize}; opacity: 0.7;">${totalTime.split('(')[0].trim()}</div>
                     ${crewCutoffHtml}
                 </div>
                 <div style="text-align: right; margin-left: 10px;">
