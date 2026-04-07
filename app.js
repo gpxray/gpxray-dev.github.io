@@ -7058,7 +7058,7 @@ function generateSplitsTable(flatPace, uphillPace, downhillPace, apiTotalTime) {
     }
     
     // Generate leg summary if AID stations exist
-    renderLegSummary(flatPace, uphillPace, downhillPace, applySurface, startTimeInMinutes, fatigueMultiplier, normalizationFactor);
+    renderLegSummary(flatPace, uphillPace, downhillPace, applySurface, startTimeInMinutes, fatigueMultiplier, apiTotalMinutes);
     
     // Show splits section
     document.getElementById('splitsSection').style.display = 'block';
@@ -7131,7 +7131,7 @@ function setupEditableStopTimes() {
 }
 
 // Render leg summary table
-function renderLegSummary(flatPace, uphillPace, downhillPace, applySurface, startTimeInMinutes, fatigueMultiplier = 1.0, normalizationFactor = 1.0) {
+function renderLegSummary(flatPace, uphillPace, downhillPace, applySurface, startTimeInMinutes, fatigueMultiplier = 1.0, apiTotalMinutes = null) {
     const legSummary = document.getElementById('legSummary');
     const legSummaryBody = document.getElementById('legSummaryBody');
     
@@ -7177,15 +7177,9 @@ function renderLegSummary(flatPace, uphillPace, downhillPace, applySurface, star
         isFinish: true
     });
     
-    // Calculate times for each leg
-    let cumulativeTime = 0;
-    
-    legSummaryBody.innerHTML = legs.map(leg => {
-        const distance = leg.toKm - leg.fromKm;
-        const elevGain = calculateElevationGainBetween(leg.fromKm, leg.toKm);
-        const elevLoss = calculateElevationLossBetween(leg.fromKm, leg.toKm);
-        
-        // Calculate leg time based on segments
+    // First pass: calculate raw leg times to compute leg-specific normalization factor
+    let rawLegTotal = 0;
+    const rawLegTimes = legs.map(leg => {
         let legTime = 0;
         for (const segment of segments) {
             if (segment.endDistance >= leg.fromKm && segment.startDistance < leg.toKm) {
@@ -7193,7 +7187,6 @@ function renderLegSummary(flatPace, uphillPace, downhillPace, applySurface, star
                 const overlapEnd = Math.min(segment.endDistance, leg.toKm);
                 const overlapDistance = overlapEnd - overlapStart;
                 
-                // Apply surface factors matching the API calculation
                 let surfaceMultiplier = 1.0;
                 if (applySurface && segment.surfaceType) {
                     const surfaceFactors = {
@@ -7207,18 +7200,37 @@ function renderLegSummary(flatPace, uphillPace, downhillPace, applySurface, star
                     surfaceMultiplier = surfaceFactors[segment.surfaceType]?.[terrain] || 1.0;
                 }
                 
-                // Use gradient-based pace calculation
                 const gradientMultiplier = getGradientPaceMultiplier(segment.grade, flatPace, uphillPace, downhillPace);
                 const basePace = flatPace * gradientMultiplier;
                 
                 legTime += overlapDistance * basePace * surfaceMultiplier;
             }
         }
+        rawLegTotal += legTime;
+        return legTime;
+    });
+    
+    // Calculate leg-specific normalization factor
+    const totalStopTime = aidStations.reduce((sum, s) => sum + (s.stopMin || 0), 0);
+    const apiRunningTime = apiTotalMinutes ? apiTotalMinutes - totalStopTime : rawLegTotal * fatigueMultiplier;
+    const rawLegWithFatigue = rawLegTotal * fatigueMultiplier;
+    const legNormFactor = apiRunningTime > 0 && rawLegWithFatigue > 0 ? apiRunningTime / rawLegWithFatigue : 1.0;
+    
+    // Calculate times for each leg using leg-specific normalization
+    let cumulativeTime = 0;
+    
+    legSummaryBody.innerHTML = legs.map((leg, idx) => {
+        const distance = leg.toKm - leg.fromKm;
+        const elevGain = calculateElevationGainBetween(leg.fromKm, leg.toKm);
+        const elevLoss = calculateElevationLossBetween(leg.fromKm, leg.toKm);
         
-        // Calculate clock time at start of this leg for night penalty
+        // Get pre-calculated raw leg time
+        const legTime = rawLegTimes[idx];
+        
+        // Calculate clock time at start of this leg for night indicator
         const clockTimeAtLegStart = startTimeInMinutes + cumulativeTime + leg.stopMin;
         
-        // Determine dominant surface for night penalty calculation
+        // Determine dominant surface for night indicator
         let dominantSurface = 'trail';
         let maxSurfaceDist = 0;
         for (const segment of segments) {
@@ -7239,8 +7251,8 @@ function renderLegSummary(flatPace, uphillPace, downhillPace, applySurface, star
         const nightMultiplier = getNightPaceMultiplier(clockTimeAtLegStart, dominantSurface);
         const isNightLeg = nightMultiplier > 1.0;
         
-        // Apply fatigue and normalization factor only - night penalty is already in API time
-        const adjustedLegTime = legTime * fatigueMultiplier * normalizationFactor;
+        // Apply fatigue and leg-specific normalization to match API total
+        const adjustedLegTime = legTime * fatigueMultiplier * legNormFactor;
         
         // Add previous stop time to cumulative
         cumulativeTime += leg.stopMin;
