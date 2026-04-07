@@ -189,11 +189,14 @@ function getNightPaceMultiplier(clockMinutes, surfaceType = 'trail') {
         return 1.0;
     }
     
+    // Normalize clock time to 24-hour cycle for multi-day races
+    const normalizedMinutes = ((clockMinutes % 1440) + 1440) % 1440;
+    
     // Night includes twilight: before (sunrise - buffer) or after (sunset + buffer)
     // Civil twilight is when headlamp is typically needed
     const effectiveSunrise = sunTimes.sunrise - TWILIGHT_BUFFER;
     const effectiveSunset = sunTimes.sunset + TWILIGHT_BUFFER;
-    const isNight = clockMinutes < effectiveSunrise || clockMinutes > effectiveSunset;
+    const isNight = normalizedMinutes < effectiveSunrise || normalizedMinutes > effectiveSunset;
     
     if (!isNight) {
         return 1.0;
