@@ -5994,6 +5994,128 @@ h2 {
     }
 }
 
+/* Advanced Options Card */
+.advanced-options-card {
+    margin-top: 20px;
+    border-radius: 12px;
+    background: rgba(0, 0, 0, 0.25);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    overflow: hidden;
+}
+
+.advanced-options-toggle {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 16px;
+    background: transparent;
+    border: none;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.advanced-options-toggle:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.advanced-options-toggle .toggle-icon {
+    font-size: 1rem;
+}
+
+.advanced-options-toggle .toggle-hint {
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 0.8rem;
+}
+
+.advanced-options-toggle .toggle-chevron {
+    margin-left: auto;
+    font-size: 0.7rem;
+    transition: transform 0.3s ease;
+}
+
+.advanced-options-card.expanded .toggle-chevron {
+    transform: rotate(180deg);
+}
+
+.advanced-options-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease, padding 0.3s ease;
+    padding: 0 16px;
+}
+
+.advanced-options-card.expanded .advanced-options-content {
+    max-height: 300px;
+    padding: 0 16px 16px 16px;
+}
+
+.option-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.option-row:last-of-type {
+    border-bottom: none;
+}
+
+.option-label {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.option-label-with-info {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.option-input-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Compact ITRA input in card */
+.advanced-options-card .itra-input {
+    width: 80px;
+    padding: 6px 10px;
+    font-size: 0.9rem;
+}
+
+.advanced-options-card .itra-apply-btn {
+    padding: 6px 12px;
+    font-size: 0.8rem;
+}
+
+.advanced-options-card .itra-clear-btn {
+    padding: 4px 8px;
+    font-size: 0.75rem;
+}
+
+.advanced-options-card .itra-info-box {
+    margin-top: 10px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    text-align: left;
+}
+
+.advanced-options-card .itra-info-box p {
+    font-size: 0.75rem;
+    margin-bottom: 6px;
+}
+
+.advanced-options-card .itra-info-box .itra-link {
+    font-size: 0.8rem;
+}
+
 .itra-input.error {
     border-color: #f44336;
     animation: shake 0.3s ease;

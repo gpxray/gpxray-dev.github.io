@@ -313,6 +313,7 @@ document.addEventListener('DOMContentLoaded', () => {
     updateEarlyAccessUI();
     setupRunnerLevel();
     setupItraScore();
+    setupAdvancedOptions();
     setupDatePresets();
     setupPaceInfoTooltip();
     setupFeaturePillTooltips();
@@ -715,6 +716,18 @@ function setupRunnerLevel() {
                 clearItraOverride();
                 handleLevelChange(btn.dataset.level);
             }
+        });
+    }
+}
+
+// Advanced Options Card Toggle
+function setupAdvancedOptions() {
+    const toggle = document.getElementById('advancedOptionsToggle');
+    const card = toggle?.closest('.advanced-options-card');
+    
+    if (toggle && card) {
+        toggle.addEventListener('click', () => {
+            card.classList.toggle('expanded');
         });
     }
 }
