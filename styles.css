@@ -6001,6 +6001,9 @@ h2 {
     background: rgba(0, 0, 0, 0.25);
     border: 1px solid rgba(255, 255, 255, 0.1);
     overflow: hidden;
+    max-width: 360px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .advanced-options-toggle {
@@ -6009,11 +6012,11 @@ h2 {
     align-items: center;
     justify-content: center;
     gap: 8px;
-    padding: 12px 16px;
+    padding: 10px 14px;
     background: transparent;
     border: none;
     color: rgba(255, 255, 255, 0.6);
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     cursor: pointer;
     transition: all 0.2s ease;
 }
@@ -6024,17 +6027,17 @@ h2 {
 }
 
 .advanced-options-toggle .toggle-icon {
-    font-size: 1rem;
+    font-size: 0.9rem;
 }
 
 .advanced-options-toggle .toggle-hint {
     color: rgba(255, 255, 255, 0.4);
-    font-size: 0.8rem;
+    font-size: 0.75rem;
 }
 
 .advanced-options-toggle .toggle-chevron {
     margin-left: auto;
-    font-size: 0.7rem;
+    font-size: 0.65rem;
     transition: transform 0.3s ease;
 }
 
@@ -6046,19 +6049,19 @@ h2 {
     max-height: 0;
     overflow: hidden;
     transition: max-height 0.3s ease, padding 0.3s ease;
-    padding: 0 16px;
+    padding: 0 14px;
 }
 
 .advanced-options-card.expanded .advanced-options-content {
     max-height: 300px;
-    padding: 0 16px 16px 16px;
+    padding: 0 14px 14px 14px;
 }
 
 .option-row {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 10px 0;
+    padding: 8px 0;
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
@@ -6067,53 +6070,66 @@ h2 {
 }
 
 .option-label {
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     color: rgba(255, 255, 255, 0.7);
 }
 
 .option-label-with-info {
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 5px;
 }
 
 .option-input-group {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
 }
 
 /* Compact ITRA input in card */
 .advanced-options-card .itra-input {
-    width: 80px;
-    padding: 6px 10px;
-    font-size: 0.9rem;
+    width: 70px;
+    padding: 5px 8px;
+    font-size: 0.85rem;
 }
 
 .advanced-options-card .itra-apply-btn {
-    padding: 6px 12px;
-    font-size: 0.8rem;
-}
-
-.advanced-options-card .itra-clear-btn {
-    padding: 4px 8px;
+    padding: 5px 10px;
     font-size: 0.75rem;
 }
 
+.advanced-options-card .itra-clear-btn {
+    padding: 3px 6px;
+    font-size: 0.7rem;
+}
+
+.advanced-options-card .target-time-input {
+    width: 60px;
+    padding: 5px 8px;
+    font-size: 0.85rem;
+    height: auto;
+}
+
+.advanced-options-card .itra-info-icon {
+    width: 14px;
+    height: 14px;
+    font-size: 0.6rem;
+}
+
 .advanced-options-card .itra-info-box {
-    margin-top: 10px;
-    padding: 10px 12px;
-    border-radius: 8px;
+    margin-top: 8px;
+    padding: 8px 10px;
+    border-radius: 6px;
     text-align: left;
 }
 
 .advanced-options-card .itra-info-box p {
-    font-size: 0.75rem;
-    margin-bottom: 6px;
+    font-size: 0.7rem;
+    margin-bottom: 5px;
 }
 
 .advanced-options-card .itra-info-box .itra-link {
-    font-size: 0.8rem;
+    font-size: 0.75rem;
 }
 
 .itra-input.error {
