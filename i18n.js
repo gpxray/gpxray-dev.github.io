@@ -9,7 +9,8 @@ const TRANSLATIONS = {
         'header.history': 'History',
         
         // Intro section
-        'intro.text': 'Plan your trail race with precision. Upload a GPX file to analyze terrain, estimate pace, and create your race strategy.',
+        'intro.headline': 'Build your race strategy before race day.',
+        'intro.text': 'Analyze terrain, simulate realistic pace, and understand where your race is decided.',
         'intro.smartPace': 'Smart Pace',
         'intro.smartPacing': 'Smart Pacing',
         'intro.topClimbs': 'Top Climbs',
@@ -555,7 +556,8 @@ const TRANSLATIONS = {
         'header.history': 'Verlauf',
         
         // Intro section
-        'intro.text': 'Plane dein Trailrennen präzise. Lade eine GPX-Datei hoch, um Gelände zu analysieren, Tempo einzuschätzen und deine Rennstrategie zu erstellen.',
+        'intro.headline': 'Plane deine Rennstrategie schon vor dem Start.',
+        'intro.text': 'Analysiere das Gelände, simuliere realistische Pace und erkenne, wo dein Rennen entschieden wird.',
         'intro.smartPace': 'Smart Pace',
         'intro.smartPacing': 'Smart Pacing',
         'intro.topClimbs': 'Top Anstiege',
