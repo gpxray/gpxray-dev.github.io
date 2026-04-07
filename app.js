@@ -738,12 +738,23 @@ function setupRunnerLevel() {
 
 // Advanced Options Card Toggle
 function setupAdvancedOptions() {
+    // Setup for race page
     const toggle = document.getElementById('advancedOptionsToggle');
     const card = toggle?.closest('.advanced-options-card');
     
     if (toggle && card) {
         toggle.addEventListener('click', () => {
             card.classList.toggle('expanded');
+        });
+    }
+    
+    // Setup for main page
+    const mainToggle = document.getElementById('mainAdvancedOptionsToggle');
+    const mainCard = mainToggle?.closest('.advanced-options-card');
+    
+    if (mainToggle && mainCard) {
+        mainToggle.addEventListener('click', () => {
+            mainCard.classList.toggle('expanded');
         });
     }
 }

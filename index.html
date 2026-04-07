@@ -462,11 +462,40 @@
                                 <button type="button" class="race-level-btn" data-level="elite" data-i18n="hero.elite">Elite</button>
                             </div>
                             
-                            <!-- Target Time (moved up, simple input) -->
-                            <div class="target-time-section">
-                                <label class="race-setup-label-inline" data-i18n="race.targetTime">Target time:</label>
-                                <input type="text" id="heroTargetTime" class="target-time-input" placeholder="HH:MM" pattern="[0-9]{1,2}:[0-9]{2}" />
-                                <span class="target-time-hint" data-i18n="race.targetOptional">(optional)</span>
+                            <!-- Advanced Options Card -->
+                            <div class="advanced-options-card">
+                                <button type="button" class="advanced-options-toggle" id="mainAdvancedOptionsToggle">
+                                    <span class="toggle-icon">⚙️</span>
+                                    <span data-i18n="race.advancedOptions">Advanced Options</span>
+                                    <span class="toggle-hint" data-i18n="race.targetOptional">(optional)</span>
+                                    <span class="toggle-chevron">▼</span>
+                                </button>
+                                <div class="advanced-options-content" id="mainAdvancedOptionsContent">
+                                    <!-- Target Time -->
+                                    <div class="option-row">
+                                        <label class="option-label" data-i18n="race.targetTime">Target time:</label>
+                                        <div class="option-input-group">
+                                            <input type="text" id="heroTargetTime" class="target-time-input auto-apply" placeholder="HH:MM" pattern="[0-9]{1,2}:[0-9]{2}" />
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- ITRA Score -->
+                                    <div class="option-row">
+                                        <div class="option-label-with-info">
+                                            <label class="option-label">ITRA:</label>
+                                            <span class="itra-info-icon" id="mainItraInfoToggle">i</span>
+                                        </div>
+                                        <div class="option-input-group">
+                                            <input type="number" id="mainItraScoreInput" class="itra-input auto-apply" min="200" max="1000" placeholder="e.g. 550" />
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- ITRA Info Box -->
+                                    <div class="itra-info-box" id="mainItraInfoBox">
+                                        <p data-i18n="race.itraExplain">ITRA (International Trail Running Association) assigns performance scores based on your race results.</p>
+                                        <a href="https://itra.run/Runners/FindARunner" target="_blank" rel="noopener" class="itra-link">🔍 <span data-i18n="race.itraFindScore">Find your ITRA score</span></a>
+                                    </div>
+                                </div>
                             </div>
                             
                             <!-- Terrain Style Section (collapsible) - DISABLED FOR NOW -->
@@ -497,23 +526,6 @@
                                             <span class="hero-terrain-hint" id="heroDownhillHint">Balanced descender</span>
                                         </div>
                                     </div>
-                                </div>
-                            </div>
-                            
-                            <!-- ITRA Score Optional -->
-                            <div class="itra-score-section">
-                                <div class="itra-label-row">
-                                    <label class="itra-label" data-i18n="race.itraOptional">Know your ITRA score?</label>
-                                    <span class="itra-info-icon" id="mainItraInfoToggle">i</span>
-                                </div>
-                                <div class="itra-input-row">
-                                    <input type="number" id="mainItraScoreInput" class="itra-input" min="200" max="1000" placeholder="e.g. 550" />
-                                    <button type="button" id="mainItraApplyBtn" class="itra-apply-btn" data-i18n="race.itraApply">Apply</button>
-                                    <button type="button" id="mainItraClearBtn" class="itra-clear-btn">✕</button>
-                                </div>
-                                <div class="itra-info-box" id="mainItraInfoBox">
-                                    <p data-i18n="race.itraExplain">ITRA (International Trail Running Association) assigns performance scores based on your race results.</p>
-                                    <a href="https://itra.run/Runners/FindARunner" target="_blank" rel="noopener" class="itra-link">🔍 <span data-i18n="race.itraFindScore">Find your ITRA score</span></a>
                                 </div>
                             </div>
                             
