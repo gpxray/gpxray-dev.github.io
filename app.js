@@ -4370,6 +4370,7 @@ function savePlan() {
         aidStations: aidStations,
         mode: currentMode,
         useMetric: useMetric,
+        raceDate: document.getElementById('heroRaceDate')?.value || '',
         startTime: document.getElementById('raceStartTime')?.value || '09:00',
         flatPaceMin: document.getElementById('flatPaceMin')?.value || '5',
         flatPaceSec: document.getElementById('flatPaceSec')?.value || '30',
@@ -4435,6 +4436,7 @@ function loadPlan() {
         
         // Restore values
         const setVal = (id, val) => { const el = document.getElementById(id); if (el) el.value = val; };
+        if (plan.raceDate) setVal('heroRaceDate', plan.raceDate);
         setVal('raceStartTime', plan.startTime);
         if (mainTimePicker24h && plan.startTime) mainTimePicker24h.setValue(plan.startTime);
         setVal('flatPaceMin', plan.flatPaceMin);
@@ -4627,6 +4629,7 @@ function saveToHistory(name) {
             aidStations: aidStations,
             mode: currentMode,
             useMetric: useMetric,
+            raceDate: document.getElementById('heroRaceDate')?.value || '',
             startTime: document.getElementById('raceStartTime')?.value || '09:00',
             flatPaceMin: document.getElementById('flatPaceMin')?.value || '5',
             flatPaceSec: document.getElementById('flatPaceSec')?.value || '30',
@@ -4759,6 +4762,7 @@ function loadFromHistory(id) {
     
     // Restore values
     const setVal = (id, val) => { const el = document.getElementById(id); if (el && val !== undefined) el.value = val; };
+    if (plan.raceDate) setVal('heroRaceDate', plan.raceDate);
     setVal('raceStartTime', plan.startTime);
     if (mainTimePicker24h && plan.startTime) mainTimePicker24h.setValue(plan.startTime);
     setVal('flatPaceMin', plan.flatPaceMin);
