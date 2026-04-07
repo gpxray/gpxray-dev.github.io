@@ -158,7 +158,7 @@ function getGradientPaceMultiplier(gradePercent, flatPace, uphillPace, downhillP
 // Night pace penalty - running at night is slower due to reduced visibility
 // Returns multiplier (e.g., 1.08 = 8% slower)
 const NIGHT_PACE_PENALTY = 0.08; // 8% slower at night
-const TWILIGHT_BUFFER = 30; // 30 minutes of civil twilight before sunrise / after sunset
+const TWILIGHT_BUFFER = 45; // 45 minutes of civil twilight before sunrise / after sunset (no headlamp needed)
 
 function getNightPaceMultiplier(clockMinutes, surfaceType = 'trail') {
     // Check if we have sun times
@@ -6069,7 +6069,7 @@ function isNightTime(clockMinutes) {
     if (!sunTimes || sunTimes.polarNight) return true;
     if (sunTimes.midnightSun) return false;
     
-    // Night includes twilight buffer (30 min before sunrise, 30 min after sunset)
+    // Night includes twilight buffer (45 min before sunrise, 45 min after sunset)
     const effectiveSunrise = sunTimes.sunrise - TWILIGHT_BUFFER;
     const effectiveSunset = sunTimes.sunset + TWILIGHT_BUFFER;
     return clockMinutes < effectiveSunrise || clockMinutes > effectiveSunset;
