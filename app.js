@@ -10765,6 +10765,19 @@ function setupRaceCreateStrategyButton() {
                         console.warn('Could not calculate sun times:', e);
                     }
                 }
+                
+                // Also set heroRaceDate for weather fetch
+                const heroDateInput = document.getElementById('heroRaceDate');
+                if (heroDateInput && currentDistanceConfig.raceDate) {
+                    heroDateInput.value = currentDistanceConfig.raceDate;
+                }
+                
+                // Fetch weather for race day (updates hero weather widget)
+                try {
+                    await fetchGpxWeather();
+                } catch (e) {
+                    console.warn('Could not fetch weather:', e);
+                }
             }
             
             // Show statement preview and story button for race pages
