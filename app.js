@@ -9416,8 +9416,8 @@ async function exportGpxWithWaypoints() {
         waypoints.push({
             lat: points[0].lat,
             lon: points[0].lon,
-            name: 'START - Go easy!',
-            desc: currentRouteName || 'Race Start',
+            name: '🏁 START',
+            desc: currentRouteName || 'Race Start - Go easy!',
             cmt: 'Good luck! Start easy, finish strong.',
             sym: 'Flag, Green'
         });
@@ -9427,12 +9427,12 @@ async function exportGpxWithWaypoints() {
             aidStations.forEach((aid, index) => {
                 const point = findPointAtDistance(aid.km);
                 const time = getTimeAtKm(aid.km);
-                const shortName = aid.name ? aid.name.substring(0, 15) : `KM${Math.round(aid.km)}`;
+                const shortName = aid.name ? aid.name.substring(0, 12) : `KM${Math.round(aid.km)}`;
                 waypoints.push({
                     lat: point.lat,
                     lon: point.lon,
-                    name: `AID ${shortName}${time ? ' @' + time : ''}`,
-                    desc: `AID at KM ${aid.km.toFixed(1)}${time ? ` | ETA: ${time}` : ''}${aid.stopMin ? ` | Stop: ${aid.stopMin}min` : ''}`,
+                    name: `🚰 ${shortName}${time ? ' ' + time : ''}`,
+                    desc: `AID at KM ${aid.km.toFixed(1)} - Refill water & eat!${aid.stopMin ? ` Stop ${aid.stopMin}min` : ''}`,
                     cmt: 'Refill water! Eat something solid.',
                     sym: 'Water Source'
                 });
@@ -9455,8 +9455,8 @@ async function exportGpxWithWaypoints() {
                 waypoints.push({
                     lat: point.lat,
                     lon: point.lon,
-                    name: `CLIMB +${Math.round(climb.gain)}m - Hike!`,
-                    desc: `KM ${climb.start.toFixed(1)}-${climb.end.toFixed(1)} | +${Math.round(climb.gain)}m`,
+                    name: `⛰️ +${Math.round(climb.gain)}m HIKE`,
+                    desc: `Climb KM${climb.start.toFixed(0)}-${climb.end.toFixed(0)} +${Math.round(climb.gain)}m - ${climbTip}`,
                     cmt: climbTip,
                     sym: 'Summit'
                 });
@@ -9467,22 +9467,22 @@ async function exportGpxWithWaypoints() {
         const allFuelStops = window.allFuelStops || [];
         if (allFuelStops.length > 0) {
             const fuelMessages = [
-                'Time to eat! Take a gel or bar now.',
-                'Fuel up! Drink and eat something.',
-                'Eat now! Keep energy levels steady.',
-                'Nutrition check! Gel or real food.',
-                'Eat something! Dont wait until hungry.'
+                'Take a gel or bar now!',
+                'Drink and eat something!',
+                'Keep energy steady!',
+                'Gel or real food!',
+                'Dont wait until hungry!'
             ];
             allFuelStops.forEach((fuel, index) => {
                 const point = findPointAtDistance(fuel.km);
                 const hours = Math.floor(fuel.estTimeMin / 60);
                 const mins = fuel.estTimeMin % 60;
-                const timeText = hours > 0 ? `~${hours}h${mins.toString().padStart(2,'0')}` : `~${mins}min`;
+                const timeText = hours > 0 ? `${hours}h${mins.toString().padStart(2,'0')}` : `${mins}min`;
                 waypoints.push({
                     lat: point.lat,
                     lon: point.lon,
-                    name: `EAT NOW! KM${Math.round(fuel.km)}`,
-                    desc: `Fuel window at KM ${fuel.km} | ETA: ${timeText}`,
+                    name: `🍫 EAT KM${Math.round(fuel.km)}`,
+                    desc: `Fuel @ ${timeText} - ${fuelMessages[index % fuelMessages.length]}`,
                     cmt: fuelMessages[index % fuelMessages.length],
                     sym: 'Restaurant'
                 });
@@ -9495,8 +9495,8 @@ async function exportGpxWithWaypoints() {
         waypoints.push({
             lat: lastPoint.lat,
             lon: lastPoint.lon,
-            name: 'FINISH - You did it!',
-            desc: `${gpxData.totalDistance.toFixed(1)} km${totalTime ? ` | Target: ${totalTime}` : ''}`,
+            name: '🏁 FINISH',
+            desc: `${gpxData.totalDistance.toFixed(1)}km - You made it!${totalTime ? ` Target: ${totalTime}` : ''}`,
             cmt: 'You made it! Celebrate!',
             sym: 'Flag, Red'
         });
