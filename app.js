@@ -9418,13 +9418,47 @@ async function exportGpxWithWaypoints() {
             return '';
         };
         
+        // Get current language
+        const lang = typeof getLang === 'function' ? getLang() : 'en';
+        const isDE = lang === 'de';
+        
+        // Localized texts
+        const txt = {
+            startDesc: isDE ? '🏃 Ruhig starten! Energie sparen.' : '🏃 Go easy! Save energy for later.',
+            startCmt: isDE ? 'Viel Erfolg! Ruhig starten.' : 'Good luck! Start easy, finish strong.',
+            aidDesc: isDE ? '💧 Wasser auffüllen! 🍌 Iss was Festes!' : '💧 Refill water! 🍌 Eat something solid!',
+            aidStop: isDE ? '⏱️ Stopp' : '⏱️ Stop',
+            aidCmt: isDE ? 'Wasser auffüllen! Iss was.' : 'Refill water! Eat something solid.',
+            climbTipNormal: isDE ? '🚶 Power-Hike wenn nötig' : '🚶 Power hike if needed',
+            climbTipBig: isDE ? '🥾 Grosser Anstieg! Gehen, essen!' : '🥾 Big one! Walk steeps, eat on climb',
+            climbTipSteep: isDE ? '🚶 Steil! Power-Hike, Beine schonen' : '🚶 Steep! Power hike, save legs',
+            fuelUp: isDE ? 'Essen!' : 'Fuel up!',
+            fuelMessages: isDE ? [
+                '🍫 Gel oder Riegel jetzt!',
+                '🥤 Trinken & essen!',
+                '⚡ Energie halten!',
+                '🍌 Echtes Essen oder Gel!',
+                '⏰ Nicht warten bis Hunger!'
+            ] : [
+                '🍫 Gel or bar now!',
+                '🥤 Drink & eat something!',
+                '⚡ Keep energy steady!',
+                '🍌 Real food or gel!',
+                '⏰ Dont wait til hungry!'
+            ],
+            finishDesc: isDE ? '🎉 Geschafft!' : '🎉 You made it!',
+            finishDone: isDE ? 'geschafft!' : 'done!',
+            finishTarget: isDE ? '🏆 Ziel:' : '🏆 Target:',
+            finishCmt: isDE ? 'Geschafft! Feiern!' : 'You made it! Celebrate!'
+        };
+        
         // 1. Start waypoint
         waypoints.push({
             lat: points[0].lat,
             lon: points[0].lon,
             name: 'START',
-            desc: '🏃 Go easy! Save energy for later.',
-            cmt: 'Good luck! Start easy, finish strong.',
+            desc: txt.startDesc,
+            cmt: txt.startCmt,
             sym: 'Flag, Green'
         });
         
@@ -9439,8 +9473,8 @@ async function exportGpxWithWaypoints() {
                     lat: point.lat,
                     lon: point.lon,
                     name: `AID${aidNum} ${shortName}${time ? ' ' + time : ''}`,
-                    desc: `💧 Refill water! 🍌 Eat something solid!${aid.stopMin ? ` ⏱️ Stop ${aid.stopMin}min` : ''}`,
-                    cmt: 'Refill water! Eat something solid.',
+                    desc: `${txt.aidDesc}${aid.stopMin ? ` ${txt.aidStop} ${aid.stopMin}min` : ''}`,
+                    cmt: txt.aidCmt,
                     sym: 'Water Source'
                 });
             });
@@ -9453,13 +9487,13 @@ async function exportGpxWithWaypoints() {
                 const point = findPointAtDistance(climb.start);
                 const climbLength = climb.end - climb.start;
                 const avgGrade = climb.gain / (climbLength * 10); // rough avg grade %
-                let climbTip = '🚶 Power hike if needed';
+                let climbTip = txt.climbTipNormal;
                 let climbEmoji = '⛰️';
                 if (climb.gain > 300) {
-                    climbTip = '🥾 Big one! Walk steeps, eat on climb';
+                    climbTip = txt.climbTipBig;
                     climbEmoji = '🏔️';
                 } else if (avgGrade > 15) {
-                    climbTip = '🚶 Steep! Power hike, save legs';
+                    climbTip = txt.climbTipSteep;
                 }
                 const climbNum = index + 1;
                 waypoints.push({
@@ -9476,22 +9510,15 @@ async function exportGpxWithWaypoints() {
         // 4. Fuel windows - use stored data (more reliable than DOM)
         const allFuelStops = window.allFuelStops || [];
         if (allFuelStops.length > 0) {
-            const fuelMessages = [
-                '🍫 Gel or bar now!',
-                '🥤 Drink & eat something!',
-                '⚡ Keep energy steady!',
-                '🍌 Real food or gel!',
-                '⏰ Dont wait til hungry!'
-            ];
             allFuelStops.forEach((fuel, index) => {
                 const point = findPointAtDistance(fuel.km);
                 const eatNum = index + 1;
                 waypoints.push({
                     lat: point.lat,
                     lon: point.lon,
-                    name: `EAT${eatNum} Fuel up!`,
-                    desc: fuelMessages[index % fuelMessages.length],
-                    cmt: fuelMessages[index % fuelMessages.length],
+                    name: `EAT${eatNum} ${txt.fuelUp}`,
+                    desc: txt.fuelMessages[index % txt.fuelMessages.length],
+                    cmt: txt.fuelMessages[index % txt.fuelMessages.length],
                     sym: 'Restaurant'
                 });
             });
@@ -9504,8 +9531,8 @@ async function exportGpxWithWaypoints() {
             lat: lastPoint.lat,
             lon: lastPoint.lon,
             name: `FINISH ${gpxData.totalDistance.toFixed(0)}km`,
-            desc: `🎉 You made it! ${gpxData.totalDistance.toFixed(1)}km done!${totalTime ? ` 🏆 Target: ${totalTime}` : ''}`,
-            cmt: 'You made it! Celebrate!',
+            desc: `${txt.finishDesc} ${gpxData.totalDistance.toFixed(1)}km ${txt.finishDone}${totalTime ? ` ${txt.finishTarget} ${totalTime}` : ''}`,
+            cmt: txt.finishCmt,
             sym: 'Flag, Red'
         });
         
