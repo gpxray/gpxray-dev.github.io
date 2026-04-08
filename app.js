@@ -9417,7 +9417,7 @@ async function exportGpxWithWaypoints() {
             lat: points[0].lat,
             lon: points[0].lon,
             name: '🏁 START',
-            desc: currentRouteName || 'Race Start - Go easy!',
+            desc: '🏃 Go easy! Save energy for later.',
             cmt: 'Good luck! Start easy, finish strong.',
             sym: 'Flag, Green'
         });
@@ -9432,7 +9432,7 @@ async function exportGpxWithWaypoints() {
                     lat: point.lat,
                     lon: point.lon,
                     name: `🚰 ${shortName}${time ? ' ' + time : ''}`,
-                    desc: `AID at KM ${aid.km.toFixed(1)} - Refill water & eat!${aid.stopMin ? ` Stop ${aid.stopMin}min` : ''}`,
+                    desc: `💧 Refill water! 🍌 Eat something solid!${aid.stopMin ? ` ⏱️ Stop ${aid.stopMin}min` : ''}`,
                     cmt: 'Refill water! Eat something solid.',
                     sym: 'Water Source'
                 });
@@ -9446,17 +9446,19 @@ async function exportGpxWithWaypoints() {
                 const point = findPointAtDistance(climb.start);
                 const climbLength = climb.end - climb.start;
                 const avgGrade = climb.gain / (climbLength * 10); // rough avg grade %
-                let climbTip = 'Slow down, power hike if needed.';
+                let climbTip = '🚶 Power hike if needed';
+                let climbEmoji = '⛰️';
                 if (climb.gain > 300) {
-                    climbTip = 'Big climb! Walk the steeps, eat on the climb.';
+                    climbTip = '🥾 Big one! Walk steeps, eat on climb';
+                    climbEmoji = '🏔️';
                 } else if (avgGrade > 15) {
-                    climbTip = 'Steep! Power hike, save your legs.';
+                    climbTip = '🚶 Steep! Power hike, save legs';
                 }
                 waypoints.push({
                     lat: point.lat,
                     lon: point.lon,
                     name: `⛰️ +${Math.round(climb.gain)}m HIKE`,
-                    desc: `Climb KM${climb.start.toFixed(0)}-${climb.end.toFixed(0)} +${Math.round(climb.gain)}m - ${climbTip}`,
+                    desc: `${climbEmoji} KM${climb.start.toFixed(0)}-${climb.end.toFixed(0)} ↗️+${Math.round(climb.gain)}m ${climbTip}`,
                     cmt: climbTip,
                     sym: 'Summit'
                 });
@@ -9467,11 +9469,11 @@ async function exportGpxWithWaypoints() {
         const allFuelStops = window.allFuelStops || [];
         if (allFuelStops.length > 0) {
             const fuelMessages = [
-                'Take a gel or bar now!',
-                'Drink and eat something!',
-                'Keep energy steady!',
-                'Gel or real food!',
-                'Dont wait until hungry!'
+                '🍫 Gel or bar now!',
+                '🥤 Drink & eat something!',
+                '⚡ Keep energy steady!',
+                '🍌 Real food or gel!',
+                '⏰ Dont wait til hungry!'
             ];
             allFuelStops.forEach((fuel, index) => {
                 const point = findPointAtDistance(fuel.km);
@@ -9482,7 +9484,7 @@ async function exportGpxWithWaypoints() {
                     lat: point.lat,
                     lon: point.lon,
                     name: `🍫 EAT KM${Math.round(fuel.km)}`,
-                    desc: `Fuel @ ${timeText} - ${fuelMessages[index % fuelMessages.length]}`,
+                    desc: `⏱️ ~${timeText} ${fuelMessages[index % fuelMessages.length]}`,
                     cmt: fuelMessages[index % fuelMessages.length],
                     sym: 'Restaurant'
                 });
@@ -9496,7 +9498,7 @@ async function exportGpxWithWaypoints() {
             lat: lastPoint.lat,
             lon: lastPoint.lon,
             name: '🏁 FINISH',
-            desc: `${gpxData.totalDistance.toFixed(1)}km - You made it!${totalTime ? ` Target: ${totalTime}` : ''}`,
+            desc: `🎉 You made it! ${gpxData.totalDistance.toFixed(1)}km done!${totalTime ? ` 🏆 Target: ${totalTime}` : ''}`,
             cmt: 'You made it! Celebrate!',
             sym: 'Flag, Red'
         });
