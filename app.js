@@ -342,6 +342,7 @@ document.addEventListener('DOMContentLoaded', () => {
     setupDDLExplainer();
     setupCookieConsent();
     setupEarlyAccess();
+    setupGpxExportModal();
     updateEarlyAccessUI();
     setupRunnerLevel();
     setupItraScore();
@@ -9488,8 +9489,69 @@ function formatStartTime(time) {
     return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
 }
 
-// Export GPX with waypoints for watch - includes AID stations, climbs, and pace info
+// Show GPX Export Options Modal
+function showGpxExportModal() {
+    if (!gpxData || !gpxData.points || gpxData.points.length < 2) {
+        alert('Please load a GPX file first.');
+        return;
+    }
+    
+    const overlay = document.getElementById('gpxExportOverlay');
+    const modal = document.getElementById('gpxExportModal');
+    
+    if (overlay && modal) {
+        overlay.classList.add('visible');
+        modal.classList.add('visible');
+    }
+}
+
+// Hide GPX Export Options Modal
+function hideGpxExportModal() {
+    const overlay = document.getElementById('gpxExportOverlay');
+    const modal = document.getElementById('gpxExportModal');
+    
+    if (overlay && modal) {
+        overlay.classList.remove('visible');
+        modal.classList.remove('visible');
+    }
+}
+
+// Setup GPX Export Modal event listeners
+function setupGpxExportModal() {
+    const overlay = document.getElementById('gpxExportOverlay');
+    const closeBtn = document.getElementById('gpxExportModalClose');
+    const cancelBtn = document.getElementById('gpxExportCancel');
+    const confirmBtn = document.getElementById('gpxExportConfirm');
+    
+    // Close modal handlers
+    overlay?.addEventListener('click', hideGpxExportModal);
+    closeBtn?.addEventListener('click', hideGpxExportModal);
+    cancelBtn?.addEventListener('click', hideGpxExportModal);
+    
+    // Confirm export with selected options
+    confirmBtn?.addEventListener('click', () => {
+        const includeAidStations = document.getElementById('gpxExportAidStations')?.checked ?? true;
+        const includeClimbs = document.getElementById('gpxExportClimbs')?.checked ?? true;
+        const includeEatStops = document.getElementById('gpxExportEatStops')?.checked ?? true;
+        
+        hideGpxExportModal();
+        exportGpxWithWaypointsWithOptions({
+            includeAidStations,
+            includeClimbs,
+            includeEatStops
+        });
+    });
+}
+
+// Export GPX with waypoints for watch - shows modal first
 async function exportGpxWithWaypoints() {
+    showGpxExportModal();
+}
+
+// Export GPX with selected waypoint options
+async function exportGpxWithWaypointsWithOptions(options = {}) {
+    const { includeAidStations = true, includeClimbs = true, includeEatStops = true } = options;
+    
     if (!gpxData || !gpxData.points || gpxData.points.length < 2) {
         alert('Please load a GPX file first.');
         return;
@@ -9580,8 +9642,8 @@ async function exportGpxWithWaypoints() {
             sym: 'Flag, Green'
         });
         
-        // 2. AID stations
-        if (aidStations && aidStations.length > 0) {
+        // 2. AID stations (if enabled)
+        if (includeAidStations && aidStations && aidStations.length > 0) {
             aidStations.forEach((aid, index) => {
                 const point = findPointAtDistance(aid.km);
                 const time = getTimeAtKm(aid.km);
@@ -9598,7 +9660,8 @@ async function exportGpxWithWaypoints() {
             });
         }
         
-        // 3. Top climbs (start points)
+        // 3. Top climbs (if enabled)
+        if (includeClimbs) {
         const topClimbs = findTopClimbs(5);
         if (topClimbs && topClimbs.length > 0) {
             topClimbs.forEach((climb, index) => {
@@ -9624,8 +9687,10 @@ async function exportGpxWithWaypoints() {
                 });
             });
         }
+        }
         
-        // 4. Fuel windows - use stored data (more reliable than DOM)
+        // 4. Fuel windows (if enabled)
+        if (includeEatStops) {
         const allFuelStops = window.allFuelStops || [];
         if (allFuelStops.length > 0) {
             allFuelStops.forEach((fuel, index) => {
@@ -9640,6 +9705,7 @@ async function exportGpxWithWaypoints() {
                     sym: 'Restaurant'
                 });
             });
+        }
         }
         
         // 5. Finish waypoint

@@ -373,6 +373,18 @@ const TRANSLATIONS = {
         'btn.downloaded': '✅ Downloaded!',
         'btn.lockscreenCard': 'Lockscreen Card',
         'btn.feedback': 'Share your feedback',
+        'btn.cancel': 'Cancel',
+        
+        // GPX Export Options Modal
+        'gpxExport.title': 'Customize Watch Export',
+        'gpxExport.subtitle': 'Select which waypoints to include:',
+        'gpxExport.aidStations': 'Aid Stations',
+        'gpxExport.aidStationsDesc': 'Water, food, crew access',
+        'gpxExport.climbs': 'Major Climbs',
+        'gpxExport.climbsDesc': 'Top 5 climbs with elevation gain',
+        'gpxExport.eatStops': 'Eat Reminders',
+        'gpxExport.eatStopsDesc': 'Terrain-based fuel spots between aid stations',
+        'gpxExport.hint': '💡 Some watches show climbs automatically. Uncheck if yours does too.',
         
         // Crew Card export
         'crew.title': 'CREW SCHEDULE',
@@ -928,6 +940,18 @@ const TRANSLATIONS = {
         'btn.downloaded': '✅ Heruntergeladen!',
         'btn.lockscreenCard': 'Sperrbildschirm-Karte',
         'btn.feedback': 'Feedback teilen',
+        'btn.cancel': 'Abbrechen',
+        
+        // GPX Export Options Modal
+        'gpxExport.title': 'Export anpassen',
+        'gpxExport.subtitle': 'Welche Wegpunkte sollen enthalten sein?',
+        'gpxExport.aidStations': 'Verpflegungsstationen',
+        'gpxExport.aidStationsDesc': 'Wasser, Essen, Crew-Zugang',
+        'gpxExport.climbs': 'Grosse Anstiege',
+        'gpxExport.climbsDesc': 'Top 5 Anstiege mit Höhengewinn',
+        'gpxExport.eatStops': 'Essen-Erinnerungen',
+        'gpxExport.eatStopsDesc': 'Terrain-basierte Spots zwischen Stationen',
+        'gpxExport.hint': '💡 Manche Uhren zeigen Anstiege automatisch. Deaktiviere wenn deine das auch tut.',
         
         // Crew Card export
         'crew.title': 'CREW ZEITPLAN',

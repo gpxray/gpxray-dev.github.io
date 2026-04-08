@@ -1412,6 +1412,191 @@ header h1 {
     flex-shrink: 0;
 }
 
+/* GPX Export Options Modal */
+.gpx-export-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    z-index: 2000;
+}
+
+.gpx-export-overlay.visible {
+    opacity: 1;
+    visibility: visible;
+}
+
+.gpx-export-modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.9);
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    border: 1px solid rgba(0, 212, 255, 0.3);
+    border-radius: 20px;
+    padding: 30px;
+    max-width: 420px;
+    width: 90%;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    z-index: 2001;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
+.gpx-export-modal.visible {
+    opacity: 1;
+    visibility: visible;
+    transform: translate(-50%, -50%) scale(1);
+}
+
+.gpx-export-modal-content {
+    position: relative;
+}
+
+.gpx-export-modal-close {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    background: none;
+    border: none;
+    color: #666;
+    font-size: 1.5rem;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.gpx-export-modal-close:hover {
+    color: #fff;
+}
+
+.gpx-export-modal-icon {
+    font-size: 2.5rem;
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.gpx-export-modal h3 {
+    color: #00d4ff;
+    margin: 0 0 8px 0;
+    font-size: 1.5rem;
+    text-align: center;
+}
+
+.gpx-export-modal-subtitle {
+    color: #aaa;
+    margin: 0 0 20px 0;
+    text-align: center;
+    font-size: 0.95rem;
+}
+
+.gpx-export-options {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.gpx-export-option {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.gpx-export-option:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(0, 212, 255, 0.3);
+}
+
+.gpx-export-option input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    accent-color: #00d4ff;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.gpx-option-icon {
+    font-size: 1.4rem;
+    flex-shrink: 0;
+}
+
+.gpx-option-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.gpx-option-text strong {
+    color: #fff;
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+.gpx-option-text small {
+    color: #888;
+    font-size: 0.8rem;
+}
+
+.gpx-export-hint {
+    color: #666;
+    font-size: 0.85rem;
+    text-align: center;
+    margin: 0 0 20px 0;
+    font-style: italic;
+}
+
+.gpx-export-buttons {
+    display: flex;
+    gap: 12px;
+}
+
+.gpx-export-cancel {
+    flex: 1;
+    padding: 12px 20px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+    color: #aaa;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.gpx-export-cancel:hover {
+    background: rgba(255, 255, 255, 0.15);
+    color: #fff;
+}
+
+.gpx-export-confirm {
+    flex: 2;
+    padding: 12px 20px;
+    background: linear-gradient(135deg, #00d4ff 0%, #0099cc 100%);
+    border: none;
+    border-radius: 10px;
+    color: #000;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.gpx-export-confirm:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 20px rgba(0, 212, 255, 0.4);
+}
+
 /* Toast Notifications */
 .notification {
     position: fixed;

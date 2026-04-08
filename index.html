@@ -1403,6 +1403,53 @@
         </div>
     </div>
 
+    <!-- GPX Export Options Modal -->
+    <div class="gpx-export-overlay" id="gpxExportOverlay"></div>
+    <div class="gpx-export-modal" id="gpxExportModal">
+        <div class="gpx-export-modal-content">
+            <button class="gpx-export-modal-close" id="gpxExportModalClose">✕</button>
+            <div class="gpx-export-modal-icon">⌚</div>
+            <h3 data-i18n="gpxExport.title">Customize Watch Export</h3>
+            <p class="gpx-export-modal-subtitle" data-i18n="gpxExport.subtitle">Select which waypoints to include:</p>
+            
+            <div class="gpx-export-options">
+                <label class="gpx-export-option">
+                    <input type="checkbox" id="gpxExportAidStations" checked>
+                    <span class="gpx-option-icon">💧</span>
+                    <span class="gpx-option-text">
+                        <strong data-i18n="gpxExport.aidStations">Aid Stations</strong>
+                        <small data-i18n="gpxExport.aidStationsDesc">Water, food, crew access</small>
+                    </span>
+                </label>
+                
+                <label class="gpx-export-option">
+                    <input type="checkbox" id="gpxExportClimbs" checked>
+                    <span class="gpx-option-icon">⛰️</span>
+                    <span class="gpx-option-text">
+                        <strong data-i18n="gpxExport.climbs">Major Climbs</strong>
+                        <small data-i18n="gpxExport.climbsDesc">Top 5 climbs with elevation gain</small>
+                    </span>
+                </label>
+                
+                <label class="gpx-export-option">
+                    <input type="checkbox" id="gpxExportEatStops" checked>
+                    <span class="gpx-option-icon">🍫</span>
+                    <span class="gpx-option-text">
+                        <strong data-i18n="gpxExport.eatStops">Eat Reminders</strong>
+                        <small data-i18n="gpxExport.eatStopsDesc">Terrain-based fuel spots between aid stations</small>
+                    </span>
+                </label>
+            </div>
+            
+            <p class="gpx-export-hint" data-i18n="gpxExport.hint">💡 Some watches show climbs automatically. Uncheck if yours does too.</p>
+            
+            <div class="gpx-export-buttons">
+                <button class="gpx-export-cancel" id="gpxExportCancel" data-i18n="btn.cancel">Cancel</button>
+                <button class="gpx-export-confirm" id="gpxExportConfirm">⌚ <span data-i18n="btn.exportGpx">Export for Watch</span></button>
+            </div>
+        </div>
+    </div>
+
     <!-- Cookie Consent Banner -->
     <div class="cookie-banner" id="cookieBanner">
         <div class="cookie-content">
