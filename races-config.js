@@ -140,7 +140,7 @@ const RACE_CONFIGS = {
         coordinates: { lat: 50.68, lon: 6.48 }, // For weather API
         // website removed for briefing
         logo: 'https://gpxrayraces.blob.core.windows.net/logos/ret-logo.png',
-        tagline: 'Go Nature, Go Rureifel Trail',
+        // tagline removed for compact view
         // accessCode removed - race page is now public
         
         // Branding colors
