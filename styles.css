@@ -5692,8 +5692,12 @@ h2 {
 @media (max-width: 500px) {
     .race-landing-header {
         flex-direction: row;
+        justify-content: flex-start;
         gap: 12px;
         padding: 10px 14px;
+        width: fit-content;
+        margin-left: auto;
+        margin-right: auto;
     }
     
     .race-logo img {
