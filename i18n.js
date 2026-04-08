@@ -26,6 +26,9 @@ const TRANSLATIONS = {
         'intro.comingSoon': 'coming soon',
         'intro.raceHeadline': 'Build your race strategy before race day.',
         'intro.raceText': 'Analyze terrain, simulate realistic pace, and understand where your race is decided.',
+        'intro.feature1': '→ Analyze the terrain',
+        'intro.feature2': '→ Simulate realistic pace',
+        'intro.feature3': '→ Find the decisive spots',
         
         // Feature pill tooltips
         'pill.smartPace.info': 'Hit every split on target. Realistic pace predictions that adapt to climbs and descents — no more blowing up on mile 15.',
@@ -573,6 +576,9 @@ const TRANSLATIONS = {
         'intro.comingSoon': 'bald verfügbar',
         'intro.raceHeadline': 'Plane deine Rennstrategie schon vor dem Start.',
         'intro.raceText': 'Analysiere das Gelände, simuliere realistische Pace und finde die entscheidenden Stellen.',
+        'intro.feature1': '→ Analysiere das Gelände',
+        'intro.feature2': '→ Simuliere realistische Pace',
+        'intro.feature3': '→ Finde die entscheidenden Stellen',
         
         // Feature pill tooltips
         'pill.smartPace.info': 'Triff jeden Split. Realistische Pace-Vorhersagen, die sich an Anstiege und Abfahrten anpassen — nie wieder einbrechen auf KM 25.',

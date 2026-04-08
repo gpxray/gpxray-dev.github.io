@@ -5605,6 +5605,19 @@ h2 {
     text-align: center;
 }
 
+.race-landing-features {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 20px 0;
+    text-align: center;
+}
+
+.race-landing-features li {
+    font-size: 1rem;
+    color: #ddd;
+    margin: 6px 0;
+}
+
 .race-landing .feature-pills {
     justify-content: center;
 }
