@@ -9422,7 +9422,7 @@ async function exportGpxWithWaypoints() {
         waypoints.push({
             lat: points[0].lat,
             lon: points[0].lon,
-            name: '🏁 START',
+            name: 'START',
             desc: '🏃 Go easy! Save energy for later.',
             cmt: 'Good luck! Start easy, finish strong.',
             sym: 'Flag, Green'
@@ -9433,11 +9433,12 @@ async function exportGpxWithWaypoints() {
             aidStations.forEach((aid, index) => {
                 const point = findPointAtDistance(aid.km);
                 const time = getTimeAtKm(aid.km);
-                const shortName = aid.name ? aid.name.substring(0, 12) : `KM${Math.round(aid.km)}`;
+                const shortName = aid.name ? aid.name.substring(0, 10) : `KM${Math.round(aid.km)}`;
+                const aidNum = index + 1;
                 waypoints.push({
                     lat: point.lat,
                     lon: point.lon,
-                    name: `🚰 ${shortName}${time ? ' ' + time : ''}`,
+                    name: `AID${aidNum} ${shortName}${time ? ' ' + time : ''}`,
                     desc: `💧 Refill water! 🍌 Eat something solid!${aid.stopMin ? ` ⏱️ Stop ${aid.stopMin}min` : ''}`,
                     cmt: 'Refill water! Eat something solid.',
                     sym: 'Water Source'
@@ -9460,10 +9461,11 @@ async function exportGpxWithWaypoints() {
                 } else if (avgGrade > 15) {
                     climbTip = '🚶 Steep! Power hike, save legs';
                 }
+                const climbNum = index + 1;
                 waypoints.push({
                     lat: point.lat,
                     lon: point.lon,
-                    name: `⛰️ +${Math.round(climb.gain)}m HIKE`,
+                    name: `CLIMB${climbNum} +${Math.round(climb.gain)}m`,
                     desc: `${climbEmoji} KM${climb.start.toFixed(0)}-${climb.end.toFixed(0)} ↗️+${Math.round(climb.gain)}m ${climbTip}`,
                     cmt: climbTip,
                     sym: 'Summit'
@@ -9486,10 +9488,11 @@ async function exportGpxWithWaypoints() {
                 const hours = Math.floor(fuel.estTimeMin / 60);
                 const mins = fuel.estTimeMin % 60;
                 const timeText = hours > 0 ? `${hours}h${mins.toString().padStart(2,'0')}` : `${mins}min`;
+                const eatNum = index + 1;
                 waypoints.push({
                     lat: point.lat,
                     lon: point.lon,
-                    name: `🍫 EAT KM${Math.round(fuel.km)}`,
+                    name: `EAT${eatNum} ~${timeText}`,
                     desc: `⏱️ ~${timeText} ${fuelMessages[index % fuelMessages.length]}`,
                     cmt: fuelMessages[index % fuelMessages.length],
                     sym: 'Restaurant'
@@ -9503,7 +9506,7 @@ async function exportGpxWithWaypoints() {
         waypoints.push({
             lat: lastPoint.lat,
             lon: lastPoint.lon,
-            name: '🏁 FINISH',
+            name: `FINISH ${gpxData.totalDistance.toFixed(0)}km`,
             desc: `🎉 You made it! ${gpxData.totalDistance.toFixed(1)}km done!${totalTime ? ` 🏆 Target: ${totalTime}` : ''}`,
             cmt: 'You made it! Celebrate!',
             sym: 'Flag, Red'
