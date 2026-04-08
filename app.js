@@ -3619,6 +3619,12 @@ function updateStoryButtonVisibility() {
     if (feedbackReminder) {
         feedbackReminder.style.display = 'block';
     }
+    
+    // Show GPX export section (DEV only)
+    const gpxExportSection = document.getElementById('gpxExportSection');
+    if (gpxExportSection && IS_DEV) {
+        gpxExportSection.style.display = 'block';
+    }
 }
 
 // Setup chart selector for elevation/gradient toggle
