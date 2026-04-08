@@ -4503,13 +4503,14 @@ function setupHistory() {
 // Feedback Panel functionality
 function setupFeedback() {
     const feedbackBtn = document.getElementById('feedbackBtn');
+    const feedbackReminderBtn = document.getElementById('feedbackReminderBtn');
     const feedbackPanel = document.getElementById('feedbackPanel');
     const feedbackOverlay = document.getElementById('feedbackOverlay');
     const feedbackClose = document.getElementById('feedbackClose');
     const feedbackForm = document.getElementById('feedbackForm');
     const feedbackSuccess = document.getElementById('feedbackSuccess');
     
-    if (!feedbackBtn || !feedbackPanel) return;
+    if (!feedbackPanel) return;
     
     // Setup pricing button selection
     const setupPricingButtons = (containerId, hiddenInputId) => {
@@ -4532,8 +4533,8 @@ function setupFeedback() {
     setupPricingButtons('pricingPerRace', 'feedbackPricingPerRace');
     setupPricingButtons('pricingPerYear', 'feedbackPricingPerYear');
     
-    // Open panel
-    feedbackBtn.addEventListener('click', () => {
+    // Open panel function
+    const openPanel = () => {
         feedbackPanel.classList.add('active');
         feedbackOverlay.classList.add('active');
         // Reset form when opening
@@ -4542,7 +4543,13 @@ function setupFeedback() {
         feedbackForm.reset();
         // Reset pricing buttons
         document.querySelectorAll('.pricing-btn').forEach(btn => btn.classList.remove('selected'));
-    });
+    };
+    
+    // Open panel from header button
+    feedbackBtn?.addEventListener('click', openPanel);
+    
+    // Open panel from reminder button
+    feedbackReminderBtn?.addEventListener('click', openPanel);
     
     // Close panel
     const closePanel = () => {

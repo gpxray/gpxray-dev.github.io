@@ -4710,7 +4710,7 @@ h2 {
     border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.feedback-btn {
+.feedback-reminder-btn {
     display: inline-block;
     padding: 10px 20px;
     background: transparent;
@@ -4718,11 +4718,11 @@ h2 {
     border-radius: 8px;
     color: #aaa;
     font-size: 0.9rem;
-    text-decoration: none;
+    cursor: pointer;
     transition: all 0.2s ease;
 }
 
-.feedback-btn:hover {
+.feedback-reminder-btn:hover {
     background: rgba(255, 255, 255, 0.05);
     border-color: #00d4ff;
     color: #00d4ff;
