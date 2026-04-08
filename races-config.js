@@ -138,7 +138,7 @@ const RACE_CONFIGS = {
         date: '2026-04-18',
         location: 'Nideggen, Germany',
         coordinates: { lat: 50.68, lon: 6.48 }, // For weather API
-        website: 'https://www.rureifel-trail.com',
+        // website removed for briefing
         logo: 'https://gpxrayraces.blob.core.windows.net/logos/ret-logo.png',
         tagline: 'Go Nature, Go Rureifel Trail',
         // accessCode removed - race page is now public
