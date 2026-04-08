@@ -1687,10 +1687,12 @@ h2 {
     margin-bottom: 20px;
     padding-bottom: 15px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    min-width: 0; /* Allow flex child to shrink */
 }
 
 .route-icon {
     font-size: 1.8rem;
+    flex-shrink: 0;
 }
 
 .route-name-display h2 {
@@ -1699,6 +1701,24 @@ h2 {
     color: #fff;
     font-weight: 600;
     flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+@media (max-width: 600px) {
+    .route-name-display {
+        flex-wrap: wrap;
+    }
+    
+    .route-name-display h2 {
+        font-size: 1.2rem;
+        white-space: normal;
+        word-break: break-word;
+        overflow: visible;
+        text-overflow: unset;
+    }
 }
 
 /* Route Actions (Save/Load) */
