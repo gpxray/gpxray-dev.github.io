@@ -66,10 +66,10 @@ function setupDevIndicator() {
         logoText.appendChild(devBadge);
     }
     
-    // Show DEV-only features
-    const gpxExportSection = document.getElementById('gpxExportSection');
-    if (gpxExportSection) {
-        gpxExportSection.style.display = 'block';
+    // Show DEV-only features (GPX export button)
+    const gpxExportBtn = document.getElementById('exportGpxWaypoints');
+    if (gpxExportBtn) {
+        gpxExportBtn.style.display = 'inline-block';
     }
 }
 
@@ -3620,10 +3620,16 @@ function updateStoryButtonVisibility() {
         feedbackReminder.style.display = 'block';
     }
     
-    // Show GPX export section (DEV only)
-    const gpxExportSection = document.getElementById('gpxExportSection');
-    if (gpxExportSection && IS_DEV) {
-        gpxExportSection.style.display = 'block';
+    // Show export actions row
+    const exportActionsRow = document.getElementById('exportActionsRow');
+    if (exportActionsRow) {
+        exportActionsRow.style.display = 'flex';
+    }
+    
+    // Show GPX export button (DEV only)
+    const gpxExportBtn = document.getElementById('exportGpxWaypoints');
+    if (gpxExportBtn && IS_DEV) {
+        gpxExportBtn.style.display = 'inline-block';
     }
 }
 

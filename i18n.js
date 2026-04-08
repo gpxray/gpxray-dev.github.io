@@ -369,6 +369,7 @@ const TRANSLATIONS = {
         'btn.joining': 'Joining...',
         'btn.joinWaitlist': 'Join Waitlist',
         'btn.shareStrategy': 'Create Share Card',
+        'btn.exportGpx': 'Export for Watch',
         'btn.lockscreenCard': 'Lockscreen Card',
         'btn.feedback': 'Share your feedback',
         
@@ -922,6 +923,7 @@ const TRANSLATIONS = {
         'btn.joining': 'Beitritt...',
         'btn.joinWaitlist': 'Warteliste beitreten',
         'btn.shareStrategy': 'Share Card erstellen',
+        'btn.exportGpx': 'Export für Uhr',
         'btn.lockscreenCard': 'Sperrbildschirm-Karte',
         'btn.feedback': 'Feedback teilen',
         
