@@ -3626,9 +3626,9 @@ function updateStoryButtonVisibility() {
         exportActionsRow.style.display = 'flex';
     }
     
-    // Show GPX export button (DEV only)
+    // Show GPX export button
     const gpxExportBtn = document.getElementById('exportGpxWaypoints');
-    if (gpxExportBtn && IS_DEV) {
+    if (gpxExportBtn) {
         gpxExportBtn.style.display = 'inline-block';
     }
 }
@@ -9365,13 +9365,7 @@ function formatStartTime(time) {
 }
 
 // Export GPX with waypoints for watch - includes AID stations, climbs, and pace info
-// DEV ONLY for now
 async function exportGpxWithWaypoints() {
-    if (!IS_DEV) {
-        console.log('GPX export with waypoints is DEV only');
-        return;
-    }
-    
     if (!gpxData || !gpxData.points || gpxData.points.length < 2) {
         alert('Please load a GPX file first.');
         return;
