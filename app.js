@@ -9418,6 +9418,7 @@ async function exportGpxWithWaypoints() {
             lon: points[0].lon,
             name: '🏁 START',
             desc: currentRouteName || 'Race Start',
+            cmt: 'Good luck! Start easy, finish strong.',
             sym: 'Flag, Green'
         });
         
@@ -9431,6 +9432,7 @@ async function exportGpxWithWaypoints() {
                     lon: point.lon,
                     name: `🚰 VP${index + 1} ${aid.name || `KM ${aid.km}`}`,
                     desc: `AID at KM ${aid.km.toFixed(1)}${time ? ` | ETA: ${time}` : ''}${aid.stopMin ? ` | Stop: ${aid.stopMin}min` : ''}`,
+                    cmt: 'Refill water! Eat something solid.',
                     sym: 'Water Source'
                 });
             });
@@ -9441,11 +9443,20 @@ async function exportGpxWithWaypoints() {
         if (topClimbs && topClimbs.length > 0) {
             topClimbs.forEach((climb, index) => {
                 const point = findPointAtDistance(climb.start);
+                const climbLength = climb.end - climb.start;
+                const avgGrade = climb.gain / (climbLength * 10); // rough avg grade %
+                let climbTip = 'Slow down, power hike if needed.';
+                if (climb.gain > 300) {
+                    climbTip = 'Big climb! Walk the steeps, eat on the climb.';
+                } else if (avgGrade > 15) {
+                    climbTip = 'Steep! Power hike, save your legs.';
+                }
                 waypoints.push({
                     lat: point.lat,
                     lon: point.lon,
                     name: `⛰️ Climb #${index + 1}`,
                     desc: `KM ${climb.start.toFixed(1)}-${climb.end.toFixed(1)} | +${Math.round(climb.gain)}m`,
+                    cmt: climbTip,
                     sym: 'Summit'
                 });
             });
@@ -9454,6 +9465,13 @@ async function exportGpxWithWaypoints() {
         // 4. Fuel windows (if available)
         const fuelWindows = document.querySelectorAll('#heroFuelWindows .fuel-window-item');
         if (fuelWindows && fuelWindows.length > 0) {
+            const fuelMessages = [
+                'Time to eat! Take a gel or bar now.',
+                'Fuel up! Drink and eat something.',
+                'Eat now! Keep energy levels steady.',
+                'Nutrition check! Gel or real food.',
+                'Eat something! Dont wait until hungry.'
+            ];
             fuelWindows.forEach((item, index) => {
                 const kmText = item.querySelector('.fuel-window-km')?.textContent;
                 const timeText = item.querySelector('.fuel-window-time')?.textContent;
@@ -9464,8 +9482,9 @@ async function exportGpxWithWaypoints() {
                         waypoints.push({
                             lat: point.lat,
                             lon: point.lon,
-                            name: `🍫 Fuel KM ${km}`,
+                            name: `🍫 EAT NOW - KM ${km}`,
                             desc: timeText ? `Estimated: ${timeText}` : 'Fuel window',
+                            cmt: fuelMessages[index % fuelMessages.length],
                             sym: 'Food Source'
                         });
                     }
@@ -9481,6 +9500,7 @@ async function exportGpxWithWaypoints() {
             lon: lastPoint.lon,
             name: '🏁 FINISH',
             desc: `${gpxData.totalDistance.toFixed(1)} km${totalTime ? ` | Target: ${totalTime}` : ''}`,
+            cmt: 'You made it! Celebrate!',
             sym: 'Flag, Red'
         });
         
@@ -9545,7 +9565,12 @@ function buildGpxWithWaypoints(waypoints, trackPoints) {
     for (const wpt of waypoints) {
         xml += `  <wpt lat="${wpt.lat.toFixed(6)}" lon="${wpt.lon.toFixed(6)}">
     <name>${escapeXml(wpt.name)}</name>
-    <desc>${escapeXml(wpt.desc)}</desc>
+    <desc>${escapeXml(wpt.desc)}</desc>`;
+        if (wpt.cmt) {
+            xml += `
+    <cmt>${escapeXml(wpt.cmt)}</cmt>`;
+        }
+        xml += `
     <sym>${escapeXml(wpt.sym)}</sym>
   </wpt>
 `;
