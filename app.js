@@ -65,6 +65,12 @@ function setupDevIndicator() {
         devBadge.textContent = 'DEV';
         logoText.appendChild(devBadge);
     }
+    
+    // Show DEV-only features
+    const gpxExportSection = document.getElementById('gpxExportSection');
+    if (gpxExportSection) {
+        gpxExportSection.style.display = 'block';
+    }
 }
 
 // Helper to resolve GPX URLs (uses blob storage if available)
@@ -8152,6 +8158,7 @@ function setupExport() {
     document.getElementById('exportStoryCard')?.addEventListener('click', exportStoryCard);
     document.getElementById('exportCrewCard')?.addEventListener('click', exportCrewCard);
     document.getElementById('exportCrewPdf')?.addEventListener('click', exportCrewPdf);
+    document.getElementById('exportGpxWaypoints')?.addEventListener('click', exportGpxWithWaypoints);
 }
 
 // Update export buttons disabled state based on demo mode
@@ -9343,6 +9350,221 @@ function initStatementPreview() {
 function formatStartTime(time) {
     const [h, m] = time.split(':').map(Number);
     return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
+}
+
+// Export GPX with waypoints for watch - includes AID stations, climbs, and pace info
+// DEV ONLY for now
+async function exportGpxWithWaypoints() {
+    if (!IS_DEV) {
+        console.log('GPX export with waypoints is DEV only');
+        return;
+    }
+    
+    if (!gpxData || !gpxData.points || gpxData.points.length < 2) {
+        alert('Please load a GPX file first.');
+        return;
+    }
+    
+    const btn = document.getElementById('exportGpxWaypoints');
+    if (btn) {
+        btn.textContent = '⏳ Generating...';
+        btn.disabled = true;
+    }
+    
+    try {
+        const waypoints = [];
+        const points = gpxData.points;
+        
+        // Helper: Find closest point to a given distance
+        const findPointAtDistance = (targetKm) => {
+            let closest = points[0];
+            let minDiff = Math.abs(points[0].distance - targetKm);
+            for (const p of points) {
+                const diff = Math.abs(p.distance - targetKm);
+                if (diff < minDiff) {
+                    minDiff = diff;
+                    closest = p;
+                }
+            }
+            return closest;
+        };
+        
+        // Helper: Get cumulative time at a km distance from splits table
+        const getTimeAtKm = (km) => {
+            const splitsTable = document.getElementById('splitsTable');
+            if (!splitsTable) return '';
+            const rows = splitsTable.querySelectorAll('tbody tr');
+            for (const row of rows) {
+                const cells = row.querySelectorAll('td');
+                if (cells.length >= 10) {
+                    const rowKm = parseFloat(cells[0]?.textContent);
+                    if (Math.abs(rowKm - km) < 0.5) {
+                        return cells[9]?.textContent || ''; // Cumulative time
+                    }
+                }
+            }
+            return '';
+        };
+        
+        // 1. Start waypoint
+        waypoints.push({
+            lat: points[0].lat,
+            lon: points[0].lon,
+            name: '🏁 START',
+            desc: currentRouteName || 'Race Start',
+            sym: 'Flag, Green'
+        });
+        
+        // 2. AID stations
+        if (aidStations && aidStations.length > 0) {
+            aidStations.forEach((aid, index) => {
+                const point = findPointAtDistance(aid.km);
+                const time = getTimeAtKm(aid.km);
+                waypoints.push({
+                    lat: point.lat,
+                    lon: point.lon,
+                    name: `🚰 VP${index + 1} ${aid.name || `KM ${aid.km}`}`,
+                    desc: `AID at KM ${aid.km.toFixed(1)}${time ? ` | ETA: ${time}` : ''}${aid.stopMin ? ` | Stop: ${aid.stopMin}min` : ''}`,
+                    sym: 'Water Source'
+                });
+            });
+        }
+        
+        // 3. Top climbs (start points)
+        const topClimbs = findTopClimbs(5);
+        if (topClimbs && topClimbs.length > 0) {
+            topClimbs.forEach((climb, index) => {
+                const point = findPointAtDistance(climb.start);
+                waypoints.push({
+                    lat: point.lat,
+                    lon: point.lon,
+                    name: `⛰️ Climb #${index + 1}`,
+                    desc: `KM ${climb.start.toFixed(1)}-${climb.end.toFixed(1)} | +${Math.round(climb.gain)}m`,
+                    sym: 'Summit'
+                });
+            });
+        }
+        
+        // 4. Fuel windows (if available)
+        const fuelWindows = document.querySelectorAll('#heroFuelWindows .fuel-window-item');
+        if (fuelWindows && fuelWindows.length > 0) {
+            fuelWindows.forEach((item, index) => {
+                const kmText = item.querySelector('.fuel-window-km')?.textContent;
+                const timeText = item.querySelector('.fuel-window-time')?.textContent;
+                if (kmText) {
+                    const km = parseFloat(kmText.replace('KM ', ''));
+                    if (!isNaN(km)) {
+                        const point = findPointAtDistance(km);
+                        waypoints.push({
+                            lat: point.lat,
+                            lon: point.lon,
+                            name: `🍫 Fuel KM ${km}`,
+                            desc: timeText ? `Estimated: ${timeText}` : 'Fuel window',
+                            sym: 'Food Source'
+                        });
+                    }
+                }
+            });
+        }
+        
+        // 5. Finish waypoint
+        const lastPoint = points[points.length - 1];
+        const totalTime = document.getElementById('totalTime')?.textContent || '';
+        waypoints.push({
+            lat: lastPoint.lat,
+            lon: lastPoint.lon,
+            name: '🏁 FINISH',
+            desc: `${gpxData.totalDistance.toFixed(1)} km${totalTime ? ` | Target: ${totalTime}` : ''}`,
+            sym: 'Flag, Red'
+        });
+        
+        // Build GPX XML
+        const gpxXml = buildGpxWithWaypoints(waypoints, points);
+        
+        // Download
+        const blob = new Blob([gpxXml], { type: 'application/gpx+xml' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        const safeName = (currentRouteName || 'race').replace(/[^a-z0-9]/gi, '_').substring(0, 30);
+        a.download = `${safeName}_with_waypoints.gpx`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        
+        if (btn) {
+            btn.textContent = '✅ Downloaded!';
+            setTimeout(() => {
+                btn.textContent = '📍 Export GPX for Watch';
+                btn.disabled = false;
+            }, 2000);
+        }
+        
+    } catch (error) {
+        console.error('Error exporting GPX:', error);
+        alert('Failed to export GPX file.');
+        if (btn) {
+            btn.textContent = '📍 Export GPX for Watch';
+            btn.disabled = false;
+        }
+    }
+}
+
+// Build GPX XML with waypoints and track
+function buildGpxWithWaypoints(waypoints, trackPoints) {
+    const escapeXml = (str) => {
+        if (!str) return '';
+        return str.replace(/&/g, '&amp;')
+                  .replace(/</g, '&lt;')
+                  .replace(/>/g, '&gt;')
+                  .replace(/"/g, '&quot;')
+                  .replace(/'/g, '&apos;');
+    };
+    
+    let xml = `<?xml version="1.0" encoding="UTF-8"?>
+<gpx version="1.1" creator="GPXray - gpxray.run"
+     xmlns="http://www.topografix.com/GPX/1/1"
+     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+     xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd">
+  <metadata>
+    <name>${escapeXml(currentRouteName || 'GPXray Race Plan')}</name>
+    <desc>Race strategy with AID stations, climbs, and pace waypoints</desc>
+    <author><name>GPXray</name></author>
+    <time>${new Date().toISOString()}</time>
+  </metadata>
+`;
+    
+    // Add waypoints
+    for (const wpt of waypoints) {
+        xml += `  <wpt lat="${wpt.lat.toFixed(6)}" lon="${wpt.lon.toFixed(6)}">
+    <name>${escapeXml(wpt.name)}</name>
+    <desc>${escapeXml(wpt.desc)}</desc>
+    <sym>${escapeXml(wpt.sym)}</sym>
+  </wpt>
+`;
+    }
+    
+    // Add track
+    xml += `  <trk>
+    <name>${escapeXml(currentRouteName || 'Race Route')}</name>
+    <trkseg>
+`;
+    
+    for (const pt of trackPoints) {
+        xml += `      <trkpt lat="${pt.lat.toFixed(6)}" lon="${pt.lon.toFixed(6)}">`;
+        if (pt.elevation !== null && pt.elevation !== undefined) {
+            xml += `<ele>${pt.elevation.toFixed(1)}</ele>`;
+        }
+        xml += `</trkpt>
+`;
+    }
+    
+    xml += `    </trkseg>
+  </trk>
+</gpx>`;
+    
+    return xml;
 }
 
 // Crew Card Export - Simple card for sharing AID station schedule with supporters

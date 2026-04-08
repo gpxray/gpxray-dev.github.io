@@ -4728,6 +4728,36 @@ h2 {
     color: #00d4ff;
 }
 
+/* GPX Export Button (DEV only) */
+.dev-only-feature {
+    text-align: center;
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px dashed rgba(255, 180, 0, 0.3);
+}
+
+.gpx-export-btn {
+    display: inline-block;
+    padding: 10px 20px;
+    background: rgba(255, 180, 0, 0.1);
+    border: 1px solid rgba(255, 180, 0, 0.4);
+    border-radius: 8px;
+    color: #ffb400;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.gpx-export-btn:hover {
+    background: rgba(255, 180, 0, 0.2);
+    border-color: #ffb400;
+}
+
+.gpx-export-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
 /* Section Header */
 .section-header {
     display: flex;
