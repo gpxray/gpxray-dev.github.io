@@ -6971,13 +6971,15 @@ function renderApiKmSplits(kmSplits, splitsBody) {
     // Build recommended fuel points
     const fuelIntervalMinutes = 45;
     const recommendedFuelKms = new Set();
-    aidStations.forEach(aid => recommendedFuelKms.add(Math.round(aid.km)));
+    // Track AID km positions to reset fuel timer (but don't add to recommendedFuelKms, AIDs get their own rows)
+    const aidKmSet = new Set(aidStations.map(aid => Math.round(aid.km)));
     
     // Fill gaps with eat zone recommendations
     let lastFuelKm = 0;
     const avgPace = (lastCalculatedPaces?.flat || 6) * 1.2;
     for (let km = 1; km <= kmSplits.length; km++) {
-        if (recommendedFuelKms.has(km)) {
+        // If this km has an AID station, reset fuel timer but don't add to recommendedFuelKms (AIDs get their own rows)
+        if (aidKmSet.has(km)) {
             lastFuelKm = km;
             continue;
         }
@@ -7187,14 +7189,10 @@ function generateSplitsTable(flatPace, uphillPace, downhillPace, apiTotalTime) {
     const fuelIntervalMinutes = 45;
     const recommendedFuelKms = new Set();
     
-    // Add AID stations as natural fuel points
-    aidStations.forEach(aid => {
-        const aidKm = Math.round(aid.km);
-        recommendedFuelKms.add(aidKm);
-    });
+    // Track AID km positions to reset fuel timer (but don't add to recommendedFuelKms, AIDs get their own rows)
+    const aidKmSet = new Set(aidStations.map(aid => Math.round(aid.km)));
     
     // Fill gaps >60 min between fuel points with eat zone recommendations
-    const sortedFuelKms = [...recommendedFuelKms].sort((a, b) => a - b);
     const totalDistKm = gpxData.totalDistance;
     
     // Add fuel points approximately every 45 min in gaps
@@ -7203,8 +7201,8 @@ function generateSplitsTable(flatPace, uphillPace, downhillPace, apiTotalTime) {
         const estTimeAtKm = km * avgPace; // rough estimate
         const timeSinceLastFuel = (km - lastFuelKm) * avgPace;
         
-        // If near a recommended point, update lastFuelKm
-        if (recommendedFuelKms.has(km)) {
+        // If this km has an AID station, reset fuel timer but don't add to recommendedFuelKms (AIDs get their own rows)
+        if (aidKmSet.has(km)) {
             lastFuelKm = km;
             continue;
         }
