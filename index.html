@@ -1493,6 +1493,26 @@
                         <small data-i18n="lockscreenExport.statsDesc">Distance, elevation gain/loss</small>
                     </span>
                 </label>
+                
+                <label class="gpx-export-option">
+                    <input type="checkbox" id="lockscreenShowProfile">
+                    <span class="gpx-option-icon">📈</span>
+                    <span class="gpx-option-text">
+                        <strong data-i18n="lockscreenExport.profile">Elevation Profile</strong>
+                        <small data-i18n="lockscreenExport.profileDesc">Mini chart with key markers</small>
+                    </span>
+                </label>
+                
+                <div class="lockscreen-profile-options" id="lockscreenProfileOptions" style="display: none;">
+                    <label class="profile-marker-option">
+                        <input type="radio" name="profileMarkers" value="aid" checked>
+                        <span>🏕️ <span data-i18n="lockscreenExport.showAidStations">Show AID Stations</span></span>
+                    </label>
+                    <label class="profile-marker-option">
+                        <input type="radio" name="profileMarkers" value="climbs">
+                        <span>⛰️ <span data-i18n="lockscreenExport.showClimbs">Show Major Climbs</span></span>
+                    </label>
+                </div>
             </div>
             
             <div class="lockscreen-size-selector">

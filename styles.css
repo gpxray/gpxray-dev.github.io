@@ -1641,6 +1641,33 @@ header h1 {
     color: #00d4ff;
 }
 
+/* Lockscreen Profile Options */
+.lockscreen-profile-options {
+    margin: -10px 0 15px 35px;
+    padding: 10px 15px;
+    background: rgba(0, 212, 255, 0.05);
+    border-left: 3px solid rgba(0, 212, 255, 0.3);
+    border-radius: 0 8px 8px 0;
+}
+
+.profile-marker-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 0;
+    cursor: pointer;
+    color: #ccc;
+    font-size: 0.9rem;
+}
+
+.profile-marker-option:hover {
+    color: #fff;
+}
+
+.profile-marker-option input[type="radio"] {
+    accent-color: #00d4ff;
+}
+
 /* Toast Notifications */
 .notification {
     position: fixed;

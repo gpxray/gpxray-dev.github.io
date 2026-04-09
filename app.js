@@ -8889,6 +8889,118 @@ async function exportToPdf() {
     }
 }
 
+// Generate mini SVG elevation profile for lockscreen card
+function generateMiniElevationProfile(markerType = 'aid', unitLabel = 'km') {
+    if (!gpxData || !gpxData.points || gpxData.points.length < 10) return '';
+    
+    const points = gpxData.points;
+    const width = 480;
+    const height = 80;
+    const margin = { top: 5, right: 10, bottom: 20, left: 10 };
+    const chartWidth = width - margin.left - margin.right;
+    const chartHeight = height - margin.top - margin.bottom;
+    
+    // Sample points for smoother SVG (every ~500m)
+    const sampleInterval = Math.max(1, Math.floor(points.length / 200));
+    const sampledPoints = points.filter((_, i) => i % sampleInterval === 0 || i === points.length - 1);
+    
+    // Find min/max elevation
+    const elevations = sampledPoints.map(p => p.elevation || 0);
+    const minElev = Math.min(...elevations);
+    const maxElev = Math.max(...elevations);
+    const elevRange = maxElev - minElev || 1;
+    
+    // Find max distance
+    const maxDist = gpxData.totalDistance;
+    
+    // Scale functions
+    const xScale = (dist) => margin.left + (dist / maxDist) * chartWidth;
+    const yScale = (elev) => margin.top + chartHeight - ((elev - minElev) / elevRange) * chartHeight;
+    
+    // Build path for the area fill
+    let pathD = `M ${xScale(0)} ${margin.top + chartHeight}`;
+    sampledPoints.forEach(p => {
+        const x = xScale(p.distance);
+        const y = yScale(p.elevation || minElev);
+        pathD += ` L ${x} ${y}`;
+    });
+    pathD += ` L ${xScale(maxDist)} ${margin.top + chartHeight} Z`;
+    
+    // Build markers based on type
+    let markersHtml = '';
+    
+    if (markerType === 'aid' && aidStations && aidStations.length > 0) {
+        // AID station markers
+        const sortedStations = [...aidStations].sort((a, b) => a.km - b.km);
+        sortedStations.forEach(station => {
+            const x = xScale(station.km);
+            // Find elevation at this point
+            let elev = minElev;
+            for (const p of points) {
+                if (Math.abs(p.distance - station.km) < 0.3) {
+                    elev = p.elevation || minElev;
+                    break;
+                }
+            }
+            const y = yScale(elev);
+            
+            const displayDist = useMetric ? station.km : station.km * KM_TO_MILES;
+            markersHtml += `
+                <line x1="${x}" y1="${y - 3}" x2="${x}" y2="${margin.top + chartHeight}" stroke="#4CAF50" stroke-width="1.5" stroke-dasharray="3,2"/>
+                <circle cx="${x}" cy="${y - 3}" r="4" fill="#4CAF50"/>
+                <text x="${x}" y="${margin.top + chartHeight + 12}" text-anchor="middle" fill="#4CAF50" font-size="9" font-weight="600">${displayDist.toFixed(0)}</text>
+            `;
+        });
+    } else if (markerType === 'climbs') {
+        // Major climb markers
+        const topClimbs = findTopClimbs(5);
+        const sortedClimbs = [...topClimbs].sort((a, b) => a.start - b.start);
+        
+        sortedClimbs.forEach(climb => {
+            const startX = xScale(climb.start);
+            const endX = xScale(climb.end);
+            
+            // Find peak elevation
+            let peakElev = minElev;
+            for (const p of points) {
+                if (p.distance >= climb.start && p.distance <= climb.end) {
+                    if (p.elevation > peakElev) peakElev = p.elevation;
+                }
+            }
+            const peakY = yScale(peakElev);
+            
+            // Highlight the climb section
+            markersHtml += `
+                <rect x="${startX}" y="${peakY}" width="${endX - startX}" height="${margin.top + chartHeight - peakY}" fill="rgba(255,165,0,0.3)" rx="2"/>
+                <text x="${(startX + endX) / 2}" y="${margin.top + chartHeight + 12}" text-anchor="middle" fill="#ffaa00" font-size="9" font-weight="600">+${Math.round(climb.gain)}m</text>
+            `;
+        });
+    }
+    
+    // Add START and FINISH labels
+    const startLabel = `<text x="${margin.left}" y="${margin.top + chartHeight + 12}" text-anchor="start" fill="#888" font-size="8">START</text>`;
+    const finishLabel = `<text x="${width - margin.right}" y="${margin.top + chartHeight + 12}" text-anchor="end" fill="#888" font-size="8">FINISH</text>`;
+    
+    // Add min/max elevation labels
+    const maxElevLabel = `<text x="${width - margin.right + 2}" y="${margin.top + 8}" text-anchor="start" fill="#666" font-size="8">${Math.round(maxElev)}m</text>`;
+    const minElevLabel = `<text x="${width - margin.right + 2}" y="${margin.top + chartHeight - 2}" text-anchor="start" fill="#666" font-size="8">${Math.round(minElev)}m</text>`;
+    
+    return `
+        <svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <linearGradient id="elevGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" stop-color="#00d4ff" stop-opacity="0.6"/>
+                    <stop offset="100%" stop-color="#00d4ff" stop-opacity="0.1"/>
+                </linearGradient>
+            </defs>
+            <path d="${pathD}" fill="url(#elevGradient)" stroke="#00d4ff" stroke-width="1.5"/>
+            ${markersHtml}
+            ${startLabel}
+            ${finishLabel}
+        </svg>
+    `;
+}
+
 // Share Card Export (Phone format image) - shows modal first
 async function exportShareCard() {
     showLockscreenExportModal();
@@ -8896,7 +9008,7 @@ async function exportShareCard() {
 
 // Share Card Export with options
 async function exportShareCardWithOptions(options = {}) {
-    const { showSchedule = true, showChallenges = true, showStats = true, fontSize = 'medium' } = options;
+    const { showSchedule = true, showChallenges = true, showStats = true, showProfile = false, profileMarkers = 'aid', fontSize = 'medium' } = options;
     
     if (!gpxData || segments.length === 0) {
         alert('Please load a GPX file and calculate your race strategy first.');
@@ -9270,6 +9382,19 @@ async function exportShareCardWithOptions(options = {}) {
         // Build challenges section conditionally
         const challengesSectionHtml = showChallenges ? challengesHtml : '';
         
+        // Build elevation profile section conditionally
+        let profileSectionHtml = '';
+        if (showProfile && gpxData && gpxData.points && gpxData.points.length > 10) {
+            const profileSvg = generateMiniElevationProfile(profileMarkers, unitLabel);
+            if (profileSvg) {
+                profileSectionHtml = `
+                    <div style="background: rgba(255,255,255,0.05); border-radius: 10px; padding: 12px 15px; margin-bottom: 15px;">
+                        ${profileSvg}
+                    </div>
+                `;
+            }
+        }
+        
         // Build schedule section conditionally
         const scheduleSectionHtml = showSchedule && aidStationsList ? `
             <div style="background: rgba(255,255,255,0.05); border-radius: 12px; padding: 15px; margin-bottom: 20px;">
@@ -9291,6 +9416,8 @@ async function exportShareCardWithOptions(options = {}) {
             </div>
             
             ${statsSection}
+            
+            ${profileSectionHtml}
             
             ${timesSection ? `<div style="text-align: center; margin-bottom: 15px;">${timesSection}</div>` : ''}
             
@@ -9784,11 +9911,20 @@ function setupLockscreenExportModal() {
     const cancelBtn = document.getElementById('lockscreenExportCancel');
     const confirmBtn = document.getElementById('lockscreenExportConfirm');
     const sizeButtons = document.querySelectorAll('.size-btn');
+    const profileCheckbox = document.getElementById('lockscreenShowProfile');
+    const profileOptions = document.getElementById('lockscreenProfileOptions');
     
     // Close modal handlers
     overlay?.addEventListener('click', hideLockscreenExportModal);
     closeBtn?.addEventListener('click', hideLockscreenExportModal);
     cancelBtn?.addEventListener('click', hideLockscreenExportModal);
+    
+    // Profile checkbox toggle - show/hide sub-options
+    profileCheckbox?.addEventListener('change', () => {
+        if (profileOptions) {
+            profileOptions.style.display = profileCheckbox.checked ? 'block' : 'none';
+        }
+    });
     
     // Size button selection
     sizeButtons.forEach(btn => {
@@ -9803,6 +9939,8 @@ function setupLockscreenExportModal() {
         const showSchedule = document.getElementById('lockscreenShowSchedule')?.checked ?? true;
         const showChallenges = document.getElementById('lockscreenShowChallenges')?.checked ?? true;
         const showStats = document.getElementById('lockscreenShowStats')?.checked ?? true;
+        const showProfile = document.getElementById('lockscreenShowProfile')?.checked ?? false;
+        const profileMarkers = document.querySelector('input[name="profileMarkers"]:checked')?.value || 'aid';
         const selectedSize = document.querySelector('.size-btn.selected')?.dataset.size || 'medium';
         
         hideLockscreenExportModal();
@@ -9810,6 +9948,8 @@ function setupLockscreenExportModal() {
             showSchedule,
             showChallenges,
             showStats,
+            showProfile,
+            profileMarkers,
             fontSize: selectedSize
         });
     });
