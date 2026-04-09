@@ -118,7 +118,9 @@ const TRANSLATIONS = {
         'race.editStrategy': '✏️ Edit Strategy',
         'race.units': 'Units:',
         'race.targetTime': 'Target time:',
-        'race.targetOptional': '(optional)',        'race.createStrategy': 'Create Strategy',        'race.addAidStations': 'Add AID Stations',
+        'race.targetOptional': '(optional)',
+        'race.overrideHint': 'Target time or ITRA overrides runner level',
+        'race.createStrategy': 'Create Strategy',        'race.addAidStations': 'Add AID Stations',
         'race.visitWebsite': 'Visit Official Website',
         
         // Weather
@@ -684,6 +686,7 @@ const TRANSLATIONS = {
         'race.units': 'Einheiten:',
         'race.targetTime': 'Zielzeit:',
         'race.targetOptional': '(optional)',
+        'race.overrideHint': 'Zielzeit oder ITRA überschreibt das Läufer-Level',
         'race.createStrategy': 'Strategie erstellen',
         'race.addAidStations': 'Verpflegungsstationen hinzufügen',
         'race.visitWebsite': 'Offizielle Website besuchen',

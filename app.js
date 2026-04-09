@@ -520,6 +520,9 @@ function setupTargetTimeInput() {
                 if (raceLevelButtons) raceLevelButtons.classList.remove('target-override');
                 if (mainLevelButtons) mainLevelButtons.classList.remove('target-override');
             }
+            
+            // Update override hint visibility
+            updateOverrideHint();
         };
         
         targetInput.addEventListener('input', updateStyle);
@@ -532,6 +535,14 @@ function setupTargetTimeInput() {
     
     setupInput('heroTargetTime');
     setupInput('raceTargetTime');
+    
+    // Setup clear buttons for target time
+    document.getElementById('heroTargetTimeClear')?.addEventListener('click', clearTargetTimeOverride);
+    document.getElementById('raceTargetTimeClear')?.addEventListener('click', clearTargetTimeOverride);
+    
+    // Setup clear buttons for ITRA
+    document.getElementById('mainItraClear')?.addEventListener('click', clearItraOverride);
+    document.getElementById('raceItraClear')?.addEventListener('click', clearItraOverride);
     
     // Setup smart time text input parser
     const smartTimeInput = document.getElementById('targetTimeText');
@@ -872,6 +883,9 @@ function setupItraForElements(els) {
             otherInput.classList.add('has-value');
         }
         
+        // Update override hint visibility
+        updateOverrideHint();
+        
         // Apply and recalculate (only auto-calc on race pages)
         if (gpxData && segments.length > 0) {
             applyRunnerLevelPaces();
@@ -918,6 +932,48 @@ function clearItraOverride() {
     [raceLevelButtons, mainLevelButtons].forEach(container => {
         if (container) container.classList.remove('itra-override');
     });
+    
+    // Update override hint visibility
+    updateOverrideHint();
+}
+
+// Clear target time override
+function clearTargetTimeOverride() {
+    // Clear both target time inputs
+    const heroTargetTime = document.getElementById('heroTargetTime');
+    const raceTargetTime = document.getElementById('raceTargetTime');
+    
+    [heroTargetTime, raceTargetTime].forEach(inp => {
+        if (inp) {
+            inp.value = '';
+            inp.classList.remove('has-value');
+        }
+    });
+    
+    // Re-enable level buttons
+    const raceLevelButtons = document.getElementById('raceLevelButtons');
+    const mainLevelButtons = document.getElementById('mainLevelButtons');
+    
+    [raceLevelButtons, mainLevelButtons].forEach(container => {
+        if (container) container.classList.remove('target-override');
+    });
+    
+    // Update override hint visibility
+    updateOverrideHint();
+}
+
+// Update override hint visibility based on active overrides
+function updateOverrideHint() {
+    const mainHint = document.getElementById('mainLevelOverrideHint');
+    const heroTargetTime = document.getElementById('heroTargetTime');
+    const mainItraInput = document.getElementById('mainItraScoreInput');
+    
+    const hasTargetTime = heroTargetTime?.value?.match(/^\\d{1,2}:\\d{2}$/);
+    const hasItra = mainItraInput?.value && parseInt(mainItraInput.value) >= 200;
+    
+    if (mainHint) {
+        mainHint.style.display = (hasTargetTime || hasItra) ? 'block' : 'none';
+    }
 }
 
 // Initialize 24h Time Picker
