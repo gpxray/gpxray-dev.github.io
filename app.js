@@ -6831,6 +6831,10 @@ function renderApiKmSplits(kmSplits, splitsBody) {
             lastFuelKm = km;
             continue;
         }
+        // Skip if AID station coming within 1km (runner can fuel there instead)
+        const aidWithin1km = aidStations.some(aid => aid.km > km && aid.km <= km + 1);
+        if (aidWithin1km) continue;
+        
         const timeSinceLastFuel = (km - lastFuelKm) * avgPace;
         if (timeSinceLastFuel >= fuelIntervalMinutes) {
             const inZone = eatZones.some(zone => km >= zone.start && km <= zone.end);
@@ -7054,6 +7058,10 @@ function generateSplitsTable(flatPace, uphillPace, downhillPace, apiTotalTime) {
             lastFuelKm = km;
             continue;
         }
+        
+        // Skip if AID station coming within 1km (runner can fuel there instead)
+        const aidWithin1km = aidStations.some(aid => aid.km > km && aid.km <= km + 1);
+        if (aidWithin1km) continue;
         
         // If >45 min since last fuel and we're in an eat zone with flat/downhill terrain, mark it
         if (timeSinceLastFuel >= fuelIntervalMinutes) {
