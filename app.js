@@ -6213,12 +6213,13 @@ function calculateSunTimes(lat, lon, date) {
     const B = toRad(360 / 365 * (dayOfYear - 81));
     const eot = 9.87 * Math.sin(2 * B) - 7.53 * Math.cos(B) - 1.5 * Math.sin(B);
     
-    // Get timezone offset from browser (handles DST automatically)
-    // getTimezoneOffset returns minutes, negative for east of UTC
-    const browserOffsetHours = -date.getTimezoneOffset() / 60;
+    // Estimate timezone from race location's longitude (not user's browser!)
+    // Each timezone is ~15° wide, so offset ≈ longitude / 15
+    // This gives approximate local solar time at the race location
+    const locationOffsetHours = Math.round(lon / 15);
     
     // Time offset for longitude (4 minutes per degree from timezone meridian)
-    const timezoneMeridian = browserOffsetHours * 15;
+    const timezoneMeridian = locationOffsetHours * 15;
     const timeOffset = 4 * (lon - timezoneMeridian) + eot;
     
     // Solar noon in local time
