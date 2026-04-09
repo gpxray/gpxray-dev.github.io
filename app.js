@@ -3812,6 +3812,9 @@ function displayMap() {
     // Fit map to route bounds
     const latLngs = points.map(p => [p.lat, p.lon]);
     map.fitBounds(L.latLngBounds(latLngs), { padding: [20, 20] });
+    
+    // Add map hover to show position on route and sync with elevation chart
+    setupMapHover();
 }
 
 // Update map legend to show either terrain or surface colors
@@ -4033,6 +4036,84 @@ function hideHoverMarker() {
         map.removeLayer(hoverMarker);
         hoverMarker = null;
     }
+}
+
+// Setup map hover to sync with elevation chart
+function setupMapHover() {
+    if (!map || !gpxData || !gpxData.points) return;
+    
+    const points = gpxData.points;
+    
+    // Throttle for performance
+    let mapHoverThrottle = 0;
+    const MAP_HOVER_THROTTLE_MS = 30;
+    
+    // Mouse move on map - find closest point on route
+    map.on('mousemove', (e) => {
+        const now = Date.now();
+        if (now - mapHoverThrottle < MAP_HOVER_THROTTLE_MS) return;
+        mapHoverThrottle = now;
+        
+        const mouseLatLng = e.latlng;
+        
+        // Find closest point on route (sample every 10th point for performance)
+        let closestPoint = null;
+        let closestDist = Infinity;
+        let closestIndex = 0;
+        
+        for (let i = 0; i < points.length; i += 5) {
+            const point = points[i];
+            const dist = mouseLatLng.distanceTo(L.latLng(point.lat, point.lon));
+            if (dist < closestDist) {
+                closestDist = dist;
+                closestPoint = point;
+                closestIndex = i;
+            }
+        }
+        
+        // Refine search around the closest point
+        const searchStart = Math.max(0, closestIndex - 5);
+        const searchEnd = Math.min(points.length - 1, closestIndex + 5);
+        for (let i = searchStart; i <= searchEnd; i++) {
+            const point = points[i];
+            const dist = mouseLatLng.distanceTo(L.latLng(point.lat, point.lon));
+            if (dist < closestDist) {
+                closestDist = dist;
+                closestPoint = point;
+                closestIndex = i;
+            }
+        }
+        
+        // Only show if within 500m of the route (about 0.005 degrees roughly)
+        if (closestPoint && closestDist < 500) {
+            // Update map marker
+            updateHoverMarker(closestPoint.lat, closestPoint.lon, closestPoint.distance, closestPoint.elevation);
+            
+            // Sync with elevation chart
+            if (elevationChart) {
+                elevationChart.setActiveElements([{
+                    datasetIndex: 0,
+                    index: closestIndex
+                }]);
+                elevationChart.tooltip.setActiveElements([{
+                    datasetIndex: 0,
+                    index: closestIndex
+                }], { x: 0, y: 0 });
+                elevationChart.update('none');
+            }
+        }
+    });
+    
+    // Hide marker when mouse leaves map
+    map.on('mouseout', () => {
+        hideHoverMarker();
+        // Clear chart highlight
+        if (elevationChart) {
+            elevationChart.setActiveElements([]);
+            elevationChart.tooltip.setActiveElements([], { x: 0, y: 0 });
+            elevationChart.update('none');
+        }
+    });
 }
 
 // Helper to find the closest label for a given km (for category axis positioning)
