@@ -8902,8 +8902,8 @@ function generateMiniElevationProfile(showAid = true, showClimbs = true, unitLab
     
     const points = gpxData.points;
     const width = 480;
-    const height = 80;
-    const margin = { top: 5, right: 10, bottom: 20, left: 10 };
+    const height = 95; // Extra height for legend
+    const margin = { top: 5, right: 10, bottom: 35, left: 10 }; // Extra bottom margin for legend
     const chartWidth = width - margin.left - margin.right;
     const chartHeight = height - margin.top - margin.bottom;
     
@@ -8996,9 +8996,27 @@ function generateMiniElevationProfile(showAid = true, showClimbs = true, unitLab
     const startLabel = `<text x="${margin.left}" y="${margin.top + chartHeight + 12}" text-anchor="start" fill="#888" font-size="8">START</text>`;
     const finishLabel = `<text x="${width - margin.right}" y="${margin.top + chartHeight + 12}" text-anchor="end" fill="#888" font-size="8">FINISH</text>`;
     
-    // Add min/max elevation labels
-    const maxElevLabel = `<text x="${width - margin.right + 2}" y="${margin.top + 8}" text-anchor="start" fill="#666" font-size="8">${Math.round(maxElev)}m</text>`;
-    const minElevLabel = `<text x="${width - margin.right + 2}" y="${margin.top + chartHeight - 2}" text-anchor="start" fill="#666" font-size="8">${Math.round(minElev)}m</text>`;
+    // Build legend based on what's shown
+    let legendItems = [];
+    const legendY = height - 8;
+    let xPos = 0;
+    
+    if (showClimbs) {
+        legendItems.push(`<rect x="${xPos}" y="${legendY - 6}" width="12" height="8" fill="rgba(255,165,0,0.5)" rx="2"/><text x="${xPos + 16}" y="${legendY}" fill="#ffaa00" font-size="9">Climbs</text>`);
+        xPos += 60;
+    }
+    if (showAid) {
+        legendItems.push(`<circle cx="${xPos + 5}" cy="${legendY - 2}" r="4" fill="#4CAF50"/><text x="${xPos + 14}" y="${legendY}" fill="#4CAF50" font-size="9">AID</text>`);
+        xPos += 45;
+    }
+    // Add total D+ info
+    const totalGain = Math.round(gpxData.elevationGain);
+    legendItems.push(`<text x="${xPos + 10}" y="${legendY}" fill="#888" font-size="9">+${totalGain}m D+</text>`);
+    xPos += 70;
+    
+    // Center the legend
+    const legendX = (width - xPos) / 2;
+    const legendGroup = legendItems.length > 0 ? `<g transform="translate(${legendX}, 0)">${legendItems.join('')}</g>` : '';
     
     return `
         <svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" xmlns="http://www.w3.org/2000/svg">
@@ -9012,6 +9030,7 @@ function generateMiniElevationProfile(showAid = true, showClimbs = true, unitLab
             ${markersHtml}
             ${startLabel}
             ${finishLabel}
+            ${legendGroup}
         </svg>
     `;
 }
