@@ -5,10 +5,12 @@ __pycache__/
 venv/
 .env
 
-# API deployment artifacts
-api/deploy.zip
+# API folder - deployed to Azure only, not GitHub
+api/
+
+# Deployment artifacts
 deploy.zip
-api/local_server.py
+api-deploy.zip
 
 # IDE
 .vscode/
