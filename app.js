@@ -11702,7 +11702,7 @@ function setupRaceCreateStrategyButton() {
                 // Recalculate sun times for the race date/location
                 if (currentDistanceConfig.raceDate && gpxData) {
                     try {
-                        calculateSunTimes();
+                        updateSunTimesDisplay();
                     } catch (e) {
                         console.warn('Could not calculate sun times:', e);
                     }
@@ -11744,7 +11744,8 @@ function setupRaceCreateStrategyButton() {
             
         } catch (error) {
             console.error('Error creating race strategy:', error);
-            alert('Failed to create strategy. Please try again.');
+            console.error('Error stack:', error.stack);
+            alert('Failed to create strategy: ' + error.message);
         } finally {
             createBtn.innerHTML = originalHTML;
             createBtn.disabled = false;
