@@ -405,7 +405,7 @@ const TRANSLATIONS = {
         'lockscreenExport.small': 'Small',
         'lockscreenExport.medium': 'Medium',
         'lockscreenExport.large': 'Large',
-        'lockscreenExport.hint': '💡 Large font = fewer stations fit. Use Small for 8+ AID stations.',
+        'lockscreenExport.hint': '💡 Tip: Profile + Schedule OR Challenges + Schedule work best. Selecting all may overflow.',
         'lockscreenExport.export': 'Create Card',
         
         // Crew Card export
@@ -993,7 +993,7 @@ const TRANSLATIONS = {
         'lockscreenExport.small': 'Klein',
         'lockscreenExport.medium': 'Mittel',
         'lockscreenExport.large': 'Groß',
-        'lockscreenExport.hint': '💡 Große Schrift = weniger Stationen passen. Nutze Klein für 8+ Stationen.',
+        'lockscreenExport.hint': '💡 Tipp: Profil + Zeitplan ODER Herausforderungen + Zeitplan funktioniert am besten. Alles auswählen kann überlaufen.'
         'lockscreenExport.export': 'Karte erstellen',
         
         // Crew Card export
