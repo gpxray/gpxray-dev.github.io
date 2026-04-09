@@ -8701,8 +8701,9 @@ async function exportToPdf() {
             doc.setTextColor(...textColor);
             colX = margin + 1;
             
-            // Columns: 0=km, 1=elev, 2=terrain, 4=aid, 6=pace, 7=split, 8=total, 9=clock
-            const indices = [0, 1, 2, 4, 6, 7, 8, 9];
+            // Columns: 0=km, 1=elev, 2=terrain, 4=aid, 7=pace, 8=split, 9=total, 10=clock
+            // Skip: 3=surface, 5=stop, 6=fuel icons
+            const indices = [0, 1, 2, 4, 7, 8, 9, 10];
             indices.forEach((cellIndex, i) => {
                 let text = cells[cellIndex]?.textContent?.trim() || '-';
                 // Truncate long text
