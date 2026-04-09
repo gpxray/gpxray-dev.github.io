@@ -1005,7 +1005,7 @@ VALID_ACCESS_HASHES = {
 # Time-bounded access codes (hash -> expiry ISO date string)
 # To add: hashlib.sha256("PROMOCODE".encode()).hexdigest() : "2026-05-01"
 TIMED_ACCESS_HASHES = {
-    '25682e585e620efd4b48921b3f052904cfd3c1e397bbf625a15fdb02fa86bb3b': '2026-04-30',  # TESTACCESS2026 expires April 30, 2026
+    # Example: 'hash_here': '2026-12-31',  # PROMOCODE expires Dec 31, 2026
 }
 
 # Simple in-memory rate limiting (resets on function cold start)
