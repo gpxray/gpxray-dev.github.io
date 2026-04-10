@@ -9555,7 +9555,7 @@ function generateMiniElevationProfile(showAid = true, showClimbs = true, unitLab
     const legendGroup = legendItems.length > 0 ? `<g transform="translate(${legendX}, 0)">${legendItems.join('')}</g>` : '';
     
     return `
-        <svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" xmlns="http://www.w3.org/2000/svg">
+        <svg width="100%" height="${height}" viewBox="0 0 ${width} ${height}" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
             <defs>
                 <linearGradient id="elevGradient" x1="0%" y1="0%" x2="0%" y2="100%">
                     <stop offset="0%" stop-color="#00d4ff" stop-opacity="0.6"/>
@@ -9960,7 +9960,7 @@ async function exportShareCardWithOptions(options = {}) {
             const profileSvg = generateMiniElevationProfile(profileShowAid, profileShowClimbs, unitLabel);
             if (profileSvg) {
                 profileSectionHtml = `
-                    <div style="background: rgba(255,255,255,0.05); border-radius: 10px; padding: 12px 15px; margin-bottom: 15px;">
+                    <div style="background: rgba(255,255,255,0.05); border-radius: 10px; padding: 10px 8px; margin-bottom: 15px;">
                         ${profileSvg}
                     </div>
                 `;
