@@ -107,6 +107,18 @@ const TRANSLATIONS = {
         'race.itraExplain': 'ITRA (International Trail Running Association) assigns performance scores based on your race results.',
         'race.itraFindScore': 'Find your ITRA score',
         
+        // Terrain skills
+        'race.terrainSkills': 'Terrain Skills',
+        'race.uphill': 'Uphill',
+        'race.downhill': 'Downhill',
+        'race.terrainBalanced': 'Balanced',
+        'race.uphillStrong': 'Strong climber',
+        'race.uphillGood': 'Good climber',
+        'race.uphillStruggles': 'Struggles uphill',
+        'race.downhillAggressive': 'Aggressive',
+        'race.downhillGood': 'Good descender',
+        'race.downhillCautious': 'Cautious',
+        
         // Race date/time presets
         'race.whenRace': 'When is your race?',
         'race.preset2h': 'In 2 hours',
@@ -693,6 +705,18 @@ const TRANSLATIONS = {
         'race.itraHint': 'ITRA-Score ermöglicht präzisere Tempoberechnung',
         'race.itraExplain': 'ITRA (International Trail Running Association) vergibt Leistungswerte basierend auf deinen Rennergebnissen.',
         'race.itraFindScore': 'Finde deinen ITRA-Score',
+        
+        // Terrain skills
+        'race.terrainSkills': 'Gelände-Fähigkeiten',
+        'race.uphill': 'Bergauf',
+        'race.downhill': 'Bergab',
+        'race.terrainBalanced': 'Ausgeglichen',
+        'race.uphillStrong': 'Starker Kletterer',
+        'race.uphillGood': 'Guter Kletterer',
+        'race.uphillStruggles': 'Kämpft bergauf',
+        'race.downhillAggressive': 'Aggressiv',
+        'race.downhillGood': 'Guter Abfahrer',
+        'race.downhillCautious': 'Vorsichtig',
         
         // Race date/time presets
         'race.whenRace': 'Wann ist dein Rennen?',

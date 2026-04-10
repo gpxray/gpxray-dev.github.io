@@ -486,6 +486,9 @@ function setupTerrainSliders() {
     // Setup hero sliders
     setupSliderPair('heroUphillSlider', 'heroDownhillSlider', 'heroUphillHint', 'heroDownhillHint');
     
+    // Setup race modal sliders (in advanced options)
+    setupSliderPair('raceUphillSlider', 'raceDownhillSlider', 'raceUphillHint', 'raceDownhillHint');
+    
     // Setup hero terrain toggle
     const terrainToggle = document.getElementById('heroTerrainToggle');
     const terrainContent = document.getElementById('heroTerrainContent');
@@ -6597,11 +6600,15 @@ async function calculateRacePlanFromAPI() {
     const downhillRatioEl = document.getElementById('downhillRatio');
     const heroUphillEl = document.getElementById('heroUphillSlider');
     const heroDownhillEl = document.getElementById('heroDownhillSlider');
+    const raceUphillEl = document.getElementById('raceUphillSlider');
+    const raceDownhillEl = document.getElementById('raceDownhillSlider');
     
-    // Get ratios - prefer hero sliders if they exist and have been touched
-    const uphillRatioValue = parseFloat(heroUphillEl?.value) || 
+    // Get ratios - prefer race modal sliders, then hero sliders, then hidden inputs
+    const uphillRatioValue = parseFloat(raceUphillEl?.value) || 
+                             parseFloat(heroUphillEl?.value) || 
                              parseFloat(uphillRatioEl?.value) || 1.4;
-    const downhillRatioValue = parseFloat(heroDownhillEl?.value) || 
+    const downhillRatioValue = parseFloat(raceDownhillEl?.value) || 
+                               parseFloat(heroDownhillEl?.value) || 
                                parseFloat(downhillRatioEl?.value) || 0.85;
     
     const payload = {
@@ -6698,10 +6705,12 @@ async function calculateRacePlanForTargetTime() {
     const targetSeconds = parseInt(document.getElementById('targetSeconds')?.value) || 0;
     const targetTimeMinutes = targetHours * 60 + targetMinutes + targetSeconds / 60;
     
-    // Get terrain style ratios from slider or hero slider
-    const uphillRatio = parseFloat(document.getElementById('uphillRatio')?.value) || 
+    // Get terrain style ratios from sliders (race modal > hero > hidden input)
+    const uphillRatio = parseFloat(document.getElementById('raceUphillSlider')?.value) ||
+                        parseFloat(document.getElementById('uphillRatio')?.value) || 
                         parseFloat(document.getElementById('heroUphillSlider')?.value) || 1.4;
-    const downhillRatio = parseFloat(document.getElementById('downhillRatio')?.value) || 
+    const downhillRatio = parseFloat(document.getElementById('raceDownhillSlider')?.value) ||
+                          parseFloat(document.getElementById('downhillRatio')?.value) || 
                           parseFloat(document.getElementById('heroDownhillSlider')?.value) || 0.85;
     
     // Build base payload

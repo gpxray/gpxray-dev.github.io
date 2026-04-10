@@ -6961,6 +6961,100 @@ h2 {
     margin-left: 8px;
 }
 
+/* Terrain Skills Section in Advanced Options */
+.terrain-skills-section {
+    margin-top: 16px;
+    padding-top: 12px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.terrain-skills-header {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 12px;
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.terrain-skills-icon {
+    font-size: 1rem;
+}
+
+.terrain-skills-title {
+    font-weight: 500;
+}
+
+.terrain-skills-sliders {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.terrain-skill-row {
+    display: grid;
+    grid-template-columns: 80px 1fr 80px;
+    align-items: center;
+    gap: 8px;
+}
+
+.terrain-skill-label {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.8);
+    white-space: nowrap;
+}
+
+.terrain-skill-slider {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.terrain-skill-slider input[type="range"] {
+    flex: 1;
+    height: 6px;
+    -webkit-appearance: none;
+    appearance: none;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+.terrain-skill-slider input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 16px;
+    height: 16px;
+    background: #00d4ff;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: transform 0.15s ease;
+}
+
+.terrain-skill-slider input[type="range"]::-webkit-slider-thumb:hover {
+    transform: scale(1.15);
+}
+
+.terrain-skill-slider input[type="range"]::-moz-range-thumb {
+    width: 16px;
+    height: 16px;
+    background: #00d4ff;
+    border-radius: 50%;
+    border: none;
+    cursor: pointer;
+}
+
+.slider-end-label {
+    font-size: 0.9rem;
+    width: 20px;
+    text-align: center;
+}
+
+.terrain-skill-hint {
+    font-size: 0.7rem;
+    color: rgba(255, 255, 255, 0.5);
+    text-align: right;
+}
+
 .race-level-buttons.itra-override .race-level-btn,
 .race-level-buttons.target-override .race-level-btn {
     opacity: 0.5;
