@@ -7018,7 +7018,7 @@ h2 {
     height: 6px;
     -webkit-appearance: none;
     appearance: none;
-    background: rgba(255, 255, 255, 0.2);
+    background: linear-gradient(to right, rgba(255, 150, 50, 0.4), rgba(0, 212, 255, 0.4));
     border-radius: 3px;
     cursor: pointer;
 }
@@ -7044,6 +7044,12 @@ h2 {
     border-radius: 50%;
     border: none;
     cursor: pointer;
+}
+
+.terrain-skill-slider input[type="range"]::-moz-range-track {
+    background: linear-gradient(to right, rgba(255, 150, 50, 0.4), rgba(0, 212, 255, 0.4));
+    height: 6px;
+    border-radius: 3px;
 }
 
 /* Flip slider direction: right = better */
