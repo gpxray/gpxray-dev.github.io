@@ -555,11 +555,14 @@ function setupTerrainSliders() {
     let mainTerrainRecalcTimeout = null;
     const triggerMainRecalc = () => {
         // Auto-recalculate on main page if already calculated
-        const paceResults = document.getElementById('paceResults');
-        // Use offsetHeight to check actual visibility (works with CSS classes too)
-        if (paceResults && paceResults.offsetHeight > 0 && typeof gpxData !== 'undefined' && gpxData) {
+        // Check statsSection (visible after first calc) instead of paceResults (hidden after first calc)
+        const statsSection = document.getElementById('statsSection');
+        const hasCalculated = statsSection && statsSection.offsetHeight > 0;
+        console.log('🔄 triggerMainRecalc check:', { hasCalculated, gpxData: !!gpxData });
+        if (hasCalculated && typeof gpxData !== 'undefined' && gpxData) {
             clearTimeout(mainTerrainRecalcTimeout);
             mainTerrainRecalcTimeout = setTimeout(() => {
+                console.log('🔄 triggerMainRecalc: calling calculateRacePlan()');
                 calculateRacePlan();
             }, 300);
         }
