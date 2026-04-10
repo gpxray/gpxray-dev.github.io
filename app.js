@@ -10492,7 +10492,7 @@ function setupLockscreenExportModal() {
     const closeBtn = document.getElementById('lockscreenExportModalClose');
     const cancelBtn = document.getElementById('lockscreenExportCancel');
     const confirmBtn = document.getElementById('lockscreenExportConfirm');
-    const sizeButtons = document.querySelectorAll('.size-btn');
+    const sizeButtons = document.querySelectorAll('#lockscreenSizeButtons .size-btn');
     const profileCheckbox = document.getElementById('lockscreenShowProfile');
     const challengesCheckbox = document.getElementById('lockscreenShowChallenges');
     const profileOptions = document.getElementById('lockscreenProfileOptions');
@@ -10539,7 +10539,7 @@ function setupLockscreenExportModal() {
         const showProfile = document.getElementById('lockscreenShowProfile')?.checked ?? false;
         const profileShowAid = document.getElementById('profileShowAid')?.checked ?? true;
         const profileShowClimbs = document.getElementById('profileShowClimbs')?.checked ?? true;
-        const selectedSize = document.querySelector('.size-btn.selected')?.dataset.size || 'medium';
+        const selectedSize = document.querySelector('#lockscreenSizeButtons .size-btn.selected')?.dataset.size || 'medium';
         
         hideLockscreenExportModal();
         exportShareCardWithOptions({
