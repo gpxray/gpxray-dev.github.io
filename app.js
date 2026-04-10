@@ -505,9 +505,10 @@ function setupTerrainSliders() {
     // Debounced recalculation for race pages
     let terrainRecalcTimeout = null;
     const triggerRaceRecalc = () => {
-        // Auto-recalculate on race pages if results visible
-        const paceResults = document.getElementById('paceResults');
-        if (paceResults && paceResults.offsetHeight > 0 && typeof gpxData !== 'undefined' && gpxData) {
+        // Auto-recalculate on race pages if results visible (check statsSection, not paceResults which is hidden)
+        const statsSection = document.getElementById('statsSection');
+        const hasCalculated = statsSection && statsSection.offsetHeight > 0;
+        if (hasCalculated && typeof gpxData !== 'undefined' && gpxData) {
             clearTimeout(terrainRecalcTimeout);
             terrainRecalcTimeout = setTimeout(() => {
                 calculateRacePlan();
