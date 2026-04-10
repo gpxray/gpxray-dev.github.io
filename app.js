@@ -3954,7 +3954,10 @@ function displayElevationChart() {
                             return `📍 ${context[0].label} km`;
                         },
                         label: function(context) {
-                            return `⛰️ ${context.raw.toFixed(0)} m`;
+                            // Show cumulative elevation gain (D+) to this point
+                            const distanceKm = parseFloat(context.label);
+                            const cumulativeGain = Math.round(calculateElevationGainBetween(0, distanceKm));
+                            return `⛰️ ${cumulativeGain} m`;
                         }
                     }
                 },
