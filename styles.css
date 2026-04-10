@@ -7126,12 +7126,11 @@ h2 {
 /* Terrain Skills Mobile */
 @media (max-width: 600px) {
     .terrain-skills-section {
-        margin-left: -8px;
-        margin-right: -8px;
+        overflow: visible;
     }
     
     .terrain-skill-row {
-        grid-template-columns: 65px 1fr 42px;
+        grid-template-columns: 65px 1fr 40px;
         gap: 4px;
     }
     
@@ -7140,9 +7139,9 @@ h2 {
     }
     
     .terrain-skill-percent {
-        font-size: 0.65rem;
-        padding: 2px 3px;
-        min-width: 38px;
+        font-size: 0.6rem;
+        padding: 2px 2px;
+        min-width: 36px;
     }
     
     .terrain-skill-slider input[type="range"]::-webkit-slider-thumb {
@@ -7161,7 +7160,7 @@ h2 {
     
     .slider-label-min,
     .slider-label-max {
-        font-size: 0.5rem;
+        display: none;
     }
 }
 
