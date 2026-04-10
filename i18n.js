@@ -94,6 +94,8 @@ const TRANSLATIONS = {
         'hero.hint': 'Based on default paces',
         'hero.customize': 'Customize strategy ↓',
         'hero.clickCalculate': '▼ Calculate below',
+        'hero.gpxBased': 'Based on GPX file',
+        'hero.official': 'Official',
         
         // Race landing page
         'race.strategyTitle': 'Create Your Race Strategy',
@@ -694,6 +696,8 @@ const TRANSLATIONS = {
         'hero.hint': 'Basierend auf Standard-Paces',
         'hero.customize': 'Strategie anpassen ↓',
         'hero.clickCalculate': '▼ Unten berechnen',
+        'hero.gpxBased': 'Basierend auf GPX-Datei',
+        'hero.official': 'Offiziell',
         
         // Race landing page
         'race.strategyTitle': 'Erstelle deine Rennstrategie',

@@ -3728,6 +3728,14 @@ function showHeroPreview() {
         const dist = useMetric ? gpxData.totalDistance : gpxData.totalDistance * KM_TO_MILES;
         const unit = useMetric ? 'km' : 'mi';
         heroDistance.textContent = `${dist.toFixed(1)} ${unit}`;
+        
+        // Add tooltip showing official distance if different
+        const officialDist = currentDistanceConfig?.distance;
+        if (officialDist && Math.abs(officialDist - gpxData.totalDistance) > 0.3) {
+            heroDistance.title = `${t('hero.gpxBased')} (${t('hero.official')}: ${officialDist} ${unit})`;
+        } else {
+            heroDistance.title = '';
+        }
     }
     
     // Show elevation gain - prefer official race config elevation when available
@@ -4565,6 +4573,14 @@ function setupUnitToggle() {
                 const dist = useMetric ? gpxData.totalDistance : gpxData.totalDistance * KM_TO_MILES;
                 const unit = useMetric ? 'km' : 'mi';
                 heroDistance.textContent = `${dist.toFixed(1)} ${unit}`;
+                
+                // Add tooltip showing official distance if different
+                const officialDist = currentDistanceConfig?.distance;
+                if (officialDist && Math.abs(officialDist - gpxData.totalDistance) > 0.3) {
+                    heroDistance.title = `${t('hero.gpxBased')} (${t('hero.official')}: ${officialDist} ${unit})`;
+                } else {
+                    heroDistance.title = '';
+                }
             }
         }
     }
@@ -7888,6 +7904,14 @@ function updateHeroSection(totalTime) {
         const dist = useMetric ? gpxData.totalDistance : gpxData.totalDistance * KM_TO_MILES;
         const unit = useMetric ? 'km' : 'mi';
         heroDistance.textContent = `${dist.toFixed(1)} ${unit}`;
+        
+        // Add tooltip showing official distance if different
+        const officialDist = currentDistanceConfig?.distance;
+        if (officialDist && Math.abs(officialDist - gpxData.totalDistance) > 0.3) {
+            heroDistance.title = `${t('hero.gpxBased')} (${t('hero.official')}: ${officialDist} ${unit})`;
+        } else {
+            heroDistance.title = '';
+        }
     }
     
     // Update Elevation Gain - prefer official race config elevation when available
