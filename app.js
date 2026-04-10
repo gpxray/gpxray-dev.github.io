@@ -9192,9 +9192,9 @@ async function exportToPdfWithTheme(theme = 'dark', options = {}) {
             const chartX = margin;
             const chartY = y;
             
-            // Draw rounded background box
+            // Draw background box
             doc.setFillColor(...(isDark ? [45, 52, 58] : [240, 243, 246]));
-            doc.roundedRect(margin - 3, y - 3, chartWidth + 6, chartHeight + 15, 3, 3, 'F');
+            doc.rect(margin - 3, y - 3, chartWidth + 6, chartHeight + 15, 'F');
             
             // Sample points for smoother profile
             const sampleInterval = Math.max(1, Math.floor(points.length / 150));
@@ -9226,34 +9226,28 @@ async function exportToPdfWithTheme(theme = 'dark', options = {}) {
                     }
                     const peakY = yScale(peakElev);
                     // Draw orange highlight rectangle
-                    doc.setFillColor(255, 165, 0, 0.5);
+                    doc.setFillColor(200, 130, 0);
                     doc.rect(startX, peakY, endX - startX, chartY + chartHeight - peakY, 'F');
                 });
             }
             
-            // Draw elevation profile fill
-            doc.setFillColor(0, 212, 255, 0.3);
-            const fillPath = [];
-            fillPath.push([chartX, chartY + chartHeight]); // Start at bottom-left
+            // Draw elevation profile as line only (simpler, avoids triangle issues)
+            doc.setDrawColor(0, 212, 255);
+            doc.setLineWidth(1);
+            let lastX = null, lastY = null;
             sampledPoints.forEach(p => {
-                fillPath.push([xScale(p.distance), yScale(p.elevation || minElev)]);
+                const px = xScale(p.distance);
+                const py = yScale(p.elevation || minElev);
+                if (lastX !== null) {
+                    doc.line(lastX, lastY, px, py);
+                }
+                lastX = px;
+                lastY = py;
             });
-            fillPath.push([xScale(maxDist), chartY + chartHeight]); // End at bottom-right
-            doc.setDrawColor(0, 212, 255);
-            doc.setLineWidth(0.5);
-            // Draw as filled polygon
-            let prevX = fillPath[0][0], prevY = fillPath[0][1];
-            for (let i = 1; i < fillPath.length - 1; i++) {
-                doc.setFillColor(0, 212, 255, 0.25);
-                doc.triangle(prevX, chartY + chartHeight, fillPath[i][0], fillPath[i][1], fillPath[i][0], chartY + chartHeight, 'F');
-                prevX = fillPath[i][0];
-            }
-            // Draw profile line
-            doc.setDrawColor(0, 212, 255);
-            doc.setLineWidth(0.8);
-            for (let i = 1; i < fillPath.length - 1; i++) {
-                doc.line(fillPath[i-1][0], fillPath[i-1][1], fillPath[i][0], fillPath[i][1]);
-            }
+            // Draw baseline
+            doc.setDrawColor(...(isDark ? [60, 70, 80] : [180, 190, 200]));
+            doc.setLineWidth(0.3);
+            doc.line(chartX, chartY + chartHeight, chartX + chartWidth, chartY + chartHeight);
             
             // Draw AID station markers
             if (profileShowAid && aidStations && aidStations.length > 0) {
@@ -9282,10 +9276,10 @@ async function exportToPdfWithTheme(theme = 'dark', options = {}) {
             const legendY = chartY + chartHeight + 10;
             let legendX = margin + 2;
             if (profileShowClimbs) {
-                doc.setFillColor(255, 165, 0, 0.5);
+                doc.setFillColor(200, 130, 0);
                 doc.rect(legendX, legendY - 3, 8, 5, 'F');
                 doc.setFontSize(6);
-                doc.setTextColor(255, 170, 0);
+                doc.setTextColor(200, 130, 0);
                 doc.text('Climbs', legendX + 10, legendY);
                 legendX += 30;
             }
