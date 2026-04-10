@@ -7046,6 +7046,11 @@ h2 {
     cursor: pointer;
 }
 
+/* Flip slider direction: right = better */
+.slider-rtl {
+    direction: rtl;
+}
+
 .slider-end-label {
     font-size: 0.9rem;
     width: 20px;

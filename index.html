@@ -254,18 +254,18 @@
                                     <div class="terrain-skill-row">
                                         <label class="terrain-skill-label">⬆️ <span data-i18n="race.uphill">Uphill</span></label>
                                         <div class="terrain-skill-slider">
+                                            <span class="slider-end-label">�</span>
+                                            <input type="range" id="raceUphillSlider" class="slider-rtl" min="1.2" max="1.6" step="0.05" value="1.4">
                                             <span class="slider-end-label">💪</span>
-                                            <input type="range" id="raceUphillSlider" min="1.2" max="1.6" step="0.05" value="1.4">
-                                            <span class="slider-end-label">😓</span>
                                         </div>
                                         <span class="terrain-skill-percent" id="raceUphillPercent">+40%</span>
                                     </div>
                                     <div class="terrain-skill-row">
                                         <label class="terrain-skill-label">⬇️ <span data-i18n="race.downhill">Downhill</span></label>
                                         <div class="terrain-skill-slider">
-                                            <span class="slider-end-label">🏃</span>
-                                            <input type="range" id="raceDownhillSlider" min="0.80" max="0.95" step="0.01" value="0.85">
                                             <span class="slider-end-label">🚶</span>
+                                            <input type="range" id="raceDownhillSlider" class="slider-rtl" min="0.80" max="0.95" step="0.01" value="0.85">
+                                            <span class="slider-end-label">🏃</span>
                                         </div>
                                         <span class="terrain-skill-percent" id="raceDownhillPercent">-15%</span>
                                     </div>
@@ -566,18 +566,18 @@
                                         <div class="hero-terrain-slider-group">
                                             <label>⬆️ Uphill</label>
                                             <div class="hero-slider-row">
-                                                <span class="slider-emoji">�</span>
-                                                <input type="range" id="heroUphillSlider" min="1.2" max="1.6" step="0.05" value="1.4">
                                                 <span class="slider-emoji">😓</span>
+                                                <input type="range" id="heroUphillSlider" class="slider-rtl" min="1.2" max="1.6" step="0.05" value="1.4">
+                                                <span class="slider-emoji">💪</span>
                                             </div>
                                             <span class="hero-terrain-hint" id="heroUphillHint">Balanced climber</span>
                                         </div>
                                         <div class="hero-terrain-slider-group">
                                             <label>⬇️ Downhill</label>
                                             <div class="hero-slider-row">
-                                                <span class="slider-emoji">🏃</span>
-                                                <input type="range" id="heroDownhillSlider" min="0.80" max="0.95" step="0.01" value="0.85">
                                                 <span class="slider-emoji">🚶</span>
+                                                <input type="range" id="heroDownhillSlider" class="slider-rtl" min="0.80" max="0.95" step="0.01" value="0.85">
+                                                <span class="slider-emoji">🏃</span>
                                             </div>
                                             <span class="hero-terrain-hint" id="heroDownhillHint">Balanced descender</span>
                                         </div>
@@ -1058,9 +1058,9 @@
                                 Uphill Style
                             </label>
                             <div class="slider-container">
-                                <span class="slider-label-left">� Strong</span>
-                                <input type="range" id="uphillSlider" min="1.2" max="1.6" step="0.05" value="1.4">
-                                <span class="slider-label-right">😓 Struggle</span>
+                                <span class="slider-label-left">😓 Struggle</span>
+                                <input type="range" id="uphillSlider" class="slider-rtl" min="1.2" max="1.6" step="0.05" value="1.4">
+                                <span class="slider-label-right">💪 Strong</span>
                             </div>
                             <input type="number" id="uphillRatio" value="1.4" min="1.0" max="2.0" step="0.05" style="display: none;">
                             <span class="ratio-hint" id="uphillHint">Balanced climber</span>
@@ -1071,9 +1071,9 @@
                                 Downhill Style
                             </label>
                             <div class="slider-container">
-                                <span class="slider-label-left">🏃 Aggressive</span>
-                                <input type="range" id="downhillSlider" min="0.80" max="0.95" step="0.01" value="0.85">
-                                <span class="slider-label-right">🚶 Cautious</span>
+                                <span class="slider-label-left">🚶 Cautious</span>
+                                <input type="range" id="downhillSlider" class="slider-rtl" min="0.80" max="0.95" step="0.01" value="0.85">
+                                <span class="slider-label-right">🏃 Aggressive</span>
                             </div>
                             <input type="number" id="downhillRatio" value="0.85" min="0.5" max="1.0" step="0.05" style="display: none;">
                             <span class="ratio-hint" id="downhillHint">Balanced descender</span>
