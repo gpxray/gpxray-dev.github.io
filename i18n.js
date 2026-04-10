@@ -712,13 +712,13 @@ const TRANSLATIONS = {
         'race.uphill': 'Bergauf',
         'race.downhill': 'Bergab',
         'race.terrainBalanced': 'Ausgeglichen',
-        'race.uphillStrong': 'Starker Kletterer',
-        'race.uphillGood': 'Guter Kletterer',
-        'race.uphillStruggles': 'Kämpft bergauf',
+        'race.uphillStrong': 'Stark bergauf',
+        'race.uphillGood': 'Gut bergauf',
+        'race.uphillStruggles': 'Schwach bergauf',
         'race.downhillAggressive': 'Aggressiv',
         'race.downhillGood': 'Guter Abfahrer',
         'race.downhillCautious': 'Vorsichtig',
-        'race.terrainExplain': 'Passe an deine Kletter- und Abfahrtsfähigkeiten im Vergleich zum Durchschnitt an. Starke Kletterer können Anstiege laufen; vorsichtige Abfahrer bremsen mehr bergab.',
+        'race.terrainExplain': 'Passe an deine Stärken bergauf und bergab an. Starke Bergaufläufer können Anstiege laufen; vorsichtige Abfahrer bremsen mehr.',
         
         // Race date/time presets
         'race.whenRace': 'Wann ist dein Rennen?',
