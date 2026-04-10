@@ -6806,6 +6806,14 @@ async function calculateRacePlanFromAPI() {
                                parseFloat(heroDownhillEl?.value) || 
                                parseFloat(downhillRatioEl?.value) || 0.85;
     
+    console.log('🎿 Terrain ratios being sent to API:', { 
+        uphillRatio: uphillRatioValue, 
+        downhillRatio: downhillRatioValue,
+        mode: currentMode,
+        raceSlider: raceUphillEl?.value,
+        mainSlider: mainUphillEl?.value
+    });
+    
     const payload = {
         segments: apiSegments,
         runnerLevel: runnerLevel,
