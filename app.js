@@ -559,11 +559,9 @@ function setupTerrainSliders() {
         // Check statsSection (visible after first calc) instead of paceResults (hidden after first calc)
         const statsSection = document.getElementById('statsSection');
         const hasCalculated = statsSection && statsSection.offsetHeight > 0;
-        console.log('🔄 triggerMainRecalc check:', { hasCalculated, gpxData: !!gpxData });
         if (hasCalculated && typeof gpxData !== 'undefined' && gpxData) {
             clearTimeout(mainTerrainRecalcTimeout);
             mainTerrainRecalcTimeout = setTimeout(() => {
-                console.log('🔄 triggerMainRecalc: calling calculateRacePlan()');
                 calculateRacePlan();
             }, 300);
         }
@@ -572,7 +570,6 @@ function setupTerrainSliders() {
     if (mainUphillSlider) {
         mainUphillSlider.addEventListener('input', () => {
             const value = parseFloat(mainUphillSlider.value);
-            console.log('🎚️ mainUphillSlider INPUT event:', { value, sliderValue: mainUphillSlider.value });
             if (uphillRatio) uphillRatio.value = value.toFixed(2);
             updateMainUphillPercent(value);
             triggerMainRecalc();
@@ -583,7 +580,6 @@ function setupTerrainSliders() {
     if (mainDownhillSlider) {
         mainDownhillSlider.addEventListener('input', () => {
             const value = parseFloat(mainDownhillSlider.value);
-            console.log('🎚️ mainDownhillSlider INPUT event:', { value, sliderValue: mainDownhillSlider.value });
             if (downhillRatio) downhillRatio.value = value.toFixed(2);
             updateMainDownhillPercent(value);
             triggerMainRecalc();
@@ -6812,37 +6808,22 @@ async function calculateRacePlanFromAPI() {
     let uphillRatioValue = 1.4;
     let downhillRatioValue = 0.85;
     
-    console.log('🎿 Terrain slider debug:', {
-        isRacePage,
-        raceSliderVisible,
-        raceUphillEl: !!raceUphillEl,
-        raceUphillVal: raceUphillEl?.value,
-        mainUphillEl: !!mainUphillEl,
-        mainUphillVal: mainUphillEl?.value,
-        heroUphillEl: !!heroUphillEl,
-        heroUphillVal: heroUphillEl?.value
-    });
-    
     if ((isRacePage || raceSliderVisible) && raceUphillEl) {
         // Race page context: use race page sliders
         uphillRatioValue = parseFloat(raceUphillEl.value) || 1.4;
         downhillRatioValue = parseFloat(raceDownhillEl?.value) || 0.85;
-        console.log('🎿 Using RACE sliders:', { uphillRatioValue, downhillRatioValue });
     } else if (mainUphillEl) {
         // Main page context: use main page sliders (they sync to hidden inputs)
         uphillRatioValue = parseFloat(mainUphillEl.value) || 1.4;
         downhillRatioValue = parseFloat(mainDownhillEl?.value) || 0.85;
-        console.log('🎿 Using MAIN sliders:', { uphillRatioValue, downhillRatioValue });
     } else if (heroUphillEl) {
         // Fallback to hero sliders
         uphillRatioValue = parseFloat(heroUphillEl.value) || 1.4;
         downhillRatioValue = parseFloat(heroDownhillEl?.value) || 0.85;
-        console.log('🎿 Using HERO sliders:', { uphillRatioValue, downhillRatioValue });
     } else if (uphillRatioEl) {
         // Fallback to hidden inputs
         uphillRatioValue = parseFloat(uphillRatioEl.value) || 1.4;
         downhillRatioValue = parseFloat(downhillRatioEl?.value) || 0.85;
-        console.log('🎿 Using HIDDEN inputs:', { uphillRatioValue, downhillRatioValue });
     }
     
     const payload = {
@@ -6903,13 +6884,6 @@ async function calculateRacePlanFromAPI() {
         payload.downhillRatio = downhillRatioValue;
     }
     
-    console.log('📤 API Request payload (terrain):', { 
-        mode: payload.mode, 
-        uphillRatio: payload.uphillRatio, 
-        downhillRatio: payload.downhillRatio,
-        runnerLevel: payload.runnerLevel
-    });
-    
     // Call API with timeout
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), API_CONFIG.timeout);
@@ -6932,11 +6906,6 @@ async function calculateRacePlanFromAPI() {
         }
         
         const result = await response.json();
-        console.log('📥 API Response:', { 
-            totalTime: result.totalTime, 
-            finishTime: result.finishTime,
-            paces: result.paces
-        });
         return result;
     } catch (error) {
         clearTimeout(timeoutId);
@@ -8004,24 +7973,18 @@ function renderLegSummary(flatPace, uphillPace, downhillPace, applySurface, star
 
 // Update Hero Result Section with finish time and AID checkpoints
 function updateHeroSection(totalTime) {
-    console.log('⏱️ updateHeroSection called with totalTime:', totalTime);
     const heroTime = document.getElementById('heroFinishTime');
     const heroCheckpoints = document.getElementById('heroCheckpoints');
     const heroDistance = document.getElementById('heroDistance');
     
     if (!heroTime) {
-        console.log('⏱️ heroTime element NOT found!');
         return;
     }
-    console.log('⏱️ heroTime element found, current value:', heroTime.textContent);
     
     // Only update finish time if totalTime is provided (skip on language change)
     if (totalTime !== undefined && !isNaN(totalTime)) {
         heroTime.textContent = formatTime(totalTime);
         heroTime.classList.remove('hero-time-preview');
-        console.log('⏱️ Updated heroTime to:', formatTime(totalTime));
-    } else {
-        console.log('⏱️ Skipping update, totalTime invalid:', totalTime);
     }
     
     // Update weather impact pill if available
