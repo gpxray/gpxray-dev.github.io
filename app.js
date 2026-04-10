@@ -7074,6 +7074,12 @@ async function calculateRacePlanForTargetTime() {
 function displayApiResults(result) {
     const { paces, terrain, totalTimeMinutes, fatigueMultiplier, checkpoints, stopTimeMinutes, ddl, finishClockTime, kmSplits } = result;
     
+    console.log('📊 displayApiResults:', { 
+        totalTimeMinutes, 
+        paces, 
+        terrain: { flat: terrain?.flatTime, uphill: terrain?.uphillTime, downhill: terrain?.downhillTime }
+    });
+    
     console.log('displayApiResults: checkpoints received:', checkpoints?.length, checkpoints);
     
     // Cache API results for use in other functions
@@ -7996,16 +8002,24 @@ function renderLegSummary(flatPace, uphillPace, downhillPace, applySurface, star
 
 // Update Hero Result Section with finish time and AID checkpoints
 function updateHeroSection(totalTime) {
+    console.log('⏱️ updateHeroSection called with totalTime:', totalTime);
     const heroTime = document.getElementById('heroFinishTime');
     const heroCheckpoints = document.getElementById('heroCheckpoints');
     const heroDistance = document.getElementById('heroDistance');
     
-    if (!heroTime) return;
+    if (!heroTime) {
+        console.log('⏱️ heroTime element NOT found!');
+        return;
+    }
+    console.log('⏱️ heroTime element found, current value:', heroTime.textContent);
     
     // Only update finish time if totalTime is provided (skip on language change)
     if (totalTime !== undefined && !isNaN(totalTime)) {
         heroTime.textContent = formatTime(totalTime);
         heroTime.classList.remove('hero-time-preview');
+        console.log('⏱️ Updated heroTime to:', formatTime(totalTime));
+    } else {
+        console.log('⏱️ Skipping update, totalTime invalid:', totalTime);
     }
     
     // Update weather impact pill if available
