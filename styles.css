@@ -6996,9 +6996,9 @@ h2 {
 
 .terrain-skill-row {
     display: grid;
-    grid-template-columns: 90px 1fr 50px;
+    grid-template-columns: 75px 1fr 50px;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
 }
 
 .terrain-skill-label {
