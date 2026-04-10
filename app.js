@@ -9005,6 +9005,17 @@ function setupPdfExportModal() {
     if (closeBtn) closeBtn.addEventListener('click', hidePdfExportModal);
     if (cancelBtn) cancelBtn.addEventListener('click', hidePdfExportModal);
     
+    // Toggle profile sub-options visibility
+    const profileCheckbox = document.getElementById('pdfShowProfile');
+    const profileOptions = document.getElementById('pdfProfileOptions');
+    if (profileCheckbox && profileOptions) {
+        const toggleProfileOptions = () => {
+            profileOptions.style.display = profileCheckbox.checked ? 'flex' : 'none';
+        };
+        profileCheckbox.addEventListener('change', toggleProfileOptions);
+        toggleProfileOptions(); // Set initial state
+    }
+    
     if (confirmBtn) {
         confirmBtn.addEventListener('click', () => {
             const theme = document.querySelector('input[name="pdfTheme"]:checked')?.value || 'dark';
@@ -9158,6 +9169,37 @@ async function exportToPdfWithTheme(theme = 'dark', options = {}) {
                     const chartWidth = pageWidth - 2 * margin;
                     const chartHeight = 35;
                     doc.addImage(chartImage, 'PNG', margin, y, chartWidth, chartHeight);
+                    
+                    // Draw AID station markers on profile
+                    if (profileShowAid && aidStations && aidStations.length > 0) {
+                        const maxDist = gpxData.totalDistance;
+                        aidStations.forEach(station => {
+                            const xPos = margin + (station.km / maxDist) * chartWidth;
+                            // Draw vertical dashed line
+                            doc.setDrawColor(76, 175, 80); // Green
+                            doc.setLineWidth(0.3);
+                            for (let lineY = y; lineY < y + chartHeight; lineY += 1.5) {
+                                doc.line(xPos, lineY, xPos, Math.min(lineY + 0.8, y + chartHeight));
+                            }
+                            // Draw dot at top
+                            doc.setFillColor(76, 175, 80);
+                            doc.circle(xPos, y + 3, 1.2, 'F');
+                        });
+                    }
+                    
+                    // Draw climb markers on profile
+                    if (profileShowClimbs) {
+                        const topClimbs = findTopClimbs(5);
+                        const maxDist = gpxData.totalDistance;
+                        topClimbs.forEach(climb => {
+                            const startX = margin + (climb.start / maxDist) * chartWidth;
+                            const endX = margin + (climb.end / maxDist) * chartWidth;
+                            // Draw orange highlight bar at bottom
+                            doc.setFillColor(255, 165, 0, 0.4);
+                            doc.rect(startX, y + chartHeight - 3, endX - startX, 3, 'F');
+                        });
+                    }
+                    
                     y += chartHeight + 8;
                 } catch (e) {
                     console.warn('Could not capture chart:', e);
