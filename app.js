@@ -9012,6 +9012,8 @@ function setupPdfExportModal() {
             const options = {
                 showStats: document.getElementById('pdfShowStats')?.checked ?? true,
                 showProfile: document.getElementById('pdfShowProfile')?.checked ?? true,
+                profileShowAid: document.getElementById('pdfProfileShowAid')?.checked ?? true,
+                profileShowClimbs: document.getElementById('pdfProfileShowClimbs')?.checked ?? true,
                 showAidSummary: document.getElementById('pdfShowAidSummary')?.checked ?? true,
                 showSplits: document.getElementById('pdfShowSplits')?.checked ?? true,
                 fontSize: fontSize
@@ -9027,6 +9029,8 @@ async function exportToPdfWithTheme(theme = 'dark', options = {}) {
     const {
         showStats = true,
         showProfile = true,
+        profileShowAid = true,
+        profileShowClimbs = true,
         showAidSummary = true,
         showSplits = true,
         fontSize = 'normal'
@@ -10316,8 +10320,8 @@ function showLockscreenExportModal() {
     const modal = document.getElementById('lockscreenExportModal');
     
     if (overlay && modal) {
-        overlay.classList.add('visible');
-        modal.classList.add('visible');
+        overlay.classList.add('active');
+        modal.classList.add('active');
     }
 }
 
@@ -10327,8 +10331,8 @@ function hideLockscreenExportModal() {
     const modal = document.getElementById('lockscreenExportModal');
     
     if (overlay && modal) {
-        overlay.classList.remove('visible');
-        modal.classList.remove('visible');
+        overlay.classList.remove('active');
+        modal.classList.remove('active');
     }
 }
 

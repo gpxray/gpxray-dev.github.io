@@ -1552,6 +1552,38 @@ header h1 {
     font-size: 0.8rem;
 }
 
+/* Sub-options (nested under main options) */
+.gpx-export-suboptions {
+    margin-left: 50px;
+    margin-bottom: 8px;
+    padding: 8px 12px;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.gpx-export-suboption {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #aaa;
+    font-size: 0.85rem;
+    cursor: pointer;
+}
+
+.gpx-export-suboption input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    accent-color: #00d4ff;
+    cursor: pointer;
+}
+
+.gpx-export-suboption:hover {
+    color: #fff;
+}
+
 .gpx-export-hint {
     color: #666;
     font-size: 0.85rem;
