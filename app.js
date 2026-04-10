@@ -6642,16 +6642,6 @@ async function calculateRacePlanFromAPI() {
                                parseFloat(heroDownhillEl?.value) || 
                                parseFloat(downhillRatioEl?.value) || 0.85;
     
-    console.log('🔧 Terrain ratios:', {
-        raceUphill: raceUphillEl?.value,
-        raceDownhill: raceDownhillEl?.value,
-        heroUphill: heroUphillEl?.value,
-        heroDownhill: heroDownhillEl?.value,
-        finalUphill: uphillRatioValue,
-        finalDownhill: downhillRatioValue,
-        mode: currentMode
-    });
-    
     const payload = {
         segments: apiSegments,
         runnerLevel: runnerLevel,
@@ -6703,9 +6693,11 @@ async function calculateRacePlanFromAPI() {
             downhill: flatPace * downhillRatio
         };
     } else if (currentMode === 'itra') {
-        payload.itraScore = parseInt(document.getElementById('itraScore')?.value) || 550;
-        payload.uphillRatio = parseFloat(document.getElementById('itraUphillRatio')?.value) || 1.3;
-        payload.downhillRatio = parseFloat(document.getElementById('itraDownhillRatio')?.value) || 0.85;
+        payload.itraScore = parseInt(document.getElementById('itraScore')?.value) || 
+                           parseInt(document.getElementById('itraScoreInput')?.value) || 550;
+        // Use race modal terrain sliders for ITRA mode too
+        payload.uphillRatio = uphillRatioValue;
+        payload.downhillRatio = downhillRatioValue;
     }
     
     // Call API with timeout
@@ -11804,6 +11796,8 @@ function setupRaceCreateStrategyButton() {
         try {
             // Handle target time from race page input
             const raceTargetTime = document.getElementById('raceTargetTime');
+            const raceItraScore = document.getElementById('itraScoreInput');
+            
             if (raceTargetTime && raceTargetTime.value) {
                 const targetValue = raceTargetTime.value;
                 const match = targetValue.match(/^(\d{1,2}):(\d{2})$/);
@@ -11821,8 +11815,20 @@ function setupRaceCreateStrategyButton() {
                     currentMode = 'target';
                     console.log('Race page: Target time mode activated:', hours, ':', minutes);
                 }
+            } else if (raceItraScore && raceItraScore.value && parseInt(raceItraScore.value) >= 200) {
+                // ITRA score entered - use ITRA mode
+                const itraScore = parseInt(raceItraScore.value);
+                
+                // Sync to ITRA mode input
+                const itraScoreInput = document.getElementById('itraScore');
+                if (itraScoreInput) itraScoreInput.value = itraScore;
+                
+                // Set ITRA mode
+                currentMode = 'itra';
+                activeItraScore = itraScore;
+                console.log('Race page: ITRA mode activated:', itraScore);
             } else {
-                // No target time - use runner level preset mode (respects terrain sliders)
+                // No target time or ITRA - use runner level preset mode (respects terrain sliders)
                 currentMode = 'preset';
             }
             
