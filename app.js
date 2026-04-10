@@ -502,11 +502,26 @@ function setupTerrainSliders() {
         if (raceDownhillPercent) raceDownhillPercent.textContent = `-${percent}%`;
     };
     
+    // Debounced recalculation for race pages
+    let terrainRecalcTimeout = null;
+    const triggerRaceRecalc = () => {
+        // Only auto-recalculate on race pages (no Calculate button) and if already calculated
+        const heroCalculateBtn = document.getElementById('heroCalculateBtn');
+        const paceResults = document.getElementById('paceResults');
+        if (!heroCalculateBtn && paceResults && paceResults.style.display !== 'none' && gpxData) {
+            clearTimeout(terrainRecalcTimeout);
+            terrainRecalcTimeout = setTimeout(() => {
+                calculateRacePlan();
+            }, 300);
+        }
+    };
+    
     if (raceUphillSlider) {
         raceUphillSlider.addEventListener('input', () => {
             const value = parseFloat(raceUphillSlider.value);
             if (uphillRatio) uphillRatio.value = value.toFixed(2);
             updateUphillPercent(value);
+            triggerRaceRecalc();
         });
         updateUphillPercent(parseFloat(raceUphillSlider.value));
     }
@@ -516,6 +531,7 @@ function setupTerrainSliders() {
             const value = parseFloat(raceDownhillSlider.value);
             if (downhillRatio) downhillRatio.value = value.toFixed(2);
             updateDownhillPercent(value);
+            triggerRaceRecalc();
         });
         updateDownhillPercent(parseFloat(raceDownhillSlider.value));
     }
@@ -536,11 +552,25 @@ function setupTerrainSliders() {
         if (mainDownhillPercent) mainDownhillPercent.textContent = `-${percent}%`;
     };
     
+    // Debounced recalculation for main page
+    let mainTerrainRecalcTimeout = null;
+    const triggerMainRecalc = () => {
+        // Auto-recalculate on main page if already calculated
+        const paceResults = document.getElementById('paceResults');
+        if (paceResults && paceResults.style.display !== 'none' && gpxData) {
+            clearTimeout(mainTerrainRecalcTimeout);
+            mainTerrainRecalcTimeout = setTimeout(() => {
+                calculateRacePlan();
+            }, 300);
+        }
+    };
+    
     if (mainUphillSlider) {
         mainUphillSlider.addEventListener('input', () => {
             const value = parseFloat(mainUphillSlider.value);
             if (uphillRatio) uphillRatio.value = value.toFixed(2);
             updateMainUphillPercent(value);
+            triggerMainRecalc();
         });
         updateMainUphillPercent(parseFloat(mainUphillSlider.value));
     }
@@ -550,6 +580,7 @@ function setupTerrainSliders() {
             const value = parseFloat(mainDownhillSlider.value);
             if (downhillRatio) downhillRatio.value = value.toFixed(2);
             updateMainDownhillPercent(value);
+            triggerMainRecalc();
         });
         updateMainDownhillPercent(parseFloat(mainDownhillSlider.value));
     }
