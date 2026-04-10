@@ -718,7 +718,7 @@ const TRANSLATIONS = {
         'race.downhillAggressive': 'Aggressiv',
         'race.downhillGood': 'Guter Abfahrer',
         'race.downhillCautious': 'Vorsichtig',
-        'race.terrainExplain': 'Passe an deine Stärken bergauf und bergab an. Starke Bergaufläufer können Anstiege laufen; vorsichtige Abfahrer bremsen mehr.',
+        'race.terrainExplain': 'Passe an deine Stärken bergauf und bergab an. Starke Bergaufläufer können Anstiege mehr pushen; vorsichtige Abfahrer bremsen mehr.',
         
         // Race date/time presets
         'race.whenRace': 'Wann ist dein Rennen?',
