@@ -439,6 +439,9 @@ const TRANSLATIONS = {
         'pdfExport.themeLabel': 'Theme:',
         'pdfExport.dark': 'Dark',
         'pdfExport.light': 'Light',
+        'pdfExport.fontSizeLabel': 'Font Size:',
+        'pdfExport.fontNormal': 'Normal',
+        'pdfExport.fontLarge': 'Large',
         'pdfExport.download': 'Download PDF',
         
         // Crew Card export
@@ -1060,6 +1063,9 @@ const TRANSLATIONS = {
         'pdfExport.themeLabel': 'Design:',
         'pdfExport.dark': 'Dunkel',
         'pdfExport.light': 'Hell',
+        'pdfExport.fontSizeLabel': 'Schriftgröße:',
+        'pdfExport.fontNormal': 'Normal',
+        'pdfExport.fontLarge': 'Groß',
         'pdfExport.download': 'PDF herunterladen',
         
         // Crew Card export
@@ -1680,6 +1686,9 @@ const TRANSLATIONS = {
         'pdfExport.themeLabel': 'Thème:',
         'pdfExport.dark': 'Sombre',
         'pdfExport.light': 'Clair',
+        'pdfExport.fontSizeLabel': 'Taille de police:',
+        'pdfExport.fontNormal': 'Normal',
+        'pdfExport.fontLarge': 'Grand',
         'pdfExport.download': 'Télécharger PDF',
         
         // Crew Card export

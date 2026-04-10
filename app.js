@@ -9008,11 +9008,13 @@ function setupPdfExportModal() {
     if (confirmBtn) {
         confirmBtn.addEventListener('click', () => {
             const theme = document.querySelector('input[name="pdfTheme"]:checked')?.value || 'dark';
+            const fontSize = document.querySelector('input[name="pdfFontSize"]:checked')?.value || 'normal';
             const options = {
                 showStats: document.getElementById('pdfShowStats')?.checked ?? true,
                 showProfile: document.getElementById('pdfShowProfile')?.checked ?? true,
                 showAidSummary: document.getElementById('pdfShowAidSummary')?.checked ?? true,
-                showSplits: document.getElementById('pdfShowSplits')?.checked ?? true
+                showSplits: document.getElementById('pdfShowSplits')?.checked ?? true,
+                fontSize: fontSize
             };
             hidePdfExportModal();
             exportToPdfWithTheme(theme, options);
@@ -9026,8 +9028,12 @@ async function exportToPdfWithTheme(theme = 'dark', options = {}) {
         showStats = true,
         showProfile = true,
         showAidSummary = true,
-        showSplits = true
+        showSplits = true,
+        fontSize = 'normal'
     } = options;
+    
+    // Font size scaling factor
+    const fontScale = fontSize === 'large' ? 1.25 : 1.0;
     
     const splitsTable = document.getElementById('splitsTable');
 
@@ -9099,7 +9105,7 @@ async function exportToPdfWithTheme(theme = 'dark', options = {}) {
         
         if (showStats) {
             doc.setTextColor(...textColor);
-            doc.setFontSize(9);
+            doc.setFontSize(Math.round(9 * fontScale));
             
             let totalTimeText = document.getElementById('totalTime')?.textContent || '-';
             // Clean up time - remove "(incl. X min stops)" for cleaner display
@@ -9163,7 +9169,7 @@ async function exportToPdfWithTheme(theme = 'dark', options = {}) {
             doc.text('AID Stations', margin, y);
             y += 6;
 
-            doc.setFontSize(8);
+            doc.setFontSize(Math.round(8 * fontScale));
             doc.setFont('helvetica', 'normal');
             doc.setTextColor(...textColor);
 
@@ -9200,7 +9206,7 @@ async function exportToPdfWithTheme(theme = 'dark', options = {}) {
             doc.rect(margin, y - 3, pageWidth - 2 * margin, 6, 'F');
             
             doc.setFont('helvetica', 'bold');
-            doc.setFontSize(7);
+            doc.setFontSize(Math.round(7 * fontScale));
             doc.setTextColor(...mutedColor);
             
             let colX = margin + 1;
@@ -9212,7 +9218,7 @@ async function exportToPdfWithTheme(theme = 'dark', options = {}) {
 
             // Table rows
             doc.setFont('helvetica', 'normal');
-            doc.setFontSize(7);
+            doc.setFontSize(Math.round(7 * fontScale));
             
             const rows = splitsTable.querySelectorAll('tbody tr');
             rows.forEach((row, rowIndex) => {
