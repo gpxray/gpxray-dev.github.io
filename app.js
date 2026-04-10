@@ -9439,7 +9439,7 @@ function generateMiniElevationProfile(showAid = true, showClimbs = true, unitLab
     const points = gpxData.points;
     const width = 480;
     const height = 95; // Extra height for legend
-    const margin = { top: 5, right: 10, bottom: 35, left: 10 }; // Extra bottom margin for legend
+    const margin = { top: 5, right: 10, bottom: 35, left: 5 }; // Extra bottom margin for legend
     const chartWidth = width - margin.left - margin.right;
     const chartHeight = height - margin.top - margin.bottom;
     
