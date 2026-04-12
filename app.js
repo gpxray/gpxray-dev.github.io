@@ -7560,18 +7560,66 @@ function generateSplitsTable(flatPace, uphillPace, downhillPace, apiTotalTime) {
     }
     const eatZones = window.allEatZones || [];
     
-    // Calculate recommended fuel points (every ~45 min, picking best terrain)
+    // Calculate recommended fuel points (every ~35 min, picking best terrain)
     // First pass: estimate time per km using average pace
-    const fuelIntervalMinutes = 45;
+    const fuelIntervalMinutes = 35;
     const recommendedFuelKms = new Set();
     
     // Track AID km positions to reset fuel timer (but don't add to recommendedFuelKms, AIDs get their own rows)
     const aidKmSet = new Set(aidStations.map(aid => Math.round(aid.km)));
     
-    // Fill gaps >60 min between fuel points with eat zone recommendations
+    // Fill gaps >35 min between fuel points with recommendations
     const totalDistKm = gpxData.totalDistance;
     
-    // Add fuel points approximately every 45 min in gaps
+    // Get user's fuel preferences (check both main page and race page IDs)
+    const getUserFuelPrefs = () => {
+        const getPref = (mainId, raceId, defaultVal) => {
+            const mainEl = document.getElementById(mainId);
+            const raceEl = document.getElementById(raceId);
+            if (raceEl && raceEl.offsetParent !== null) return raceEl.checked;
+            if (mainEl) return mainEl.checked;
+            return defaultVal;
+        };
+        return {
+            gels: getPref('fuelPrefGels', 'raceFuelPrefGels', true),
+            bars: getPref('fuelPrefBars', 'raceFuelPrefBars', true),
+            gummies: getPref('fuelPrefGummies', 'raceFuelPrefGummies', true),
+            realFood: getPref('fuelPrefRealFood', 'raceFuelPrefRealFood', false),
+            carbDrinks: getPref('fuelPrefCarbDrinks', 'raceFuelPrefCarbDrinks', false)
+        };
+    };
+    
+    // Get food type suggestion based on race time, terrain, and user preferences
+    const getFoodSuggestion = (minutes, terrainType) => {
+        const hours = minutes / 60;
+        const isClimb = terrainType === 'uphill';
+        const prefs = getUserFuelPrefs();
+        
+        const available = [];
+        if (prefs.gels) available.push({ icon: '💧', text: 'Gel', priority: isClimb ? 1 : (hours > 4 ? 1 : 3) });
+        if (prefs.gummies) available.push({ icon: '🐻', text: 'Gummy', priority: isClimb ? 2 : (hours > 2 ? 2 : 3) });
+        if (prefs.bars) available.push({ icon: '🍫', text: 'Bar', priority: isClimb ? 4 : (hours < 3 ? 1 : 3) });
+        if (prefs.realFood) available.push({ icon: '🍌', text: 'Food', priority: isClimb ? 5 : (hours < 4 ? 2 : 4) });
+        if (prefs.carbDrinks) available.push({ icon: '🧃', text: 'Carb', priority: isClimb ? 1 : 2 });
+        
+        if (available.length === 0) {
+            return { icon: '⚡', text: 'Fuel', tip: 'Time to eat!' };
+        }
+        
+        available.sort((a, b) => a.priority - b.priority);
+        const best = available[0];
+        
+        let tip = '';
+        if (isClimb) tip = `${best.text} - easy on climb`;
+        else if (hours < 2) tip = `${best.text} - stomach still fresh`;
+        else if (hours < 4) tip = `${best.text} - keep energy steady`;
+        else tip = `${best.text} - quick energy`;
+        
+        const displayText = available.length > 1 ? `${best.text}/${available[1].text}` : best.text;
+        return { icon: best.icon, text: displayText, tip };
+    };
+    
+    // Add fuel points approximately every 35 min in gaps
     let lastFuelKm = 0;
     for (let km = 1; km <= Math.ceil(totalDistKm); km++) {
         const estTimeAtKm = km * avgPace; // rough estimate
@@ -7583,15 +7631,14 @@ function generateSplitsTable(flatPace, uphillPace, downhillPace, apiTotalTime) {
             continue;
         }
         
-        // Skip if AID station coming within 1km (runner can fuel there instead)
-        const aidWithin1km = aidStations.some(aid => aid.km > km && aid.km <= km + 1);
-        if (aidWithin1km) continue;
+        // Skip if AID station coming within 2km (runner can fuel there instead)
+        const aidWithin2km = aidStations.some(aid => aid.km > km && aid.km <= km + 2);
+        if (aidWithin2km) continue;
         
-        // If >45 min since last fuel and we're in an eat zone with flat/downhill terrain, mark it
+        // If >35 min since last fuel, mark it (prefer flat/down but allow on climbs after 50 min)
         if (timeSinceLastFuel >= fuelIntervalMinutes) {
-            const inZone = eatZones.some(zone => km >= zone.start && km <= zone.end);
             const isFlatOrDown = isTerrainFlatOrDownhill(km);
-            if (inZone && isFlatOrDown) {
+            if (isFlatOrDown || timeSinceLastFuel >= 50) {
                 recommendedFuelKms.add(km);
                 lastFuelKm = km;
             }
@@ -7707,6 +7754,8 @@ function generateSplitsTable(flatPace, uphillPace, downhillPace, apiTotalTime) {
             if (isNightTime(clockTimeMinutes % (24 * 60))) {
                 aidRow.classList.add('night-section');
             }
+            // Get fuel suggestion based on race time
+            const aidFuelSuggestion = getFoodSuggestion(timeToStation, 'flat');
             aidRow.innerHTML = `
                 <td>${displayDistance.toFixed(1)}</td>
                 <td>-</td>
@@ -7714,7 +7763,7 @@ function generateSplitsTable(flatPace, uphillPace, downhillPace, apiTotalTime) {
                 <td>-</td>
                 <td class="aid-station-cell">${station.name}</td>
                 <td class="stop-time editable-stop" data-station-index="${stationIndex}" data-station-km="${station.km}">${stopTime > 0 ? '+' + stopTime + ' min' : '-'}</td>
-                <td><span class="fuel-icon" title="${station.name || 'AID'} — planned refuel stop">🍫🚰</span></td>
+                <td><span class="fuel-icon" title="${station.name || 'AID'} — ${aidFuelSuggestion.text}🚰">${aidFuelSuggestion.icon}🚰</span></td>
                 <td>-</td>
                 <td>-</td>
                 <td>${formatTime(timeToStation)}</td>
@@ -7770,11 +7819,16 @@ function generateSplitsTable(flatPace, uphillPace, downhillPace, apiTotalTime) {
         // Check if this km is a recommended fuel point
         const unitKm = useMetric ? unit : Math.round(unit * MILES_TO_KM);
         const isRecommendedFuel = recommendedFuelKms.has(unitKm);
+        // Get terrain type for this segment
+        const segmentTerrain = dominantTerrain.uphill > dominantTerrain.flat && dominantTerrain.uphill > dominantTerrain.downhill
+            ? 'uphill' : (dominantTerrain.downhill > dominantTerrain.flat ? 'downhill' : 'flat');
+        // Get smart fuel suggestion based on race time and terrain
+        const fuelSuggestion = getFoodSuggestion(cumulativeTime, segmentTerrain);
         // AID stations always show fuel icon since they're natural refuel points
-        const fuelIcon = hasAidStation ? '🍫🚰' : (isRecommendedFuel ? '🍫' : '');
+        const fuelIcon = hasAidStation ? (fuelSuggestion.icon + '🚰') : (isRecommendedFuel ? fuelSuggestion.icon : '');
         const fuelTooltip = hasAidStation
-            ? `${aidStation.name || 'AID'} — planned refuel stop`
-            : (isRecommendedFuel ? 'Flat/downhill terrain — good eating opportunity' : '');
+            ? `${aidStation.name || 'AID'} — ${fuelSuggestion.text}`
+            : (isRecommendedFuel ? `${fuelSuggestion.tip}` : '');
         
         // Calculate clock time (after adding stop time)
         const clockTimeMinutes = startTimeInMinutes + cumulativeTime;
