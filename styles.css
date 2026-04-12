@@ -7251,6 +7251,107 @@ h2 {
     line-height: 1.4;
 }
 
+/* Fuel Preferences Section */
+.fuel-prefs-section {
+    margin-top: 16px;
+    padding-top: 12px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.fuel-prefs-header {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 10px;
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.fuel-prefs-icon {
+    font-size: 1rem;
+}
+
+.fuel-prefs-title {
+    font-weight: 500;
+}
+
+.fuel-info-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    font-size: 0.65rem;
+    font-weight: bold;
+    font-style: italic;
+    color: rgba(255, 255, 255, 0.7);
+    cursor: pointer;
+    margin-left: 6px;
+    transition: all 0.2s ease;
+}
+
+.fuel-info-icon:hover {
+    background: rgba(0, 212, 255, 0.3);
+    color: #00d4ff;
+}
+
+.fuel-info-box {
+    display: none;
+    margin: 8px 0 12px 0;
+    padding: 8px 10px;
+    background: rgba(0, 212, 255, 0.1);
+    border-radius: 6px;
+    border-left: 3px solid #00d4ff;
+}
+
+.fuel-info-box.visible {
+    display: block;
+}
+
+.fuel-info-box p {
+    font-size: 0.7rem;
+    color: rgba(255, 255, 255, 0.7);
+    margin: 0;
+    line-height: 1.4;
+}
+
+.fuel-prefs-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.fuel-pref-option {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 15px;
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.7);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.fuel-pref-option:hover {
+    background: rgba(255, 255, 255, 0.12);
+}
+
+.fuel-pref-option input[type="checkbox"] {
+    width: 14px;
+    height: 14px;
+    cursor: pointer;
+    accent-color: #00d4ff;
+}
+
+.fuel-pref-option:has(input:checked) {
+    background: rgba(0, 212, 255, 0.2);
+    color: #00d4ff;
+}
+
 /* Terrain Skills Mobile */
 @media (max-width: 600px) {
     .terrain-skills-section {

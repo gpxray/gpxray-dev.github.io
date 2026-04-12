@@ -124,6 +124,15 @@ const TRANSLATIONS = {
         'race.slow': 'Slow',
         'race.fast': 'Fast',
         
+        // Fuel preferences
+        'race.fuelPrefs': 'My Fuel',
+        'race.fuelExplain': 'Select what you actually use during races. We\'ll suggest these in the Fuel column.',
+        'fuel.gels': 'Gels',
+        'fuel.bars': 'Bars',
+        'fuel.gummies': 'Gummies',
+        'fuel.realFood': 'Real Food',
+        'fuel.drinks': 'Sports Drinks',
+        
         // Race date/time presets
         'race.whenRace': 'When is your race?',
         'race.preset2h': 'In 2 hours',
@@ -750,6 +759,15 @@ const TRANSLATIONS = {
         'race.slow': 'Langsam',
         'race.fast': 'Schnell',
         
+        // Fuel preferences
+        'race.fuelPrefs': 'Meine Verpflegung',
+        'race.fuelExplain': 'Wähle aus, was du wirklich im Rennen isst. Wir schlagen es in der Fuel-Spalte vor.',
+        'fuel.gels': 'Gels',
+        'fuel.bars': 'Riegel',
+        'fuel.gummies': 'Gummibärchen',
+        'fuel.realFood': 'Echtes Essen',
+        'fuel.drinks': 'Sportgetränke',
+        
         // Race date/time presets
         'race.whenRace': 'Wann ist dein Rennen?',
         'race.preset2h': 'In 2 Stunden',
@@ -1375,6 +1393,15 @@ const TRANSLATIONS = {
         'race.terrainExplain': 'Ajuste selon tes capacités en montée et descente. Droite (cyan) = plus rapide, gauche (orange) = plus lent.',
         'race.slow': 'Lent',
         'race.fast': 'Rapide',
+        
+        // Fuel preferences
+        'race.fuelPrefs': 'Mon Carburant',
+        'race.fuelExplain': 'Sélectionne ce que tu utilises vraiment en course. On te le suggérera dans la colonne Fuel.',
+        'fuel.gels': 'Gels',
+        'fuel.bars': 'Barres',
+        'fuel.gummies': 'Bonbons',
+        'fuel.realFood': 'Vraie Nourriture',
+        'fuel.drinks': 'Boissons Sport',
         
         // Race date/time presets
         'race.whenRace': 'Quand est ta course?',

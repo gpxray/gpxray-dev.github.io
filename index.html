@@ -576,6 +576,40 @@
                                             </div>
                                         </div>
                                     </div>
+                                    
+                                    <!-- Fuel Preferences -->
+                                    <div class="fuel-prefs-section">
+                                        <div class="fuel-prefs-header">
+                                            <span class="fuel-prefs-icon">🍫</span>
+                                            <span class="fuel-prefs-title" data-i18n="race.fuelPrefs">My Fuel</span>
+                                            <span class="fuel-info-icon" id="fuelInfoToggle">i</span>
+                                        </div>
+                                        <div class="fuel-info-box" id="fuelInfoBox">
+                                            <p data-i18n="race.fuelExplain">Select what you actually use during races. We'll suggest these in the Fuel column.</p>
+                                        </div>
+                                        <div class="fuel-prefs-options">
+                                            <label class="fuel-pref-option">
+                                                <input type="checkbox" id="fuelPrefGels" checked>
+                                                <span>⚡ <span data-i18n="fuel.gels">Gels</span></span>
+                                            </label>
+                                            <label class="fuel-pref-option">
+                                                <input type="checkbox" id="fuelPrefBars" checked>
+                                                <span>🍫 <span data-i18n="fuel.bars">Bars</span></span>
+                                            </label>
+                                            <label class="fuel-pref-option">
+                                                <input type="checkbox" id="fuelPrefGummies" checked>
+                                                <span>🍬 <span data-i18n="fuel.gummies">Gummies</span></span>
+                                            </label>
+                                            <label class="fuel-pref-option">
+                                                <input type="checkbox" id="fuelPrefRealFood">
+                                                <span>🍌 <span data-i18n="fuel.realFood">Real Food</span></span>
+                                            </label>
+                                            <label class="fuel-pref-option">
+                                                <input type="checkbox" id="fuelPrefDrinks">
+                                                <span>🥤 <span data-i18n="fuel.drinks">Sports Drinks</span></span>
+                                            </label>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                             
@@ -738,9 +772,11 @@
                                     <span class="info-tooltip-content">
                                         <strong data-i18n="nutrition.title">Smart Fuel Recommendations</strong><br>
                                         <span data-i18n="nutrition.description">Approximately every ~45 min at flat terrain or AID stations.</span><br><br>
-                                        <em data-i18n="nutrition.logic">Prioritizes AID stations, fills gaps with gentle terrain (<10% grade).</em><br><br>
-                                        🍫 = Eat zone (gentle terrain)<br>
-                                        🍫🚰 = AID station
+                                        <em data-i18n="nutrition.logic">Adapts to race time and terrain:</em><br><br>
+                                        🍫 = Bar (early race, flat terrain)<br>
+                                        🍬 = Gummy (mid-race or climbs)<br>
+                                        ⚡ = Gel (late race, quick energy)<br>
+                                        🚰 = Water/refill at AID
                                     </span>
                                 </span>
                             </span>

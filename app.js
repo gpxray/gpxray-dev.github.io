@@ -621,6 +621,28 @@ function setupTerrainSliders() {
             mainTerrainInfoToggle.classList.toggle('active');
         });
     }
+    
+    // Setup fuel preferences info toggle
+    const fuelInfoToggle = document.getElementById('fuelInfoToggle');
+    const fuelInfoBox = document.getElementById('fuelInfoBox');
+    
+    if (fuelInfoToggle && fuelInfoBox) {
+        fuelInfoToggle.addEventListener('click', () => {
+            fuelInfoBox.classList.toggle('visible');
+            fuelInfoToggle.classList.toggle('active');
+        });
+    }
+    
+    // Add event listeners to fuel preference checkboxes to retrigger calculation
+    const fuelPrefCheckboxes = document.querySelectorAll('[id^="fuelPref"]');
+    fuelPrefCheckboxes.forEach(cb => {
+        cb.addEventListener('change', () => {
+            // Regenerate splits if we have data
+            if (gpxData && segments.length > 0) {
+                generateSplitsTable();
+            }
+        });
+    });
 }
 
 // Target Time Input styling
@@ -7300,10 +7322,65 @@ function renderApiKmSplits(kmSplits, splitsBody) {
         // Fuel recommendation - AID stations are natural refuel points
         const isRecommendedFuel = recommendedFuelKms.has(km);
         let fuelHtml = '-';
+        
+        // Get user's fuel preferences
+        const getUserFuelPrefs = () => {
+            return {
+                gels: document.getElementById('fuelPrefGels')?.checked ?? true,
+                bars: document.getElementById('fuelPrefBars')?.checked ?? true,
+                gummies: document.getElementById('fuelPrefGummies')?.checked ?? true,
+                realFood: document.getElementById('fuelPrefRealFood')?.checked ?? false,
+                drinks: document.getElementById('fuelPrefDrinks')?.checked ?? false
+            };
+        };
+        
+        // Get food type suggestion based on race time, terrain, and user preferences
+        const getFoodSuggestion = (minutes, terrainType) => {
+            const hours = minutes / 60;
+            const isClimb = terrainType === 'uphill';
+            const prefs = getUserFuelPrefs();
+            
+            // Build list of available fuel types based on preferences
+            const available = [];
+            if (prefs.gels) available.push({ icon: '⚡', text: 'Gel', priority: isClimb ? 1 : (hours > 4 ? 1 : 3) });
+            if (prefs.gummies) available.push({ icon: '🍬', text: 'Gummy', priority: isClimb ? 2 : (hours > 2 ? 2 : 3) });
+            if (prefs.bars) available.push({ icon: '🍫', text: 'Bar', priority: isClimb ? 4 : (hours < 3 ? 1 : 3) });
+            if (prefs.realFood) available.push({ icon: '🍌', text: 'Food', priority: isClimb ? 5 : (hours < 4 ? 2 : 4) });
+            if (prefs.drinks) available.push({ icon: '🥤', text: 'Drink', priority: 2 });
+            
+            // Fallback if nothing selected
+            if (available.length === 0) {
+                return { icon: '🍫', text: 'Fuel', tip: 'Time to eat!' };
+            }
+            
+            // Sort by priority (lower = better for this situation)
+            available.sort((a, b) => a.priority - b.priority);
+            const best = available[0];
+            
+            // Generate contextual tip
+            let tip = '';
+            if (isClimb) {
+                tip = `${best.text} - easy on climb`;
+            } else if (hours < 2) {
+                tip = `${best.text} - stomach still fresh`;
+            } else if (hours < 4) {
+                tip = `${best.text} - keep energy steady`;
+            } else {
+                tip = `${best.text} - quick energy`;
+            }
+            
+            // Show top 2 options if available
+            const displayText = available.length > 1 ? `${best.text}/${available[1].text}` : best.text;
+            
+            return { icon: best.icon, text: displayText, tip };
+        };
+        
         if (aidAtKm) {
-            fuelHtml = `<span class="fuel-icon" title="${aidAtKm.name || 'AID'} — planned refuel stop (~${Math.round(cumulativeTime)} min in)">🍫🚰</span>`;
+            const food = getFoodSuggestion(cumulativeTime, terrain);
+            fuelHtml = `<span class="fuel-icon" title="${aidAtKm.name || 'AID'} — Refuel: ${food.text} + Water (~${Math.round(cumulativeTime)} min)">🍫🚰</span>`;
         } else if (isRecommendedFuel) {
-            fuelHtml = `<span class="fuel-icon" title="Recommended fuel point (~${Math.round(cumulativeTime)} min in)">🍫</span>`;
+            const food = getFoodSuggestion(cumulativeTime, terrain);
+            fuelHtml = `<span class="fuel-icon" title="${food.tip} (~${Math.round(cumulativeTime)} min) - ${food.text}">${food.icon}</span>`;
         }
         
         // Format times
