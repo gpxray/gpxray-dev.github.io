@@ -633,8 +633,19 @@ function setupTerrainSliders() {
         });
     }
     
-    // Add event listeners to fuel preference checkboxes to retrigger calculation
-    const fuelPrefCheckboxes = document.querySelectorAll('[id^="fuelPref"]');
+    // Setup fuel preferences info toggle (race page)
+    const raceFuelInfoToggle = document.getElementById('raceFuelInfoToggle');
+    const raceFuelInfoBox = document.getElementById('raceFuelInfoBox');
+    
+    if (raceFuelInfoToggle && raceFuelInfoBox) {
+        raceFuelInfoToggle.addEventListener('click', () => {
+            raceFuelInfoBox.classList.toggle('visible');
+            raceFuelInfoToggle.classList.toggle('active');
+        });
+    }
+    
+    // Add event listeners to fuel preference checkboxes to retrigger calculation (both pages)
+    const fuelPrefCheckboxes = document.querySelectorAll('[id^="fuelPref"], [id^="raceFuelPref"]');
     fuelPrefCheckboxes.forEach(cb => {
         cb.addEventListener('change', () => {
             // Regenerate splits if we have data
@@ -7323,14 +7334,22 @@ function renderApiKmSplits(kmSplits, splitsBody) {
         const isRecommendedFuel = recommendedFuelKms.has(km);
         let fuelHtml = '-';
         
-        // Get user's fuel preferences
+        // Get user's fuel preferences (check both main page and race page IDs)
         const getUserFuelPrefs = () => {
+            const getPref = (mainId, raceId, defaultVal) => {
+                const mainEl = document.getElementById(mainId);
+                const raceEl = document.getElementById(raceId);
+                // Use race page if visible, otherwise main page
+                if (raceEl && raceEl.offsetParent !== null) return raceEl.checked;
+                if (mainEl) return mainEl.checked;
+                return defaultVal;
+            };
             return {
-                gels: document.getElementById('fuelPrefGels')?.checked ?? true,
-                bars: document.getElementById('fuelPrefBars')?.checked ?? true,
-                gummies: document.getElementById('fuelPrefGummies')?.checked ?? true,
-                realFood: document.getElementById('fuelPrefRealFood')?.checked ?? false,
-                drinks: document.getElementById('fuelPrefDrinks')?.checked ?? false
+                gels: getPref('fuelPrefGels', 'raceFuelPrefGels', true),
+                bars: getPref('fuelPrefBars', 'raceFuelPrefBars', true),
+                gummies: getPref('fuelPrefGummies', 'raceFuelPrefGummies', true),
+                realFood: getPref('fuelPrefRealFood', 'raceFuelPrefRealFood', false),
+                drinks: getPref('fuelPrefDrinks', 'raceFuelPrefDrinks', false)
             };
         };
         
