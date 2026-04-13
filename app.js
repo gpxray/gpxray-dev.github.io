@@ -25,6 +25,7 @@ let isSurfaceLoading = false; // Whether surface data is being fetched
 let lastCalculatedPaces = null; // Store last calculated paces for re-rendering
 let lastCachedDDL = null; // Store DDL from API - formulas protected on server
 let lastCachedCheckpoints = null; // Store checkpoints from API
+let lastCachedLegNutrition = null; // Store leg nutrition from API
 let hoverMarker = null; // Marker for hover position on map (profile sync)
 let lastCachedFatigue = 1.0; // Store fatigue multiplier from API
 let lastCachedKmSplits = null; // Store km splits from API (gradient-based)
@@ -5899,10 +5900,24 @@ function renderAidStations() {
             const elevGain = calculateElevationGainBetween(leg.fromKm, leg.toKm);
             const elevLoss = calculateElevationLossBetween(leg.fromKm, leg.toKm);
             
+            // Get nutrition from API cache, or calculate locally as fallback
+            let nutrition = null;
+            if (lastCachedLegNutrition && lastCachedLegNutrition[legIndex]) {
+                nutrition = lastCachedLegNutrition[legIndex];
+            } else {
+                nutrition = calculateLegNutrition(leg.fromKm, leg.toKm);
+            }
+            const nutritionHtml = nutrition ? `
+                <span class="leg-nutrition" title="${t('leg.nutritionTooltip') || 'Estimated fuel needs for this leg'}">
+                    🍫 ${nutrition.gels} ${t('leg.gels') || 'gels'} · 💧 ${nutrition.waterMl}ml
+                </span>
+            ` : '';
+            
             legInfo = `
                 <div class="aid-station-leg">
                     <span class="leg-distance">↔ ${distance.toFixed(1)} km from ${leg.from}</span>
                     <span class="leg-elevation">⬆️ ${elevGain.toFixed(0)}m ⬇️ ${elevLoss.toFixed(0)}m</span>
+                    ${nutritionHtml}
                 </div>
             `;
         }
@@ -5935,6 +5950,20 @@ function renderAidStations() {
         const elevGain = calculateElevationGainBetween(finalLeg.fromKm, finalLeg.toKm);
         const elevLoss = calculateElevationLossBetween(finalLeg.fromKm, finalLeg.toKm);
         
+        // Get nutrition from API cache (final leg is at index legs.length - 1), or calculate locally
+        const finalLegIndex = legs.length - 1;
+        let nutrition = null;
+        if (lastCachedLegNutrition && lastCachedLegNutrition[finalLegIndex]) {
+            nutrition = lastCachedLegNutrition[finalLegIndex];
+        } else {
+            nutrition = calculateLegNutrition(finalLeg.fromKm, finalLeg.toKm);
+        }
+        const nutritionHtml = nutrition ? `
+            <span class="leg-nutrition" title="${t('leg.nutritionTooltip') || 'Estimated fuel needs for this leg'}">
+                🍫 ${nutrition.gels} ${t('leg.gels') || 'gels'} · 💧 ${nutrition.waterMl}ml
+            </span>
+        ` : '';
+        
         list.innerHTML += `
             <div class="aid-station-item final-leg">
                 <div class="aid-station-info">
@@ -5944,6 +5973,7 @@ function renderAidStations() {
                 <div class="aid-station-leg">
                     <span class="leg-distance">↔ ${distance.toFixed(1)} km from ${finalLeg.from}</span>
                     <span class="leg-elevation">⬆️ ${elevGain.toFixed(0)}m ⬇️ ${elevLoss.toFixed(0)}m</span>
+                    ${nutritionHtml}
                 </div>
             </div>
         `;
@@ -6064,6 +6094,51 @@ function calculateElevationLossBetween(fromKm, toKm) {
     }
     
     return loss;
+}
+
+// Calculate nutrition needs for a leg between two distances
+function calculateLegNutrition(fromKm, toKm, legTimeMinutes = null) {
+    if (!gpxData) return null;
+    
+    const distance = toKm - fromKm;
+    const elevGain = calculateElevationGainBetween(fromKm, toKm);
+    const elevLoss = calculateElevationLossBetween(fromKm, toKm);
+    
+    // Estimate time if not provided (use cached paces or defaults)
+    let timeMinutes = legTimeMinutes;
+    if (!timeMinutes) {
+        const avgPace = lastCalculatedPaces?.flat || 6; // min/km
+        const climbPace = lastCalculatedPaces?.uphill || 8;
+        // Rough estimate: flat pace + extra for climbing
+        const climbKm = elevGain / 100; // ~100m gain = 1 "equivalent km"
+        timeMinutes = (distance * avgPace) + (climbKm * climbPace);
+    }
+    
+    const hours = timeMinutes / 60;
+    
+    // Calorie burn: ~70 kcal/km base + 0.8 kcal per meter elevation gain
+    const caloriesBase = distance * 70;
+    const caloriesClimb = elevGain * 0.8;
+    const caloriesTotal = Math.round(caloriesBase + caloriesClimb);
+    
+    // Gels: 1 gel ≈ 100 kcal, aim to replace ~60% of burn
+    // But also consider time: minimum 1 gel per 45 min on long legs
+    const gelsFromCalories = Math.ceil((caloriesTotal * 0.6) / 100);
+    const gelsFromTime = Math.ceil(timeMinutes / 45);
+    const gels = Math.max(1, Math.min(gelsFromCalories, gelsFromTime)); // At least 1, balanced approach
+    
+    // Water: ~500ml/hour base, no weather adjustment here (could add later)
+    const waterMl = Math.round(hours * 500);
+    
+    return {
+        distance,
+        elevGain,
+        elevLoss,
+        timeMinutes: Math.round(timeMinutes),
+        calories: caloriesTotal,
+        gels,
+        waterMl: Math.round(waterMl / 100) * 100 // Round to nearest 100ml
+    };
 }
 
 function removeAidStation(index) {
@@ -7083,7 +7158,7 @@ async function calculateRacePlanForTargetTime() {
 
 // Display results from API response
 function displayApiResults(result) {
-    const { paces, terrain, totalTimeMinutes, fatigueMultiplier, checkpoints, stopTimeMinutes, ddl, finishClockTime, kmSplits } = result;
+    const { paces, terrain, totalTimeMinutes, fatigueMultiplier, checkpoints, stopTimeMinutes, ddl, finishClockTime, kmSplits, legNutrition } = result;
     
     console.log('📊 displayApiResults:', { 
         totalTimeMinutes, 
@@ -7092,9 +7167,11 @@ function displayApiResults(result) {
     });
     
     console.log('displayApiResults: checkpoints received:', checkpoints?.length, checkpoints);
+    console.log('displayApiResults: legNutrition received:', legNutrition?.length, legNutrition);
     
     // Cache API results for use in other functions
     lastCachedCheckpoints = checkpoints;
+    lastCachedLegNutrition = legNutrition || null;
     lastCachedFatigue = fatigueMultiplier;
     lastCalculatedPaces = { flat: paces.flat, uphill: paces.uphill, downhill: paces.downhill };
     lastCachedKmSplits = kmSplits || null;  // Cache API km splits

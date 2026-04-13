@@ -4861,6 +4861,16 @@ h2 {
     white-space: nowrap;
 }
 
+.leg-nutrition {
+    color: #50fa7b;
+    white-space: nowrap;
+    font-weight: 500;
+    padding: 2px 8px;
+    background: rgba(80, 250, 123, 0.1);
+    border-radius: 4px;
+    cursor: help;
+}
+
 .aid-station-km {
     font-weight: bold;
     color: #ffa500;
