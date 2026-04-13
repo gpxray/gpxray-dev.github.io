@@ -89,12 +89,7 @@ function hideDevOnlyFeatures() {
     document.querySelectorAll('.fuel-prefs-section').forEach(el => {
         el.style.display = 'none';
     });
-    
-    // Hide "Fuel Windows" widget in hero section (DEV feature)
-    const heroNutritionBox = document.getElementById('heroNutritionBox');
-    if (heroNutritionBox) {
-        heroNutritionBox.style.display = 'none';
-    }
+    // Note: Fuel Windows widget stays visible but shows generic icons (no gel/bar/gummy specifics)
 }
 
 // Helper to resolve GPX URLs (uses blob storage if available)
@@ -7451,6 +7446,11 @@ function renderApiKmSplits(kmSplits, splitsBody) {
         
         // Get food type suggestion based on race time, terrain, and user preferences
         const getFoodSuggestion = (minutes, terrainType) => {
+            // On PROD: show generic fuel icon only (specific food types are DEV feature)
+            if (!IS_DEV) {
+                return { icon: '🍫', text: 'Fuel', tip: 'Time to eat!' };
+            }
+            
             const hours = minutes / 60;
             const isClimb = terrainType === 'uphill';
             const prefs = getUserFuelPrefs();
@@ -7687,6 +7687,11 @@ function generateSplitsTable(flatPace, uphillPace, downhillPace, apiTotalTime) {
     
     // Get food type suggestion based on race time, terrain, and user preferences
     const getFoodSuggestion = (minutes, terrainType) => {
+        // On PROD: show generic fuel icon only (specific food types are DEV feature)
+        if (!IS_DEV) {
+            return { icon: '🍫', text: 'Fuel', tip: 'Time to eat!' };
+        }
+        
         const hours = minutes / 60;
         const isClimb = terrainType === 'uphill';
         const prefs = getUserFuelPrefs();
@@ -8407,6 +8412,11 @@ function updateHeroSection(totalTime) {
         
         // Get food type suggestion based on race time and terrain
         const getFoodSuggestion = (minutes, terrainType) => {
+            // On PROD: show generic fuel icon only (specific food types are DEV feature)
+            if (!IS_DEV) {
+                return { icon: '🍫', text: 'Fuel', tip: 'Time to eat!' };
+            }
+            
             const hours = minutes / 60;
             const isClimb = terrainType === 'uphill';
             const prefs = getUserFuelPrefs();
@@ -8919,6 +8929,11 @@ function showAllFuelStops() {
     };
     
     const getFoodSuggestion = (minutes, terrainType) => {
+        // On PROD: show generic fuel icon only (specific food types are DEV feature)
+        if (!IS_DEV) {
+            return { icon: '🍫', text: 'Fuel' };
+        }
+        
         const hours = minutes / 60;
         const isClimb = terrainType === 'uphill';
         const prefs = getUserFuelPrefs();
