@@ -89,6 +89,12 @@ function hideDevOnlyFeatures() {
     document.querySelectorAll('.fuel-prefs-section').forEach(el => {
         el.style.display = 'none';
     });
+    
+    // Hide "Fuel Windows" widget in hero section (DEV feature)
+    const heroNutritionBox = document.getElementById('heroNutritionBox');
+    if (heroNutritionBox) {
+        heroNutritionBox.style.display = 'none';
+    }
 }
 
 // Helper to resolve GPX URLs (uses blob storage if available)
