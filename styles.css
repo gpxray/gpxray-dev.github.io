@@ -2675,19 +2675,30 @@ h2 {
 }
 
 .hero-weather-source {
-    font-size: 0.65rem;
-    color: rgba(255, 255, 255, 0.35);
     margin-top: auto;
     padding-top: 6px;
 }
 
-.hero-weather-source a {
+.hero-weather-source .info-tooltip {
+    font-size: 0.7rem;
     color: rgba(255, 255, 255, 0.4);
+}
+
+.hero-weather-source .info-tooltip:hover,
+.hero-weather-source .info-tooltip:focus {
+    color: rgba(0, 212, 255, 0.8);
+}
+
+.hero-weather-source .info-tooltip-content {
+    width: 240px;
+}
+
+.hero-weather-source .info-tooltip-content a {
+    color: #00d4ff;
     text-decoration: none;
 }
 
-.hero-weather-source a:hover {
-    color: rgba(0, 212, 255, 0.7);
+.hero-weather-source .info-tooltip-content a:hover {
     text-decoration: underline;
 }
 
