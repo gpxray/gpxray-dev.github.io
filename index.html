@@ -862,7 +862,22 @@
                 <div class="hero-insights-row" id="heroInsightsRow">
                     <!-- Hero Weather Widget -->
                     <div class="hero-insight-widget hero-weather-widget" id="heroWeatherWidget" style="display: none;">
-                        <div class="hero-widget-title" data-i18n="weather.forecast">Weather Forecast</div>
+                        <div class="hero-widget-title">
+                            <span data-i18n="weather.forecast">Weather Forecast</span>
+                            <span class="info-tooltip" tabindex="0">
+                                ⓘ
+                                <span class="info-tooltip-content">
+                                    <strong data-i18n="weather.sourceTitle">Weather Data</strong><br>
+                                    <span data-i18n="weather.sourceDesc">Powered by Open-Meteo, a free weather API aggregating multiple models.</span><br><br>
+                                    <strong data-i18n="weather.sourceModels">Models used:</strong><br>
+                                    • ECMWF (European)<br>
+                                    • DWD ICON (German)<br>
+                                    • GFS (American)<br><br>
+                                    <em data-i18n="weather.sourceNote">Forecasts may differ from other services due to different model blending.</em><br><br>
+                                    <a href="https://open-meteo.com/" target="_blank" rel="noopener">open-meteo.com ↗</a>
+                                </span>
+                            </span>
+                        </div>
                         <div class="hero-weather-header">
                             <span class="hero-weather-icon" id="heroWeatherIcon">🌤️</span>
                             <span class="hero-weather-temp" id="heroWeatherTemp">--°C</span>
@@ -880,21 +895,6 @@
                             <span class="hero-weather-adj-icon">⏱️</span>
                             <span class="hero-weather-adj-text" id="heroWeatherAdjText">+0 min</span>
                             <span class="hero-weather-adj-label" data-i18n="weather.adjustment">weather adjustment</span>
-                        </div>
-                        <div class="hero-weather-source">
-                            <span class="info-tooltip info-tooltip-weather" tabindex="0">
-                                ⓘ
-                                <span class="info-tooltip-content">
-                                    <strong data-i18n="weather.sourceTitle">Weather Data</strong><br>
-                                    <span data-i18n="weather.sourceDesc">Powered by Open-Meteo, a free weather API aggregating multiple models.</span><br><br>
-                                    <strong data-i18n="weather.sourceModels">Models used:</strong><br>
-                                    • ECMWF (European)<br>
-                                    • DWD ICON (German)<br>
-                                    • GFS (American)<br><br>
-                                    <em data-i18n="weather.sourceNote">Forecasts may differ from other services due to different model blending.</em><br><br>
-                                    <a href="https://open-meteo.com/" target="_blank" rel="noopener">open-meteo.com ↗</a>
-                                </span>
-                            </span>
                         </div>
                     </div>
                     

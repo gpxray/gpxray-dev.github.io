@@ -2674,31 +2674,16 @@ h2 {
     color: rgba(255, 183, 77, 0.7);
 }
 
-.hero-weather-source {
-    margin-top: auto;
-    padding-top: 6px;
-}
-
-.hero-weather-source .info-tooltip {
-    font-size: 0.7rem;
-    color: rgba(255, 255, 255, 0.4);
-}
-
-.hero-weather-source .info-tooltip:hover,
-.hero-weather-source .info-tooltip:focus {
-    color: rgba(0, 212, 255, 0.8);
-}
-
-.hero-weather-source .info-tooltip-content {
+.hero-widget-title .info-tooltip-content {
     width: 240px;
 }
 
-.hero-weather-source .info-tooltip-content a {
+.hero-widget-title .info-tooltip-content a {
     color: #00d4ff;
     text-decoration: none;
 }
 
-.hero-weather-source .info-tooltip-content a:hover {
+.hero-widget-title .info-tooltip-content a:hover {
     text-decoration: underline;
 }
 
