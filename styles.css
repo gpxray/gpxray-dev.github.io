@@ -2674,6 +2674,23 @@ h2 {
     color: rgba(255, 183, 77, 0.7);
 }
 
+.hero-weather-source {
+    font-size: 0.65rem;
+    color: rgba(255, 255, 255, 0.35);
+    margin-top: auto;
+    padding-top: 6px;
+}
+
+.hero-weather-source a {
+    color: rgba(255, 255, 255, 0.4);
+    text-decoration: none;
+}
+
+.hero-weather-source a:hover {
+    color: rgba(0, 212, 255, 0.7);
+    text-decoration: underline;
+}
+
 /* Hero Insights Row - Container for Weather, Surface, Climb, Night widgets */
 .hero-insights-row {
     display: flex;
