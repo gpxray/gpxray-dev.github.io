@@ -7028,15 +7028,15 @@ h2 {
     display: flex;
 }
 
-/* Override hint message */
+/* Override hint message - informational style (not warning) */
 .level-override-hint {
     margin: 12px auto;
     padding: 4px 12px;
-    background: rgba(255, 200, 100, 0.08);
-    border: 1px solid rgba(255, 200, 100, 0.25);
+    background: rgba(0, 212, 255, 0.08);
+    border: 1px solid rgba(0, 212, 255, 0.2);
     border-radius: 4px;
     font-size: 0.7rem;
-    color: rgba(255, 200, 100, 0.8);
+    color: rgba(0, 212, 255, 0.85);
     text-align: center;
     width: fit-content;
 }

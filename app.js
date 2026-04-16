@@ -1202,8 +1202,22 @@ function clearTargetTimeOverride() {
     updateOverrideHint();
 }
 
-// Update override hint visibility based on active overrides
+// Update override hint visibility and text based on active overrides
 function updateOverrideHint() {
+    const lang = typeof getLang === 'function' ? getLang() : 'en';
+    
+    // Helper to get positive hint text
+    const getHintText = (hasTargetTime, hasItra) => {
+        if (hasTargetTime && hasItra) {
+            return lang === 'de' ? '✓ Personalisierte Pace aus Zielzeit' : '✓ Personalized pace from target time';
+        } else if (hasTargetTime) {
+            return lang === 'de' ? '✓ Personalisierte Pace aus Zielzeit' : '✓ Personalized pace from target time';
+        } else if (hasItra) {
+            return lang === 'de' ? '✓ Personalisierte Pace aus ITRA-Score' : '✓ Personalized pace from ITRA score';
+        }
+        return '';
+    };
+    
     // Main page hint
     const mainHint = document.getElementById('mainLevelOverrideHint');
     const heroTargetTime = document.getElementById('heroTargetTime');
@@ -1213,7 +1227,12 @@ function updateOverrideHint() {
     const hasMainItra = mainItraInput?.value && parseInt(mainItraInput.value) >= 200;
     
     if (mainHint) {
-        mainHint.style.display = (hasMainTargetTime || hasMainItra) ? 'block' : 'none';
+        if (hasMainTargetTime || hasMainItra) {
+            mainHint.textContent = getHintText(hasMainTargetTime, hasMainItra);
+            mainHint.style.display = 'block';
+        } else {
+            mainHint.style.display = 'none';
+        }
     }
     
     // Race modal hint
@@ -1225,7 +1244,12 @@ function updateOverrideHint() {
     const hasRaceItra = raceItraInput?.value && parseInt(raceItraInput.value) >= 200;
     
     if (raceHint) {
-        raceHint.style.display = (hasRaceTargetTime || hasRaceItra) ? 'block' : 'none';
+        if (hasRaceTargetTime || hasRaceItra) {
+            raceHint.textContent = getHintText(hasRaceTargetTime, hasRaceItra);
+            raceHint.style.display = 'block';
+        } else {
+            raceHint.style.display = 'none';
+        }
     }
 }
 
